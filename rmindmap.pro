@@ -1,35 +1,35 @@
 HEADERS += \
-        edge.h \
-        node.h \
-        graphwidget.h \
-    mindtoolbar.h \
-    graphitemmodel.h \
-    mainwindow.h \
-    serializable.h \
-    graphedgemodel.h \
-    graphcommonmodel.h \
+        src/edge.h \
+        src/node.h \
+        src/graphwidget.h \
+    src/mindtoolbar.h \
+    src/graphitemmodel.h \
+    src/mainwindow.h \
+    src/serializable.h \
+    src/graphedgemodel.h \
+    src/graphcommonmodel.h \
 
 
 SOURCES += \
-        edge.cpp \
-        main.cpp \
-        node.cpp \
-        graphwidget.cpp \
-    mindtoolbar.cpp \
-    graphitemmodel.cpp \
-    mainwindow.cpp \
-    graphedgemodel.cpp \
-    graphcommonmodel.cpp \
+        src/edge.cpp \
+        src/main.cpp \
+        src/node.cpp \
+        src/graphwidget.cpp \
+    src/mindtoolbar.cpp \
+    src/graphitemmodel.cpp \
+    src/mainwindow.cpp \
+    src/graphedgemodel.cpp \
+    src/graphcommonmodel.cpp \
 
 
 
 
-include(preferences/preferences.pri)
-include(detailpanel/detailpanel.pri)
-include(widgets/widgets.pri)
-include(items/items.pri)
-include(browser/browser.pri)
-include(stringmanager/stringmanager.pri)
+include(src/preferences/preferences.pri)
+include(src/detailpanel/detailpanel.pri)
+include(src/widgets/widgets.pri)
+include(src/items/items.pri)
+include(src/browser/browser.pri)
+include(src/stringmanager/stringmanager.pri)
 
 
 INCLUDEPATH += widgets
