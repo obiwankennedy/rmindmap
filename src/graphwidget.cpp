@@ -14,8 +14,8 @@
 
 #include <math.h>
 
-GraphWidget::GraphWidget(QWidget *parent)
-    : QGraphicsView(parent)
+GraphWidget::GraphWidget(StringManager* stringManager,QWidget *parent)
+    : QGraphicsView(parent),m_stringManager(stringManager)
 {
     lastAddedPackage = NULL;
     m_currentEdgeBrush = NULL;
@@ -422,6 +422,7 @@ void GraphWidget::readFromData(QDataStream& out)
     for(int i=0; i<size;++i)
     {
         node = new Node(this);
+        node->setStringManager(m_stringManager);
         emit itemHasBeenAdded(node);
         node->readFromData(out);
         m_scene->addItem(node);

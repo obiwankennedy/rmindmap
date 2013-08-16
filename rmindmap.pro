@@ -32,7 +32,7 @@ include(src/browser/browser.pri)
 include(src/stringmanager/stringmanager.pri)
 
 
-INCLUDEPATH += widgets
+INCLUDEPATH += src/widgets src
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

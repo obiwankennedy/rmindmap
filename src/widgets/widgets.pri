@@ -1,5 +1,5 @@
 HEADERS += \
-    widgets/colorbutton.h
+    $$PWD/colorbutton.h
 
 SOURCES += \
-    widgets/colorbutton.cpp
+    $$PWD/colorbutton.cpp

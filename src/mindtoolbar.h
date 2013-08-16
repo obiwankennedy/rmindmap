@@ -12,13 +12,14 @@
 #include "graphitemmodel.h"
 #include "graphedgemodel.h"
 #include "graphcommonmodel.h"
+#include "stringmanager/stringmanager.h"
 
 class MindToolBar : public QWidget, public SettingsUser
 {
     Q_OBJECT
 public:
     enum MINDTOOL { NONE, HANDLE,ADD_ITEM,DEL_ITEM, ARROW, ADD_BREAK, DEL_BREAK , ADD_GEO};
-    explicit MindToolBar(QWidget *parent = 0);
+    explicit MindToolBar(StringManager* stringManager,QWidget *parent = 0);
 
     void setupUi();
 
@@ -67,6 +68,8 @@ private:
     QPushButton* m_delBreak;
 
     QButtonGroup* m_group;
+
+    StringManager* m_stringManager;
 
 };
 

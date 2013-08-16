@@ -1,7 +1,7 @@
 HEADERS += \
-    browser/itembrowser.h \
-    browser/itembrowsermodel.h
+    $$PWD/itembrowser.h \
+    $$PWD/itembrowsermodel.h
 
 SOURCES += \
-    browser/itembrowser.cpp \
-    browser/itembrowsermodel.cpp
+    $$PWD/itembrowser.cpp \
+    $$PWD/itembrowsermodel.cpp

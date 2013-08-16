@@ -8,10 +8,10 @@
 
 #include "items/packageitem.h"
 
-MindToolBar::MindToolBar(QWidget *parent) :
-    QWidget(parent)
+MindToolBar::MindToolBar(StringManager* stringManager,QWidget *parent) :
+    QWidget(parent),m_stringManager(stringManager)
 {
-    m_model=new GraphItemModel();
+    m_model=new GraphItemModel(m_stringManager);
     m_group = new QButtonGroup();
     m_edgeModel = new GraphEdgeModel();
     m_commonModel = new GraphCommonModel();

@@ -10,10 +10,12 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    m_widget = new GraphWidget(this);
-    m_mindtoolbar = new MindToolBar(this);
+    m_stringManager = new StringManager();
+    m_widget = new GraphWidget(m_stringManager,this);
+    m_mindtoolbar = new MindToolBar(m_stringManager,this);
     m_detailpanel = new DetailPanel(this);
     m_browser = new ItemBrowser;
+
 
     m_title = tr("%1[*] - MindMap Rolisteam - v0.0.1");
     setObjectName("MainWindow");

@@ -1,8 +1,9 @@
 HEADERS += \
-    items/genericmindmapitem.h \
-    items/packageitem.h \
-    items/edgebreak.h
+    $$PWD/genericmindmapitem.h \
+   $$PWD/packageitem.h \
+    $$PWD/edgebreak.h
 
 SOURCES += \
-    items/packageitem.cpp \
-    items/edgebreak.cpp
+    $$PWD/packageitem.cpp \
+    $$PWD/edgebreak.cpp \
+    src/items/genericmindmapitem.cpp

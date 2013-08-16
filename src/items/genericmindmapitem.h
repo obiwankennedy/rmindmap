@@ -3,8 +3,9 @@
 
 #include <QGraphicsItem>
 
+#include "stringmanager/stringmanager.h"
 
-#include "serializable.h"
+#include "src/serializable.h"
 
 
 class GenericMindMapItem : public QGraphicsObject,public Serialisable
@@ -17,13 +18,17 @@ public:
 
 
 
+    virtual void setStringManager(StringManager* stringManager);
 
 public slots:
    virtual void setText(QString) = 0;
    virtual void setName(QString&) = 0;
 
+protected:
+    StringManager* m_stringManager;
 
 };
+
 class Edge;
 class EdgableItems : public GenericMindMapItem
 {

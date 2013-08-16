@@ -26,6 +26,8 @@ public:
     void writeSettings(QSettings& settings);
 
 
+
+
 private:
     QList<Edge*>* m_list;
 };

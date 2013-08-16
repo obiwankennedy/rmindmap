@@ -81,7 +81,7 @@ Edge::Edge(EdgableItems *sourceNode)
 
 
     m_dest = NULL;
-    qDebug()<< sourceNode;
+
     if(sourceNode!=NULL)
     {
         m_source = sourceNode;
@@ -95,6 +95,7 @@ void Edge::init()
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setCacheMode(NoCache);
+
 
 
      m_endkind = BOTH;
@@ -339,6 +340,7 @@ void Edge::lookUpPoint()
 
 QString Edge::getText() const
 {
+
     return m_text;
 }
 

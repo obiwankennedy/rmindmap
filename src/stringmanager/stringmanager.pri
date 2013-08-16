@@ -1,5 +1,5 @@
 HEADERS += \
-    stringmanager/stringmanager.h
+    $$PWD/stringmanager.h
 
 SOURCES += \
-    stringmanager/stringmanager.cpp
+    $$PWD/stringmanager.cpp

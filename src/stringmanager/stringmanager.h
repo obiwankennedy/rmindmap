@@ -2,12 +2,14 @@
 #define STRINGMANAGER_H
 
 #include <QObject>
+#include <QList>
+#include <QMap>
 
-#include <serializable.h>
+#include "src/serializable.h"
 /**
  * @brief The StringManager class - provides features to translate a mindmap dynamically.
  */
-class StringManager : public QObject, public SettingsUser
+class StringManager : public QObject, public Serialisable
 {
     Q_OBJECT
 public:
@@ -15,12 +17,12 @@ public:
 
     void setValue(QString key, QString value);
 
-    QString& getValue(QString key);
+    QString getValue(QString key);
 
     void setCurrentLang(int);
 
-    virtual void readSettings(QSettings&);
-    virtual void writeSettings(QSettings&);
+    virtual void readFromData(QDataStream&);
+    virtual void writeToData(QDataStream&);
 
 
 private:

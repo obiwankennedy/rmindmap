@@ -218,11 +218,19 @@ void Node::setText(QString text)
     QFont font;
     QFontMetrics info(font);
     m_textRect = info.boundingRect(m_text);
+    if(NULL!=m_stringManager)
+    {
+        m_stringManager->setValue(tr("%1_%2").arg(m_id).arg("text"),text);
+    }
 }
 
 QString Node::getText() const
 {
-    return m_text;
+    if(NULL!=m_stringManager)
+    {
+        return m_stringManager->getValue(tr("%1_%2").arg(m_id).arg("text"));
+    }
+    return QString();
 }
 
 

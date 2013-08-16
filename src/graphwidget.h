@@ -8,6 +8,7 @@
 #include "mindtoolbar.h"
 #include "serializable.h"
 #include "items/edgebreak.h"
+#include "stringmanager/stringmanager.h"
 
 class Node;
 class QAction;
@@ -20,7 +21,7 @@ class GraphWidget : public QGraphicsView,public Serialisable
     Q_OBJECT
 
 public:
-    GraphWidget(QWidget *parent = 0);
+    GraphWidget(StringManager* stringManager,QWidget *parent = 0);
 
     virtual void readFromData(QDataStream&);
     virtual void writeToData(QDataStream&);
@@ -120,6 +121,8 @@ private:
     QAction* m_boundItemsAct;
 
     QPoint m_point;
+
+    StringManager* m_stringManager;
 };
 
 #endif

@@ -5,12 +5,14 @@
 #include <QSettings>
 
 #include "node.h"
+#include "stringmanager/stringmanager.h"
+
 class PreferencesManager;
 
 class GraphItemModel : public QAbstractListModel
 {
 public:
-    GraphItemModel();
+    GraphItemModel(StringManager* stringManager);
     ~GraphItemModel();
     int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
     QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
@@ -26,11 +28,12 @@ public:
 
     void readSettings(QSettings& settings);
     void writeSettings(QSettings& settings);
-
+    void setStringManager(StringManager* stringManager);
 
 private:
     QList<Node*>* m_list;
     PreferencesManager* m_preferences;
+    StringManager* m_stringManager;
 
 };
 

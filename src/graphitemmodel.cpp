@@ -5,7 +5,8 @@
 
 
 
-GraphItemModel::GraphItemModel()
+GraphItemModel::GraphItemModel(StringManager* stringManager)
+    : m_stringManager(stringManager)
 {
     m_list = new QList<Node*>();
     m_preferences = PreferencesManager::getInstance();
@@ -57,6 +58,7 @@ void GraphItemModel::readSettings(QSettings& settings)
      for (int i = 0; i < size; ++i) {
          settings.setArrayIndex(i);
          tmp=new Node(NULL);
+         tmp->setStringManager(m_stringManager);
          tmp->setText(settings.value("text").toString());
          tmp->setBgColor(settings.value("bgcolor").value<QColor>());
          tmp->setColor(settings.value("color").value<QColor>());
@@ -70,17 +72,20 @@ void GraphItemModel::readSettings(QSettings& settings)
     {
         Node* tmp=new Node(NULL);
         tmp->setColor(Qt::blue);
+        tmp->setStringManager(m_stringManager);
         tmp->setText(tr("Male"));
         addItems(tmp);
 
         tmp=new Node(NULL);
         tmp->setColor(Qt::red);
         tmp->setText(tr("Female"));
+        tmp->setStringManager(m_stringManager);
         addItems(tmp);
 
         tmp=new Node(NULL);
         tmp->setColor(Qt::green);
         tmp->setText(tr("Place"));
+        tmp->setStringManager(m_stringManager);
         addItems(tmp);
     }
 }

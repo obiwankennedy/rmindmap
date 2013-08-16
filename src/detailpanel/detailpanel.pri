@@ -1,8 +1,8 @@
 HEADERS += \
-    detailpanel/detailpanel.h
+    $$PWD/detailpanel.h
 
 SOURCES += \
-    detailpanel/detailpanel.cpp
+    $$PWD/detailpanel.cpp
 
 FORMS += \
-    detailpanel/detailpanel.ui
+    $$PWD/detailpanel.ui

@@ -10,6 +10,8 @@
 #include "preferences/preferencesmanager.h"
 
 #include "browser/itembrowser.h"
+#include "stringmanager/stringmanager.h"
+
 
 class DetailPanel;
 
@@ -85,6 +87,7 @@ private://attributs
 
    DetailPanel* m_detailpanel;
    ItemBrowser* m_browser;
+   StringManager* m_stringManager;
     
 };
 

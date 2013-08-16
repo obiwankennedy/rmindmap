@@ -2,7 +2,7 @@
 #define SERIALIZABLE_H
 
 #include <QSettings>
-
+#include <QDataStream>
 
 class SettingsUser
 {
