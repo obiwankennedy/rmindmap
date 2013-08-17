@@ -272,10 +272,10 @@ void Node::setDescription(QString desc)
 void Node::readFromData(QDataStream& in)
 {
     in >> m_text;
-    setText(m_text);
     in >> m_bgcolor;
     in >> m_color;
     in >> m_id;
+    setText(m_text);
     QPointF point;
     in >> point;
 
@@ -315,4 +315,9 @@ QPixmap Node::getIcon() const
 QPointF Node::middlePoint()
 {
     return QPointF(0,0);
+}
+void Node::setUuid(QString uuid)
+{
+    qDebug() << "uuid" << uuid;
+    m_id = uuid;
 }

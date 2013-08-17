@@ -386,6 +386,7 @@ void GraphWidget::addNodeAt(QPoint pos)
     m_scene->addItem(node);
     m_nodeList->append(node);
     node->setPos(pos.x(),pos.y());
+    node->setStringManager(m_stringManager);
     node->setColor(m_currentNodeBrush->color());
     node->setBgColor(m_currentNodeBrush->bgColor());
     node->setText(m_currentNodeBrush->getText());

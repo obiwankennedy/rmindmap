@@ -81,6 +81,7 @@ public:
     virtual void writeToData(QDataStream&);
 
     QString getUuid();
+    void setUuid(QString uuid);
 
     void updateEdges();
     virtual QString getName() const;

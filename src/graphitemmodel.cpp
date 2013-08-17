@@ -59,6 +59,7 @@ void GraphItemModel::readSettings(QSettings& settings)
          settings.setArrayIndex(i);
          tmp=new Node(NULL);
          tmp->setStringManager(m_stringManager);
+         tmp->setUuid(settings.value("id").toString());
          tmp->setText(settings.value("text").toString());
          tmp->setBgColor(settings.value("bgcolor").value<QColor>());
          tmp->setColor(settings.value("color").value<QColor>());
@@ -100,6 +101,7 @@ void GraphItemModel::writeSettings(QSettings& settings)
         settings.setValue("text", m_list->at(i)->getText());
         settings.setValue("bgcolor", m_list->at(i)->bgColor());
         settings.setValue("color",m_list->at(i)->color());
+        settings.setValue("id",m_list->at(i)->getUuid());
 
     }
     settings.endArray();

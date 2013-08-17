@@ -15,7 +15,11 @@ void StringManager::readFromData(QDataStream& out)
     m_availableLang = settings.value("Availablelang");
     m_currentLang = settings.value("currentlang");*/
     out >> m_availableLang;
-    out >> m_currentLang;
+    QMap<QString,QString> lang;
+    out >> lang;
+    m_currentLang.unite(lang);
+
+    qDebug()<< m_currentLang.size() << m_availableLang.size();
 
 }
 
@@ -36,6 +40,7 @@ void StringManager::setValue(QString key, QString value)
 
 QString StringManager::getValue(QString key)
 {
+    qDebug()<< "Asked key" << key;
     return m_currentLang.value(key);
 }
 

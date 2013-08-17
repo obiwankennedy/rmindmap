@@ -270,6 +270,7 @@ void MainWindow::readFile()
     if (file.open(QIODevice::ReadOnly))
     {
         QDataStream in(&file);
+        m_stringManager->readFromData(in);
         m_widget->readFromData(in);
         file.close();
 
@@ -322,6 +323,7 @@ void MainWindow::saveMindMap()
     if (file.open(QIODevice::WriteOnly))
     {
         QDataStream in(&file);
+        m_stringManager->writeToData(in);
         m_widget->writeToData(in);
         file.close();
     }
