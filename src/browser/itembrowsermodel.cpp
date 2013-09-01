@@ -128,7 +128,7 @@ QVariant ItemBrowserModel::data ( const QModelIndex & index, int role  ) const
       //       return QVariant();
 
     TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
-         if (role == Qt::DisplayRole)
+    if((role == Qt::DisplayRole)||(role==Qt::EditRole))
          {
              return item->getData()->getText();
          }

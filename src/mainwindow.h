@@ -69,7 +69,7 @@ private://attributs
     QAction* m_exitAct;
 
     QAction* m_svgExportAct;
-    QAction* m_bipmapExportAct;
+    QAction* m_pngExportAct;
 
     QAction* m_zoomInAct;
     QAction* m_zoomOutAct;

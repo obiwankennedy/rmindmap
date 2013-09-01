@@ -149,7 +149,7 @@ void MainWindow::makeMenu()
     m_fileMenu->addSeparator();
     m_exportMenu =  m_fileMenu->addMenu(tr("&Export"));
     m_exportMenu->addAction(m_svgExportAct);
-    m_exportMenu->addAction(m_bipmapExportAct);
+    m_exportMenu->addAction(m_pngExportAct);
     m_fileMenu->addSeparator();
     refreshOpenedFile();
     m_fileMenu->addSeparator();
@@ -204,9 +204,9 @@ void MainWindow::makeAction()
     m_svgExportAct->setStatusTip(tr("Export the map as SVG file"));
     connect(m_svgExportAct, SIGNAL(triggered()), this, SLOT(exportMap()));
 
-    m_bipmapExportAct= new QAction(tr("Bipmap"), this);
-    m_bipmapExportAct->setStatusTip(tr("Export the map as Bipmap file"));
-    connect(m_bipmapExportAct, SIGNAL(triggered()), this, SLOT(exportMap()));
+    m_pngExportAct= new QAction(tr("Image"), this);
+    m_pngExportAct->setStatusTip(tr("Export the map as Image file"));
+    connect(m_pngExportAct, SIGNAL(triggered()), this, SLOT(exportMap()));
 
     m_zoomInAct = new QAction(tr("Zoom In"),this);
     m_zoomInAct->setShortcut(tr("Ctrl++"));
@@ -348,9 +348,9 @@ void MainWindow::exportMap()
         m_widget->dumpMapInSvg(uri);
 
     }
-    else if(obj == m_bipmapExportAct)
+    else if(obj == m_pngExportAct)
     {
-        QString uri = QFileDialog::getSaveFileName(this, tr("export Mind Map as Bipmap"), m_preferences->value("MindMapDirectory",QDir::homePath()).toString(), tr("Bipmap file (*.png, *.jpg, *.bmp)"));
+        QString uri = QFileDialog::getSaveFileName(this, tr("export Mind Map as Image"), m_preferences->value("MindMapDirectory",QDir::homePath()).toString(), tr("Bipmap file (*.png, *.jpg, *.bmp)"));
         m_widget->dumpMapInBipmap(uri);
     }
 }
