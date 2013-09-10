@@ -584,7 +584,9 @@ void GraphWidget::dumpMapInSvg(QString file)
 
     svgGen.setFileName(file);
     svgGen.setSize(m_scene->sceneRect().size().toSize());
-    svgGen.setViewBox(viewport()->rect());
+    QRectF viewBox = m_scene->sceneRect();
+    //viewBox.setX();
+    svgGen.setViewBox(viewBox);
     svgGen.setTitle(tr("Export Map in SVG"));
     svgGen.setDescription(tr("the mind map is rendering in the svg format"));
 
@@ -592,7 +594,7 @@ void GraphWidget::dumpMapInSvg(QString file)
     QPainter painter;
     painter.begin(&svgGen );
     painter.setRenderHint(QPainter::Antialiasing);
-    m_scene->render( &painter );
+    m_scene->render( &painter,m_scene->sceneRect(),mapToScene(viewport()->rect()).boundingRect());
     painter.end();
 }
 
