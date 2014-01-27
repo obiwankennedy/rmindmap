@@ -11,6 +11,7 @@
 class GenericMindMapItem : public QGraphicsObject,public Serialisable
 {
 public:
+    GenericMindMapItem();
    virtual QString getName() const = 0;
    virtual QString getText() const = 0;
 
