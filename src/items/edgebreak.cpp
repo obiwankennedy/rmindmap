@@ -97,3 +97,7 @@ void EdgeBreak::updateEdges()
         edge->adjust();
     }
 }
+void EdgeBreak::setGeometry(int w,int h)
+{
+
+}
