@@ -25,6 +25,8 @@ public:
     virtual void readFromData(QDataStream&);
     virtual void writeToData(QDataStream&);
 
+    void setGeometry(int w,int h);
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
