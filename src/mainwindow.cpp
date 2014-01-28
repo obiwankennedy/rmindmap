@@ -24,12 +24,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_mindtoolbar,SIGNAL(currentToolChanged(MindToolBar::MINDTOOL)),m_widget,SLOT(setCurrentTool(MindToolBar::MINDTOOL)));
     connect(m_mindtoolbar,SIGNAL(currentEdgeBrushChanged(Edge*)),m_widget,SLOT(setCurrentEdgeBrush(Edge*)));
 
-    connect(m_widget,SIGNAL(currentEdge(Edge*)),m_detailpanel,SLOT(setCurrentEdge(Edge*)));
-    connect(m_widget,SIGNAL(currentNode(Node*)),m_detailpanel,SLOT(setCurrentNode(Node*)));
-    connect(m_widget,SIGNAL(currentPackage(PackageItem*)),m_detailpanel,SLOT(setCurrentPackage(PackageItem*)));
-    connect(m_widget,SIGNAL(currentPackage(PackageItem*)),m_detailpanel,SLOT(show()));
-    connect(m_widget,SIGNAL(currentEdge(Edge*)),m_detailpanel,SLOT(show()));
-    connect(m_widget,SIGNAL(currentNode(Node*)),m_detailpanel,SLOT(show()));
+    connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
+    connect(m_widget,SIGNAL(currentNode(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
+    connect(m_widget,SIGNAL(currentPackage(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
+
+    connect(m_widget,SIGNAL(currentPackage(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
+    connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
+    connect(m_widget,SIGNAL(currentNode(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
     connect(m_widget,SIGNAL(selectionIsEmpty()),m_detailpanel,SLOT(hide()));
     connect(m_widget,SIGNAL(nodeAsBrush(Node*)),m_mindtoolbar,SLOT(addNodeBrush(Node*)));
 
@@ -43,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_preferences = PreferencesManager::getInstance();
 
     connect(m_browser,SIGNAL(selectionChanged(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
-
+    connect(m_browser,SIGNAL(selectionChanged(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
 
     m_recentFileActions = new QList<QAction*>();
 
