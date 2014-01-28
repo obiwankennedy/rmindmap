@@ -18,6 +18,7 @@ PackageItem::PackageItem() : m_name("Package")
     m_id = QUuid::createUuid().toString();
     m_topLeft.setX(0);
     m_topLeft.setY(0);
+    updateHW();
 }
 
 void PackageItem::setName(QString& q)
@@ -41,7 +42,7 @@ QString PackageItem::getText() const
 }
 QRectF PackageItem::boundingRect() const
 {
-    QRectF r(0, 0, m_bottomRight.x()-m_topLeft.x(),m_bottomRight.y()-m_topLeft.y());
+    QRectF r(0, 0, m_w,m_h);
     //rect.translate(lastAddedPackage->pos());
 
 
@@ -85,7 +86,7 @@ void PackageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 void PackageItem::setTopLeft(QPointF p )
 {
     m_topLeft=p;
-    //setPos(p);
+    updateHW();
 
 
 }
@@ -97,8 +98,7 @@ void  PackageItem::setGrap(GraphWidget* g)
 void PackageItem::setBottomRight(QPointF p)
 {
     m_bottomRight=p;
-    /*m_bottomRight.setX(m_bottomRight.x()-pos().x());
-    m_bottomRight.setY(m_bottomRight.y()-pos().y());*/
+updateHW();
     update();
 }
 void PackageItem::setBorder(PackageItem::Border b)
@@ -132,6 +132,7 @@ void PackageItem::readFromData(QDataStream& in)
 
     }
     setPos(pos);
+    updateHW();
 
 }
 QVariant PackageItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -205,4 +206,16 @@ QString PackageItem::getUuid()
 QPointF PackageItem::middlePoint()
 {
     return boundingRect().center();
+}
+void PackageItem::updateHW()
+{
+    m_w = m_bottomRight.x()-m_topLeft.x();
+    m_h = m_bottomRight.y()-m_topLeft.y();
+}
+void PackageItem::setGeometry(int w, int h)
+{
+    m_bottomRight.setX(m_topLeft.x()+w);
+    m_bottomRight.setY(m_topLeft.y()+h);
+
+    updateHW();
 }
