@@ -41,7 +41,7 @@ QString PackageItem::getText() const
 }
 QRectF PackageItem::boundingRect() const
 {
-    QRectF r(m_topLeft,m_bottomRight);
+    QRectF r(0, 0, m_bottomRight.x()-m_topLeft.x(),m_bottomRight.y()-m_topLeft.y());
     //rect.translate(lastAddedPackage->pos());
 
 
@@ -49,7 +49,13 @@ QRectF PackageItem::boundingRect() const
     //r.moveTop(-r.height()/2);
 
 
-    //qDebug() << "rect:" << r << " pos:"<< pos() << " parent:"<< parent();
+
+
+//    r.setX(0);
+//    r.setY(0);
+
+    //qDebug() << "rect:" << r << " pos:"<< pos() << r;
+
     return r;
 }
 QRectF PackageItem::rect()
@@ -73,7 +79,7 @@ void PackageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
         QRect r = option->fontMetrics.boundingRect(m_title);
-    painter->drawText(boundingRect().x()+20,boundingRect().y(),r.width(),r.height(),Qt::AlignCenter, m_title);
+    painter->drawText(boundingRect().x(),boundingRect().y(),r.width(),r.height(),Qt::AlignCenter, m_title);
 
 }
 void PackageItem::setTopLeft(QPointF p )
