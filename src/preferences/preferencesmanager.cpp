@@ -88,7 +88,7 @@ void PreferencesManager::readSettings(QSettings & settings)
 
    for(int i = 0;m_optionDictionary->size()>i;i++)
     {
-       qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
+      // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
 
 
     }
@@ -104,7 +104,7 @@ void PreferencesManager::writeSettings(QSettings & settings)
 
     for(int i = 0;m_optionDictionary->size()>i;i++)
      {
-        qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
+       // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
 
 
      }
