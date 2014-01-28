@@ -471,3 +471,7 @@ EdgableItems* Edge::getSource()
 {
     return m_source;
 }
+void Edge::setGeometry(int w,int h)
+{
+
+}
