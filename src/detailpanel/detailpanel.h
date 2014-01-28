@@ -30,6 +30,7 @@ public slots:
     void updateCurrentNode();
     void updateCurrentEdge();
     void updateCurrentPackage();
+    void updateGenericItem();
     
 private:
     Ui::DetailPanel *ui;
@@ -37,6 +38,7 @@ private:
     Node* m_currentNode;
     Edge* m_currentEdge;
     PackageItem* m_currentPackage;
+    GenericMindMapItem* m_currentGenericItem;
 };
 
 #endif // DETAILPANEL_H
