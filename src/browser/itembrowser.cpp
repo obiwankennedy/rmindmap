@@ -20,6 +20,8 @@ ItemBrowser::ItemBrowser()
     m_removeItem = new QAction(tr("Remove Items"),this);
     connect(m_view,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(contextMenu(QPoint)));
     connect(m_removeItem,SIGNAL(triggered()),this,SLOT(removeCurrentItem()));
+
+    connect(m_view,SIGNAL(doubleClicked(QModelIndex)),this, SLOT(editIndex(QModelIndex)));
 }
 void ItemBrowser::addItem(GenericMindMapItem* p)
 {
@@ -53,4 +55,9 @@ void ItemBrowser::removeCurrentItem()
     }
     m_model->removeItem(m_view->currentIndex());
 
+}
+void ItemBrowser::editIndex(const QModelIndex& index)
+{
+     GenericMindMapItem* item = m_model->indexToMindMapItem(index);
+     emit selectionChanged(item);
 }
