@@ -24,6 +24,9 @@ public slots:
     void removeItem(GenericMindMapItem*);
     void clear();
 
+
+    void editIndex(const QModelIndex& index);
+
 signals:
     void selectionChanged(GenericMindMapItem*);
     void itemHasBeenDeleted(GenericMindMapItem* item);
