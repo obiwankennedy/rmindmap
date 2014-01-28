@@ -38,6 +38,10 @@ public:
 
     virtual QPointF middlePoint();
 
+    virtual void setGeometry(int w, int h);
+
+    virtual void updateHW();
+
 public slots:
     void setName(QString&);
     void setText(QString q);
@@ -61,6 +65,8 @@ private:
     QPointF m_bottomRight;
     PackageItem::Border m_border;
     QList<Edge *> m_edgeList;
+    quint64 m_w;
+    quint64 m_h;
 };
 
 #endif // PACKAGEITEM_H
