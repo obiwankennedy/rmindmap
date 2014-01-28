@@ -22,6 +22,9 @@ DetailPanel::DetailPanel(QWidget *parent) :
     connect(ui->m_packageText,SIGNAL(textEdited(QString)),this,SLOT(updateCurrentPackage()));
     connect(ui->m_packageLine,SIGNAL(currentIndexChanged(int)),this,SLOT(updateCurrentPackage()));
 
+    connect(ui->m_xEdit,SIGNAL(valueChanged(int)),this,SLOT(updateCurrentPackage()));
+    connect(ui->m_yEdit,SIGNAL(valueChanged(int)),this,SLOT(updateCurrentPackage()));
+
 
 }
 
@@ -84,6 +87,7 @@ void DetailPanel::updateCurrentPackage()
     {
         m_currentPackage->setText(ui->m_packageText->text());
         m_currentPackage->setBorder((PackageItem::Border)ui->m_packageLine->currentIndex());
+        m_currentPackage->setPos(ui->m_xEdit->value(),ui->m_yEdit->value());
     }
 }
 void DetailPanel::setCurrentPackage(PackageItem* p)
@@ -93,6 +97,24 @@ void DetailPanel::setCurrentPackage(PackageItem* p)
     m_currentPackage = NULL;
     ui->m_stackedWidget->setCurrentIndex(2);
     ui->m_packageText->setText(p->getText());
+    ui->m_xEdit->setValue(p->pos().x());
+    ui->m_yEdit->setValue(p->pos().y());
 
     m_currentPackage = p;
+}
+
+void DetailPanel::setCurrentGenericItem(GenericMindMapItem* p)
+{
+    if(NULL!=dynamic_cast<PackageItem*>(p))
+    {
+        setCurrentPackage(dynamic_cast<PackageItem*>(p));
+    }
+    else if(NULL!=dynamic_cast<Node*>(p))
+    {
+        setCurrentNode(dynamic_cast<Node*>(p));
+    }
+    else if(NULL!=dynamic_cast<Edge*>(p))
+    {
+        setCurrentEdge(dynamic_cast<Edge*>(p));
+    }
 }
