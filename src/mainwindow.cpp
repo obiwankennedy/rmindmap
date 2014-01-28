@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_preferences = PreferencesManager::getInstance();
 
+    connect(m_browser,SIGNAL(selectionChanged(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
+
 
     m_recentFileActions = new QList<QAction*>();
 
