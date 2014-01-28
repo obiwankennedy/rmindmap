@@ -330,7 +330,7 @@ void GraphWidget::addGeoAt(QPointF pos)
 
         QRectF rect = lastAddedPackage->rect();
 
-        qDebug() << "Add parent" << rect;
+       // qDebug() << "Add parent" << rect;
         foreach(QGraphicsItem* item,m_scene->items(rect))
         {
             if(NULL!=dynamic_cast<Node*>(item))
@@ -524,14 +524,15 @@ void GraphWidget::attachedChild()
 
     if(tmp!=NULL)
     {
-        qDebug() << tmp->boundingRect() << m_point;
-        foreach(QGraphicsItem* item,m_scene->items(tmp->boundingRect()))
+        qDebug() << tmp->boundingRect() << tmp->pos();
+        foreach(QGraphicsItem* item,m_scene->items(tmp->boundingRect().translated(tmp->pos()),Qt::IntersectsItemBoundingRect))
         {
-            qDebug()<< item->boundingRect() << item->pos();
+            //qDebug()<< item->boundingRect() << item->pos();
             if(NULL!=dynamic_cast<Node*>(item))
             {
+                    Node* node = dynamic_cast<Node*>(item);
 
-                item->setParentItem(tmp);
+                   item->setParentItem(tmp);
             }
             if(NULL!=dynamic_cast<Edge*>(item))
             {
