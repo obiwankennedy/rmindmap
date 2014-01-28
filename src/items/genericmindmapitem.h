@@ -21,6 +21,8 @@ public:
 
     virtual void setStringManager(StringManager* stringManager);
 
+    virtual void setGeometry(int w,int h) = 0;
+
 public slots:
    virtual void setText(QString) = 0;
    virtual void setName(QString&) = 0;
