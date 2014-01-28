@@ -37,9 +37,9 @@ public:
     EdgableItems* getEdgableItemFromUuid(QString id);
 
 signals:
-    void currentNode(Node*);
-    void currentEdge(Edge*);
-    void currentPackage(PackageItem*);
+    void currentNode(GenericMindMapItem*);
+    void currentEdge(GenericMindMapItem*);
+    void currentPackage(GenericMindMapItem*);
 
     void selectionIsEmpty();
     void nodeAsBrush(Node*);
