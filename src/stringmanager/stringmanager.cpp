@@ -19,7 +19,7 @@ void StringManager::readFromData(QDataStream& out)
     out >> lang;
     m_currentLang.unite(lang);
 
-    qDebug()<< m_currentLang.size() << m_availableLang.size();
+   // qDebug()<< m_currentLang.size() << m_availableLang.size();
 
 }
 
@@ -34,13 +34,13 @@ void StringManager::writeToData(QDataStream& in)
 }
 void StringManager::setValue(QString key, QString value)
 {
-    qDebug()<< key << value;
+   // qDebug()<< key << value;
     m_currentLang.insert(key,value);
 }
 
 QString StringManager::getValue(QString key)
 {
-    qDebug()<< "Asked key" << key;
+//    qDebug()<< "Asked key" << key;
     return m_currentLang.value(key);
 }
 
