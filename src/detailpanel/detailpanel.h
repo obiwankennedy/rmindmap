@@ -25,6 +25,7 @@ public slots:
     void setCurrentNode(Node*);
     void setCurrentEdge(Edge*);
     void setCurrentPackage(PackageItem*);
+    void setCurrentGenericItem(GenericMindMapItem* p);
 
     void updateCurrentNode();
     void updateCurrentEdge();
