@@ -318,6 +318,10 @@ QPointF Node::middlePoint()
 }
 void Node::setUuid(QString uuid)
 {
-    qDebug() << "uuid" << uuid;
+   // qDebug() << "uuid" << uuid;
     m_id = uuid;
+}
+void Node::setGeometry(int w,int h)
+{
+
 }
