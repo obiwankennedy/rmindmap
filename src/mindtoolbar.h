@@ -35,6 +35,7 @@ signals:
 
 public slots:
     void addNodeBrush(Node*);
+    void currentToolHasChanged(MindToolBar::MINDTOOL);
 
 private slots:
     void clickOn(QModelIndex );
