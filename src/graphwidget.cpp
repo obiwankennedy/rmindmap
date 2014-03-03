@@ -46,15 +46,15 @@ GraphWidget::GraphWidget(StringManager* stringManager,QWidget *parent)
 
 void GraphWidget::initAction()
 {
-     m_editAct = new QAction(tr("Edit"),this);
-     m_editAct->setToolTip(tr("Edit item text"));
-     //m_actionZoomIn->setIcon(QIcon(":/resources/icons/zoom-in-32.png"));
-     connect(m_editAct,SIGNAL(triggered()),this,SLOT(editItem()));
+    m_editAct = new QAction(tr("Edit"),this);
+    m_editAct->setToolTip(tr("Edit item text"));
+    //m_actionZoomIn->setIcon(QIcon(":/resources/icons/zoom-in-32.png"));
+    connect(m_editAct,SIGNAL(triggered()),this,SLOT(editItem()));
 
-     m_removeAct = new QAction(tr("Remove"),this);
-     //m_removeAct->setIcon(QIcon(":/resources/icons/zoom-out-32.png"));
-     m_removeAct->setToolTip(tr("Remove item"));
-     connect(m_removeAct,SIGNAL(triggered()),this,SLOT(removeItem()));
+    m_removeAct = new QAction(tr("Remove"),this);
+    //m_removeAct->setIcon(QIcon(":/resources/icons/zoom-out-32.png"));
+    m_removeAct->setToolTip(tr("Remove item"));
+    connect(m_removeAct,SIGNAL(triggered()),this,SLOT(removeItem()));
 
     m_addAsBrushAct = new QAction(tr("Save Style"),this);
     //m_removeAct->setIcon(QIcon(":/resources/icons/zoom-out-32.png"));
@@ -70,22 +70,22 @@ void GraphWidget::initAction()
 void GraphWidget::removeItem()
 {
     QList<QGraphicsItem*> items= m_scene->selectedItems();
-        for(int i =0; ((i<items.size()));++i)
+    for(int i =0; ((i<items.size()));++i)
+    {
+        m_scene->removeItem(items[i]);
+        if(NULL!=dynamic_cast<Node*>(items[i]))
         {
-            m_scene->removeItem(items[i]);
-            if(NULL!=dynamic_cast<Node*>(items[i]))
-            {
-                m_nodeList->removeAll(dynamic_cast<Node*>(items[i]));
-            }
-            if(NULL!=dynamic_cast<Edge*>(items[i]))
-            {
-                m_edgeList->removeAll(dynamic_cast<Edge*>(items[i]));
-            }
-            if(NULL!=dynamic_cast<PackageItem*>(items[i]))
-            {
-                m_packageList->removeAll(dynamic_cast<PackageItem*>(items[i]));
-            }
+            m_nodeList->removeAll(dynamic_cast<Node*>(items[i]));
         }
+        if(NULL!=dynamic_cast<Edge*>(items[i]))
+        {
+            m_edgeList->removeAll(dynamic_cast<Edge*>(items[i]));
+        }
+        if(NULL!=dynamic_cast<PackageItem*>(items[i]))
+        {
+            m_packageList->removeAll(dynamic_cast<PackageItem*>(items[i]));
+        }
+    }
 
 }
 
@@ -95,14 +95,14 @@ void GraphWidget::editItem()
 }
 void GraphWidget::makeBrush()
 {
-       QList<QGraphicsItem*> items= m_scene->selectedItems();
-        for(int i =0; ((i<items.size()));++i)
+    QList<QGraphicsItem*> items= m_scene->selectedItems();
+    for(int i =0; ((i<items.size()));++i)
+    {
+        if(NULL!=dynamic_cast<Node*>(items[i]))
         {
-            if(NULL!=dynamic_cast<Node*>(items[i]))
-            {
-                emit nodeAsBrush(dynamic_cast<Node*>(items[i]));
-            }
+            emit nodeAsBrush(dynamic_cast<Node*>(items[i]));
         }
+    }
 }
 
 void  GraphWidget::resizeEvent(QResizeEvent *event)
@@ -117,35 +117,35 @@ void  GraphWidget::resizeEvent(QResizeEvent *event)
 
 void GraphWidget::contextMenuEvent ( QContextMenuEvent * event )
 {
-   QMenu menu(this);
-   menu.addAction(m_editAct);
-   menu.addAction(m_removeAct);
-   menu.addAction(m_addAsBrushAct);
-   menu.addAction(m_boundItemsAct);
+    QMenu menu(this);
+    menu.addAction(m_editAct);
+    menu.addAction(m_removeAct);
+    menu.addAction(m_addAsBrushAct);
+    menu.addAction(m_boundItemsAct);
 
-   m_point = event->pos();
-   QGraphicsItem* item=itemAt(m_point);
-   if(NULL!=dynamic_cast<PackageItem*>(item))
-   {
-       m_boundItemsAct->setEnabled(true);
-   }
-   else
-   {
-       m_boundItemsAct->setEnabled(false);
-   }
-   if(NULL!=dynamic_cast<Node*>(item))
-   {
-       m_addAsBrushAct->setEnabled(true);
-   }
-   else
-   {
-       m_addAsBrushAct->setEnabled(false);
-   }
+    m_point = event->pos();
+    QGraphicsItem* item=itemAt(m_point);
+    if(NULL!=dynamic_cast<PackageItem*>(item))
+    {
+        m_boundItemsAct->setEnabled(true);
+    }
+    else
+    {
+        m_boundItemsAct->setEnabled(false);
+    }
+    if(NULL!=dynamic_cast<Node*>(item))
+    {
+        m_addAsBrushAct->setEnabled(true);
+    }
+    else
+    {
+        m_addAsBrushAct->setEnabled(false);
+    }
 
 
-   menu.exec(event->globalPos());
+    menu.exec(event->globalPos());
 
-   event->accept();
+    event->accept();
 
 }
 void GraphWidget::scaleView(qreal scaleFactor)
@@ -178,19 +178,19 @@ void GraphWidget::manageArrow(QMouseEvent *event)
 
             if(NULL!=dynamic_cast<EdgableItems*>(item))
             {
-                    lastAddedEdge = new Edge(dynamic_cast<EdgableItems*>(item));
-                    if(NULL!=m_currentEdgeBrush)
-                    {
-                        lastAddedEdge->setKind(m_currentEdgeBrush->getKind());
-                    }
+                lastAddedEdge = new Edge(dynamic_cast<EdgableItems*>(item));
+                if(NULL!=m_currentEdgeBrush)
+                {
+                    lastAddedEdge->setKind(m_currentEdgeBrush->getKind());
+                }
 
-                    emit itemHasBeenAdded(lastAddedEdge);
-                    lastAddedEdge->setGrap(this);
-                     m_scene->addItem(lastAddedEdge);
-                    m_edgeList->append(lastAddedEdge);
-                    m_begunArrow = false;
-                    setMouseTracking(true);
-                    lastAddedEdge->adjust();
+                emit itemHasBeenAdded(lastAddedEdge);
+                lastAddedEdge->setGrap(this);
+                m_scene->addItem(lastAddedEdge);
+                m_edgeList->append(lastAddedEdge);
+                m_begunArrow = false;
+                setMouseTracking(true);
+                lastAddedEdge->adjust();
             }
         }
     }
@@ -310,14 +310,14 @@ void GraphWidget::addGeoAt(QPointF pos)
 {
     if(m_begunGeo)
     {
-            lastAddedPackage = new PackageItem();
-            emit itemHasBeenAdded(lastAddedPackage);
-            lastAddedPackage->setTopLeft(pos);
-            //lastAddedPackage->setGrap(this);
-            m_scene->addItem(lastAddedPackage);
-            m_packageList->append(lastAddedPackage);
-            m_begunGeo = false;
-            setMouseTracking(true);
+        lastAddedPackage = new PackageItem();
+        emit itemHasBeenAdded(lastAddedPackage);
+        lastAddedPackage->setTopLeft(pos);
+        //lastAddedPackage->setGrap(this);
+        m_scene->addItem(lastAddedPackage);
+        m_packageList->append(lastAddedPackage);
+        m_begunGeo = false;
+        setMouseTracking(true);
 
     }
     else
@@ -330,7 +330,7 @@ void GraphWidget::addGeoAt(QPointF pos)
 
         QRectF rect = lastAddedPackage->rect();
 
-       // qDebug() << "Add parent" << rect;
+        // qDebug() << "Add parent" << rect;
         foreach(QGraphicsItem* item,m_scene->items(rect))
         {
             if(NULL!=dynamic_cast<Node*>(item))
@@ -358,10 +358,10 @@ void GraphWidget::buildEdge()
             if((NULL!=tmp1)&&(NULL!=tmp2)&&(tmp1!=tmp2))
             {
                 Edge* tmp = new Edge(tmp1, tmp2);
-              m_scene->addItem(tmp);
-              emit itemHasBeenAdded(tmp);
-              m_pointList->removeAt(i);
-              m_pointList->removeAt(i-1);
+                m_scene->addItem(tmp);
+                emit itemHasBeenAdded(tmp);
+                m_pointList->removeAt(i);
+                m_pointList->removeAt(i-1);
             }
             if(NULL==tmp1)
             {
@@ -530,9 +530,15 @@ void GraphWidget::attachedChild()
             //qDebug()<< item->boundingRect() << item->pos();
             if(NULL!=dynamic_cast<Node*>(item))
             {
-                    Node* node = dynamic_cast<Node*>(item);
+                Node* node = dynamic_cast<Node*>(item);
 
-                   item->setParentItem(tmp);
+                PackageItem* tmp2 = dynamic_cast<PackageItem*>(item->parentItem());
+
+                if(tmp2!=tmp)
+                {
+                    item->setParentItem(tmp);
+                    item->setPos(item->pos().x()-tmp->pos().x(),item->pos().y()-tmp->pos().y());
+                }
             }
             if(NULL!=dynamic_cast<Edge*>(item))
             {
@@ -546,32 +552,32 @@ void GraphWidget::attachedChild()
 
 void GraphWidget::selectionHasChanged()
 {
-        QList<QGraphicsItem*> items= m_scene->selectedItems();
-        if(items.isEmpty())
+    QList<QGraphicsItem*> items= m_scene->selectedItems();
+    if(items.isEmpty())
+    {
+        emit selectionIsEmpty();
+    }
+    else
+    {
+        bool unfound=true;
+        for(int i =0; ((i<items.size())&&(unfound));++i)
         {
-            emit selectionIsEmpty();
-        }
-        else
-        {
-            bool unfound=true;
-            for(int i =0; ((i<items.size())&&(unfound));++i)
+            if(NULL!=dynamic_cast<Node*>(items[i]))
             {
-                if(NULL!=dynamic_cast<Node*>(items[i]))
-                 {
-                     emit currentNode(dynamic_cast<Node*>(items[i]));
-                 }
-                else if(NULL!=dynamic_cast<Edge*>(items[i]))
-                {
-                    emit currentEdge(dynamic_cast<Edge*>(items[i]));
-                }
-                else if(NULL!=dynamic_cast<PackageItem*>(items[i]))
-                {
-                    emit currentPackage(dynamic_cast<PackageItem*>(items[i]));
-                }
-
+                emit currentNode(dynamic_cast<Node*>(items[i]));
             }
-       }
- }
+            else if(NULL!=dynamic_cast<Edge*>(items[i]))
+            {
+                emit currentEdge(dynamic_cast<Edge*>(items[i]));
+            }
+            else if(NULL!=dynamic_cast<PackageItem*>(items[i]))
+            {
+                emit currentPackage(dynamic_cast<PackageItem*>(items[i]));
+            }
+
+        }
+    }
+}
 void GraphWidget::cleanScene()
 {
     m_scene->clear();
