@@ -82,10 +82,12 @@ void MindToolBar::setupUi()
     m_group->addButton(m_handleItem);
     m_group->addButton(m_delBreak);
     m_group->addButton(m_addBreak);
+    m_group->setExclusive(false);
 
 
     connect(m_handleItem,SIGNAL(pressed()),this,SLOT(chooseTool()));
     connect(m_addBreak,SIGNAL(pressed()),this,SLOT(chooseTool()));
+    connect(this,SIGNAL(currentToolChanged(MindToolBar::MINDTOOL)),this, SLOT(currentToolHasChanged(MindToolBar::MINDTOOL)));
    // connect(m_arrow,SIGNAL(pressed()),this,SLOT(chooseTool()));
 
 
@@ -150,4 +152,115 @@ void MindToolBar::chooseTool()
 void MindToolBar::addNodeBrush(Node* node)
 {
     m_model->addItems(node);
+}
+void MindToolBar::currentToolHasChanged(MindToolBar::MINDTOOL tool)
+{
+    //NONE, HANDLE,ADD_ITEM,DEL_ITEM, ARROW, ADD_BREAK, DEL_BREAK , ADD_GEO
+    /*
+     *
+     *
+     * QPushButton* m_handleItem;
+
+    QPushButton* m_addItem;
+    QPushButton* m_delItem;
+
+    QPushButton* m_arrow;
+    QPushButton* m_addBreak;
+    QPushButton* m_delBreak;
+
+    QButtonGroup* m_group;
+*/
+    switch(tool)
+    {
+    case MindToolBar::NONE:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_addItem->setChecked(false);
+        m_delItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::HANDLE:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        //m_handleItem->setChecked(false);
+        m_delItem->setChecked(false);
+        m_addItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::ADD_ITEM:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_delItem->setChecked(false);
+        //m_addItem->setChecked(false);
+        //m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::DEL_ITEM:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_addItem->setChecked(false);
+        //m_delItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::ARROW:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_addItem->setChecked(false);
+        m_delItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        //m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::ADD_BREAK:
+        //m_arrow->setChecked(false);
+        //m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_addItem->setChecked(false);
+        m_delItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::DEL_BREAK:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        //m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_addItem->setChecked(false);
+        m_delItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        m_geoList->selectionModel()->clear();
+        break;
+    case MindToolBar::ADD_GEO:
+        //m_arrow->setChecked(false);
+        m_addBreak->setChecked(false);
+        m_delBreak->setChecked(false);
+        m_handleItem->setChecked(false);
+        m_addItem->setChecked(false);
+        m_delItem->setChecked(false);
+        m_itemList->selectionModel()->clear();
+        m_edgeList->selectionModel()->clear();
+        //m_geoList->selectionModel()->clear();
+        break;
+
+
+    }
 }
