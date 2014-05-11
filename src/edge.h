@@ -91,6 +91,9 @@ private:
 
     EndKind m_endkind;
 
+    QPointF m_sourceTanPoint;
+    QPointF m_destTanPoint;
+
 
 
 };

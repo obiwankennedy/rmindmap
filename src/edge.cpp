@@ -45,7 +45,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 #include <math.h>
-
+#include <QtCore/qmath.h>
 
 #include "edge.h"
 #include "items/genericmindmapitem.h"
@@ -206,7 +206,78 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         destPoint = sourcePoint;
     }
 
+/*    AB.AC = ABx*ACx + ABy*ACy + ABz*ACz
+    ||AB|| = sqrt(ABx²+ABy²+ABz²)
+    ||AC|| = sqrt(ACx²+ACy²+ACz²)
+*/
 
+
+    QPointF pointC= sourcePoint;
+    pointC.setX(pointC.x()+10);
+
+    QPointF AB(sourcePoint.x()-destPoint.x(),sourcePoint.y()-destPoint.y());
+    QPointF AC(sourcePoint.x()-pointC.x(),sourcePoint.y()-pointC.y());
+
+    qreal abac = AB.x()*AC.x()+AB.y()*AC.y();
+    qreal ABdist=sqrt(AB.x()*AB.x()+AB.y()*AB.y());
+    qreal ACdist=sqrt(AC.x()*AC.x()+AC.y()*AC.y());
+
+
+    qreal angleVector = qAcos(abac/(ABdist*ACdist));
+    qDebug() << angleVector;
+    bool above=sourcePoint.y() > destPoint.y() ? true : false;
+
+    if(angleVector<=Pi/4)//if source is on left of the destination.
+    {
+        double distx = (destPoint.x()-sourcePoint.x())/2;
+        qDebug() << "distx" << distx;
+        distx*=(angleVector > 1) ? 1 : angleVector;
+        m_sourceTanPoint.setX(sourcePoint.x()+distx);
+        m_sourceTanPoint.setY(sourcePoint.y());
+
+        m_destTanPoint.setX(destPoint.x()-distx);
+        m_destTanPoint.setY(destPoint.y());
+    }
+    else if(angleVector>=3*Pi/4)//if source is on right of the destination.
+    {
+
+        double distx = (sourcePoint.x()-destPoint.x())/2;
+        qDebug() << "distx" << distx;
+        distx*=(angleVector > 1) ? 1 : angleVector;
+        m_sourceTanPoint.setX(sourcePoint.x()-distx);
+        m_sourceTanPoint.setY(sourcePoint.y());
+
+        m_destTanPoint.setX(destPoint.x()+distx);
+        m_destTanPoint.setY(destPoint.y());
+    }
+    else if((angleVector<3*Pi/4)&&(angleVector>Pi/4)&&above)//if source is below of the destination.
+    {
+        double disty = (sourcePoint.y()-destPoint.y())/2;
+        qDebug() << "disty" << disty;
+        disty*=(angleVector > 1) ? 1 : angleVector;
+        m_sourceTanPoint.setX(sourcePoint.x());
+        m_sourceTanPoint.setY(sourcePoint.y()-disty);
+
+        m_destTanPoint.setX(destPoint.x());
+        m_destTanPoint.setY(destPoint.y()+disty);
+    }
+    else //if source is above of the destination.
+    {
+        double disty = (destPoint.y()-sourcePoint.y())/2;
+        disty*=(angleVector > 1) ? 1 : angleVector;
+        qDebug() << "disty" << disty;
+        m_sourceTanPoint.setX(sourcePoint.x());
+        m_sourceTanPoint.setY(sourcePoint.y()+disty);
+
+        m_destTanPoint.setX(destPoint.x());
+        m_destTanPoint.setY(destPoint.y()-disty);
+    }
+
+
+
+
+    QPainterPath path(sourcePoint);
+    path.cubicTo(m_sourceTanPoint,m_destTanPoint,destPoint);
 
 
     QLineF line(sourcePoint, destPoint);
@@ -217,6 +288,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         // Draw the line itself
     painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->drawLine(line);
+    painter->drawPath(path);
 
     painter->drawText(line.pointAt(0.5),m_text);
 

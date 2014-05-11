@@ -34,13 +34,11 @@ void StringManager::writeToData(QDataStream& in)
 }
 void StringManager::setValue(QString key, QString value)
 {
-   // qDebug()<< key << value;
     m_currentLang.insert(key,value);
 }
 
 QString StringManager::getValue(QString key)
 {
-//    qDebug()<< "Asked key" << key;
     return m_currentLang.value(key);
 }
 
