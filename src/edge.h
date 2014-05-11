@@ -94,6 +94,8 @@ private:
     QPointF m_sourceTanPoint;
     QPointF m_destTanPoint;
 
+    bool m_showTanPoints;
+
 
 
 };
