@@ -231,7 +231,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     if(angleVector<=Pi/2)//if source is on left of the destination.
     {
         double distx = (destPoint.x()-sourcePoint.x())/2;
-        qDebug() << "distx" << distx;
+
         distx*=(angleVector > 1) ? 1 : angleVector;
         m_sourceTanPoint.setX(sourcePoint.x()+distx);
         m_sourceTanPoint.setY(sourcePoint.y());
@@ -243,7 +243,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     {
 
         double distx = (sourcePoint.x()-destPoint.x())/2;
-        qDebug() << "distx" << distx;
+
         distx*=(angleVector > 1) ? 1 : angleVector;
         m_sourceTanPoint.setX(sourcePoint.x()-distx);
         m_sourceTanPoint.setY(sourcePoint.y());
@@ -317,8 +317,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     qreal angleSRC = ::acos(lineSRC.dx() / (lineSRC.length() > 0 ? lineSRC.length() : 1) );
     qreal angleDEST = ::acos(lineDEST.dx() / (lineDEST.length() > 0 ? lineDEST.length() : 1));
-        qDebug() << "angleDEST" << angleDEST<<lineDEST.dx() << lineDEST.length();
-        qDebug() << "angleSRC" << angleSRC <<lineSRC.dx() << lineSRC.length();
+
 //    if (lineSRC.dy() >= 0)
 //    {
 //        angleSRC = TwoPi - angle;
