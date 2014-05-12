@@ -42,7 +42,7 @@ QString PackageItem::getText() const
 }
 QRectF PackageItem::boundingRect() const
 {
-    QRectF r(0, 0, m_w,m_h);
+    QRectF r(m_topLeft.x(), m_topLeft.y(), m_w,m_h);
     //rect.translate(lastAddedPackage->pos());
 
 
@@ -98,7 +98,7 @@ void  PackageItem::setGrap(GraphWidget* g)
 void PackageItem::setBottomRight(QPointF p)
 {
     m_bottomRight=p;
-updateHW();
+    updateHW();
     update();
 }
 void PackageItem::setBorder(PackageItem::Border b)
