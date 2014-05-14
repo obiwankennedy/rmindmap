@@ -2,6 +2,7 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QDebug>
+#include <QDockWidget>
 
 #include "mainwindow.h"
 #include "detailpanel/detailpanel.h"
@@ -15,6 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_mindtoolbar = new MindToolBar(m_stringManager,this);
     m_detailpanel = new DetailPanel(this);
     m_browser = new ItemBrowser;
+    m_timeLine = new TimeLineWidget();
+
+
+    QDockWidget* bottom = new QDockWidget(tr("TimeLine"),this);
+    bottom->setWidget(m_timeLine);
+    addDockWidget(Qt::BottomDockWidgetArea,bottom);
 
 
     m_title = tr("%1[*] - MindMap Rolisteam - v0.0.1");
