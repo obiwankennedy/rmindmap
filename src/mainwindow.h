@@ -12,7 +12,7 @@
 #include "browser/itembrowser.h"
 #include "stringmanager/stringmanager.h"
 
-
+#include "widgets/timelinewidget.h"
 class DetailPanel;
 
 class MainWindow : public QMainWindow
@@ -88,6 +88,7 @@ private://attributs
    DetailPanel* m_detailpanel;
    ItemBrowser* m_browser;
    StringManager* m_stringManager;
+   TimeLineWidget* m_timeLine;
     
 };
 
