@@ -27,8 +27,19 @@ class TimeLineWidget : public QWidget
     Q_OBJECT
 public:
     TimeLineWidget();
+    void setIntervalTime(qreal a);
 
+protected:
+    void paintEvent( QPaintEvent * event);
+
+
+private:
+    quint32 m_divisionCount;
+    qreal m_intervalTime;/// @brief millisecond
+    qreal m_currentPosition;
+    qreal m_totalTime;
 
 };
 
 #endif // TIMELINEWIDGET_H
+
