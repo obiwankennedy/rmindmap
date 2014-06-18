@@ -1,22 +1,3 @@
-/***************************************************************************
- *	Copyright (C) 2011 by Renaud Guezennec                             *
- *   http://renaudguezennec.homelinux.org/accueil,3.html                   *
- *                                                                         *
- *   rmindmap is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
 #include <QPainter>
 #include <QGraphicsProxyWidget>
 
@@ -37,7 +18,7 @@ static double TwoPi = 2.0 * Pi;
 static const int Arrow_Size = 8;
 
 Edge::Edge()
- : m_arrowSize(Arrow_Size)
+    : m_arrowSize(Arrow_Size)
 {
     init();
 }
@@ -78,15 +59,15 @@ void Edge::init()
 
 
 
-     m_endkind = BOTH;
-     m_proxyw =NULL;
-     m_tempedit = new QLineEdit();
-     m_tempedit->setFrame(false);
-     m_tempedit->setEnabled(true);
-     m_tempedit->setFocus();
-     connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(setText(QString)));
-     connect(m_tempedit,SIGNAL(editingFinished()),m_tempedit,SLOT(hide()));
-     connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(updatePainting()));
+    m_endkind = BOTH;
+    m_proxyw =NULL;
+    m_tempedit = new QLineEdit();
+    m_tempedit->setFrame(false);
+    m_tempedit->setEnabled(true);
+    m_tempedit->setFocus();
+    connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(setText(QString)));
+    connect(m_tempedit,SIGNAL(editingFinished()),m_tempedit,SLOT(hide()));
+    connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(updatePainting()));
 }
 
 EdgableItems *Edge::sourceNode() const
@@ -117,7 +98,20 @@ void Edge::adjust()
 
     if (length > qreal(20.))
     {
-        QPointF edgeOffset((line.dx() * (m_source->boundingRect().width()/2)) / length, (line.dy() * (m_source->boundingRect().height()/2)) / length);
+        qreal dx = line.dx();
+        qreal dy = line.dy();
+        qDebug() << "dx" << dx << dy;
+        if(dx*1.3>dy)
+        {
+            dy=0;
+        }
+        else
+        {
+            dx=0;
+        }
+
+        QPointF edgeOffset((dx * (m_source->boundingRect().width()/2)) / length, (dy * (m_source->boundingRect().height()/2)) / length);
+
 
         if(abs(line.dx())<10)
         {
@@ -146,11 +140,40 @@ void Edge::adjust()
 
 
         sourcePoint = line.p1() + edgeOffset;
+        line.setP1(sourcePoint);
         if(NULL!=m_dest)
         {
             edgeOffset.setX((line.dx() * m_dest->boundingRect().width()/2) / length);
             edgeOffset.setY((line.dy() * m_dest->boundingRect().height()/2) / length);
             destPoint = line.p2() - edgeOffset;
+
+            QPointF middlePoint = mapFromItem(m_dest,m_dest->middlePoint());
+
+            if(dx==0)
+            {
+                destPoint.setX(middlePoint.x());
+                if(dy<0)
+                {
+                    destPoint.setY(middlePoint.y() + m_dest->boundingRect().height()/2);
+                }
+                else
+                {
+                    destPoint.setY(middlePoint.y() - m_dest->boundingRect().height()/2);
+                }
+            }
+            else
+            {
+                if(dx<0)
+                {
+                    destPoint.setX(middlePoint.x() + m_dest->boundingRect().width()/2);
+                }
+                else
+                {
+                    destPoint.setX(middlePoint.x() - m_dest->boundingRect().width()/2);
+                }
+                destPoint.setY(middlePoint.y());
+            }
+            qDebug() << dx << dy << edgeOffset << "dest:"<< destPoint << "midlle:"<< mapFromItem(m_dest,m_dest->middlePoint());
         }
     }
     else
@@ -192,17 +215,17 @@ QRectF Edge::boundingRect() const
     qreal extra = (penWidth + m_arrowSize) / 2.0;
 
     QRectF  myRectF(sourcePoint, QSizeF(destPoint.x() - sourcePoint.x(),destPoint.y() - sourcePoint.y()));
-            myRectF=myRectF.normalized();
-            myRectF=myRectF.adjusted(-extra, -extra, extra, extra);
+    myRectF=myRectF.normalized();
+    myRectF=myRectF.adjusted(-extra, -extra, extra, extra);
 
-            if(myRectF.width()<m_textRect.width()*2)
-            {
-                myRectF.adjust(0,0,m_textRect.width(),0);
-            }
-            if(myRectF.height()<m_textRect.height())
-            {
-                myRectF.adjust(0,-m_textRect.height(),0,0);
-            }
+    if(myRectF.width()<m_textRect.width()*2)
+    {
+        myRectF.adjust(0,0,m_textRect.width(),0);
+    }
+    if(myRectF.height()<m_textRect.height())
+    {
+        myRectF.adjust(0,-m_textRect.height(),0,0);
+    }
 
     return myRectF;
 }
@@ -216,7 +239,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         destPoint = sourcePoint;
     }
 
-/*    AB.AC = ABx*ACx + ABy*ACy + ABz*ACz
+    /*    AB.AC = ABx*ACx + ABy*ACy + ABz*ACz
     ||AB|| = sqrt(ABx²+ABy²+ABz²)
     ||AC|| = sqrt(ACx²+ACy²+ACz²)
 */
@@ -234,7 +257,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
 
     qreal angleVector = qAcos(abac/(ABdist*ACdist));
-    qDebug() << angleVector;
+
     bool above=sourcePoint.y() > destPoint.y() ? true : false;
 
     if(angleVector<=Pi/2)//if source is on left of the destination.
@@ -260,28 +283,28 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         m_destTanPoint.setX(destPoint.x()+distx);
         m_destTanPoint.setY(destPoint.y());
     }
-//    else if((angleVector<3*Pi/4)&&(angleVector>Pi/4)&&above)//if source is below of the destination.
-//    {
-//        double disty = (sourcePoint.y()-destPoint.y())/2;
-//        qDebug() << "disty" << disty;
-//        disty*=(angleVector > 1) ? 1 : angleVector;
-//        m_sourceTanPoint.setX(sourcePoint.x());
-//        m_sourceTanPoint.setY(sourcePoint.y()-disty);
+    //    else if((angleVector<3*Pi/4)&&(angleVector>Pi/4)&&above)//if source is below of the destination.
+    //    {
+    //        double disty = (sourcePoint.y()-destPoint.y())/2;
+    //        qDebug() << "disty" << disty;
+    //        disty*=(angleVector > 1) ? 1 : angleVector;
+    //        m_sourceTanPoint.setX(sourcePoint.x());
+    //        m_sourceTanPoint.setY(sourcePoint.y()-disty);
 
-//        m_destTanPoint.setX(destPoint.x());
-//        m_destTanPoint.setY(destPoint.y()+disty);
-//    }
-//    else //if source is above of the destination.
-//    {
-//        double disty = (destPoint.y()-sourcePoint.y())/2;
-//        disty*=(angleVector > 1) ? 1 : angleVector;
+    //        m_destTanPoint.setX(destPoint.x());
+    //        m_destTanPoint.setY(destPoint.y()+disty);
+    //    }
+    //    else //if source is above of the destination.
+    //    {
+    //        double disty = (destPoint.y()-sourcePoint.y())/2;
+    //        disty*=(angleVector > 1) ? 1 : angleVector;
 
-//        m_sourceTanPoint.setX(sourcePoint.x());
-//        m_sourceTanPoint.setY(sourcePoint.y()+disty);
+    //        m_sourceTanPoint.setX(sourcePoint.x());
+    //        m_sourceTanPoint.setY(sourcePoint.y()+disty);
 
-//        m_destTanPoint.setX(destPoint.x());
-//        m_destTanPoint.setY(destPoint.y()-disty);
-//    }
+    //        m_destTanPoint.setX(destPoint.x());
+    //        m_destTanPoint.setY(destPoint.y()-disty);
+    //    }
 
 
 
@@ -291,10 +314,10 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     QLineF line(sourcePoint, destPoint);
     if (qFuzzyCompare(line.length(), qreal(0.)))
-         return;
+        return;
 
 
-        // Draw the line itself
+    // Draw the line itself
     painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     //painter->drawLine(line);
 
@@ -310,8 +333,8 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         painter->setPen(QPen(Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         painter->drawRect(QRectF(sourcePoint, QSizeF(destPoint.x() - sourcePoint.x(),
                                                      destPoint.y() - sourcePoint.y()))
-                       .normalized()
-                       .adjusted(-extra, -extra, extra, extra));
+                          .normalized()
+                          .adjusted(-extra, -extra, extra, extra));
     }
     /// END OF TEST of BOUNDING RECT
 
@@ -327,14 +350,14 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     qreal angleSRC = ::acos(lineSRC.dx() / (lineSRC.length() > 0 ? lineSRC.length() : 1) );
     qreal angleDEST = ::acos(lineDEST.dx() / (lineDEST.length() > 0 ? lineDEST.length() : 1));
 
-//    if (lineSRC.dy() >= 0)
-//    {
-//        angleSRC = TwoPi - angle;
-//    }
-//    if (lineDEST.dy() >= 0)
-//    {
-//        angleDEST = TwoPi - angle;
-//    }
+    //    if (lineSRC.dy() >= 0)
+    //    {
+    //        angleSRC = TwoPi - angle;
+    //    }
+    //    if (lineDEST.dy() >= 0)
+    //    {
+    //        angleDEST = TwoPi - angle;
+    //    }
 
 
     QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angleSRC + Pi / 3) * m_arrowSize,
@@ -404,7 +427,7 @@ void Edge::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event )
     m_proxyw->setPos(event->pos().x(),event->pos().y());
 
     //QGraphicsProxyWidget* tmp = scene()->addWidget(m_tempedit);
-   //tmp->setPos(pos().x()-boundingRect().width(),pos().y()-boundingRect().height());
+    //tmp->setPos(pos().x()-boundingRect().width(),pos().y()-boundingRect().height());
     m_tempedit->setText(m_text);
     m_tempedit->selectAll();
     m_tempedit->setFocus(Qt::OtherFocusReason);
@@ -431,7 +454,7 @@ void Edge::setDestinationPoint(QPointF pos)
 }
 void Edge::setGrap(GraphWidget* graph)
 {
-   m_graph = graph;
+    m_graph = graph;
 }
 
 void Edge::readFromData(QDataStream& in)
@@ -482,14 +505,14 @@ void Edge::writeToData(QDataStream& out)
 }
 void Edge::updatePainting()
 {
-   update();
+    update();
 }
 void Edge::setText(QString t)
 {
-   m_text = t;
-   QFont font;
-   QFontMetrics info(font);
-   m_textRect = info.boundingRect(m_text);
+    m_text = t;
+    QFont font;
+    QFontMetrics info(font);
+    m_textRect = info.boundingRect(m_text);
 }
 void Edge::setKind(Edge::EndKind kind)
 {
@@ -564,9 +587,9 @@ QPixmap Edge::getIcon() const
         angle = TwoPi - angle;
 
     QPointF sourceArrowP1 = line.p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                                  cos(angle + Pi / 3) * arrowSize);
+                                                cos(angle + Pi / 3) * arrowSize);
     QPointF sourceArrowP2 = line.p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                                  cos(angle + Pi - Pi / 3) * arrowSize);
+                                                cos(angle + Pi - Pi / 3) * arrowSize);
     QPointF destArrowP1 = line.p2() + QPointF(sin(angle - Pi / 3) * arrowSize,
                                               cos(angle - Pi / 3) * arrowSize);
     QPointF destArrowP2 = line.p2() + QPointF(sin(angle - Pi + Pi / 3) * arrowSize,
