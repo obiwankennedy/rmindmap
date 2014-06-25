@@ -100,8 +100,8 @@ void Edge::adjust()
     {
         qreal dx = line.dx();
         qreal dy = line.dy();
-        qDebug() << "dx" << dx << dy;
-        if(dx*1.3>dy)
+        //qDebug() << "dx" << dx << dy;
+        if(abs(dx)*1.3>abs(dy))
         {
             dy=0;
         }
@@ -110,42 +110,42 @@ void Edge::adjust()
             dx=0;
         }
 
-        QPointF edgeOffset((dx * (m_source->boundingRect().width()/2)) / length, (dy * (m_source->boundingRect().height()/2)) / length);
+        //QPointF edgeOffset((dx * (m_source->boundingRect().width()/2)) / length, (dy * (m_source->boundingRect().height()/2)) / length);
+         QPointF middlePoint = mapFromItem(m_source,m_source->middlePoint());
 
-
-        if(abs(line.dx())<10)
+        if(dx==0)
         {
-            edgeOffset.setX(0);
-            if(line.dy()>0)
+            sourcePoint.setX(middlePoint.x());
+            if(dy<0)
             {
-                edgeOffset.setY(m_source->boundingRect().height()/2);
+                sourcePoint.setY(middlePoint.y()-m_source->boundingRect().height()/2);
             }
             else
             {
-                edgeOffset.setY(-m_source->boundingRect().height()/2);
+               sourcePoint.setY(middlePoint.y()+m_source->boundingRect().height()/2);
             }
         }
-        else
+        else//dy == 0
         {
-            edgeOffset.setY(0);
-            if(line.dx()>0)
+            sourcePoint.setY(middlePoint.y());
+            if(dx>0)
             {
-                edgeOffset.setX(m_source->boundingRect().width()/2);
+                sourcePoint.setX(middlePoint.x() + m_source->boundingRect().width()/2);
             }
             else
             {
-                edgeOffset.setX(-m_source->boundingRect().width()/2);
+               sourcePoint.setX(middlePoint.x() - m_source->boundingRect().width()/2);
             }
         }
+// qDebug() << "source" << dx << dy <<  "source:"<< m_source << "midlle:"<< mapFromItem(m_source,m_source->middlePoint());
 
-
-        sourcePoint = line.p1() + edgeOffset;
+       // sourcePoint = line.p1() + edgeOffset;
         line.setP1(sourcePoint);
         if(NULL!=m_dest)
         {
-            edgeOffset.setX((line.dx() * m_dest->boundingRect().width()/2) / length);
+           /* edgeOffset.setX((line.dx() * m_dest->boundingRect().width()/2) / length);
             edgeOffset.setY((line.dy() * m_dest->boundingRect().height()/2) / length);
-            destPoint = line.p2() - edgeOffset;
+            destPoint = line.p2() - edgeOffset;*/
 
             QPointF middlePoint = mapFromItem(m_dest,m_dest->middlePoint());
 
@@ -173,7 +173,7 @@ void Edge::adjust()
                 }
                 destPoint.setY(middlePoint.y());
             }
-            qDebug() << dx << dy << edgeOffset << "dest:"<< destPoint << "midlle:"<< mapFromItem(m_dest,m_dest->middlePoint());
+            // qDebug() << "destination" << dx << dy << edgeOffset << "dest:"<< destPoint << "midlle:"<< mapFromItem(m_dest,m_dest->middlePoint());
         }
     }
     else
@@ -260,51 +260,96 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     bool above=sourcePoint.y() > destPoint.y() ? true : false;
 
-    if(angleVector<=Pi/2)//if source is on left of the destination.
-    {
-        double distx = (destPoint.x()-sourcePoint.x())/2;
 
-        distx*=(angleVector > 1) ? 1 : angleVector;
-        m_sourceTanPoint.setX(sourcePoint.x()+distx);
-        m_sourceTanPoint.setY(sourcePoint.y());
 
-        m_destTanPoint.setX(destPoint.x()-distx);
-        m_destTanPoint.setY(destPoint.y());
-    }
-    else // if(angleVector>=3*Pi/4)//if source is on right of the destination.
+
+
+    QPointF srcMiddlePoint = mapFromItem(m_source,m_source->middlePoint());
+    if((srcMiddlePoint.x()>sourcePoint.x())&&(srcMiddlePoint.y()==sourcePoint.y()))//if(angleVector<=Pi/2)//if source is on left of the destination.
     {
 
-        double distx = (sourcePoint.x()-destPoint.x())/2;
-
+        double distx = abs(destPoint.x()-sourcePoint.x())/2;
         distx*=(angleVector > 1) ? 1 : angleVector;
         m_sourceTanPoint.setX(sourcePoint.x()-distx);
         m_sourceTanPoint.setY(sourcePoint.y());
 
+    }
+    else if((srcMiddlePoint.x()<sourcePoint.x())&&(srcMiddlePoint.y()==sourcePoint.y())) //(angleVector>=3*Pi/4)//if source is on right of the destination.
+    {
+        double distx = abs(sourcePoint.x()-destPoint.x())/2;
+        distx*=(angleVector > 1) ? 1 : angleVector;
+        m_sourceTanPoint.setX(sourcePoint.x()+distx);
+        m_sourceTanPoint.setY(sourcePoint.y());
+    }
+    else if((srcMiddlePoint.y()>sourcePoint.y())&&(srcMiddlePoint.x()==sourcePoint.x()))//if(angleVector<=Pi/2)//if source is on left of the destination.
+    {
+
+        double disty = (destPoint.y()-sourcePoint.y())/2;
+        disty*=(angleVector > 1) ? 1 : angleVector;
+        m_sourceTanPoint.setX(sourcePoint.x());
+        m_sourceTanPoint.setY(sourcePoint.y()+disty);
+
+    }
+    else if((srcMiddlePoint.y()<sourcePoint.y())&&(srcMiddlePoint.x()==sourcePoint.x())) //(angleVector>=3*Pi/4)//if source is on right of the destination.
+    {
+        double disty = (sourcePoint.y()-destPoint.y())/2;
+        disty*=(angleVector > 1) ? 1 : angleVector;
+        m_sourceTanPoint.setX(sourcePoint.x());
+        m_sourceTanPoint.setY(sourcePoint.y()-disty);
+    }
+    QPointF destMiddlePoint;
+    if(m_dest==NULL)
+    {
+        destMiddlePoint = destPoint;
+    }
+    else
+    {
+        destMiddlePoint = mapFromItem(m_dest,m_dest->middlePoint());
+
+    }
+
+    if((m_dest!=NULL)&&(destMiddlePoint.y()>destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is below of the destination.
+    {
+
+        double disty = (sourcePoint.y()-destPoint.y())/2;
+
+        disty*=(angleVector > 1) ? 1 : angleVector;
+
+        m_destTanPoint.setX(destPoint.x());
+        m_destTanPoint.setY(destPoint.y()+disty);
+    }
+    else if((m_dest!=NULL)&&(destMiddlePoint.y()<destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is above of the destination.
+    {
+
+        double disty = (destPoint.y()-sourcePoint.y())/2;
+        disty*=(angleVector > 1) ? 1 : angleVector;
+
+        m_destTanPoint.setX(destPoint.x());
+        m_destTanPoint.setY(destPoint.y()-disty);
+    }
+    else if((m_dest!=NULL)&&(destMiddlePoint.x()>destPoint.x())&&(destMiddlePoint.y()==destPoint.y()))//if source is below of the destination.
+    {
+
+        double distx = abs(sourcePoint.x()-destPoint.x())/2;
+
+        distx*=(angleVector > 1) ? 1 : angleVector;
+
+        m_destTanPoint.setX(destPoint.x()-distx);
+        m_destTanPoint.setY(destPoint.y());
+    }
+    else if((m_dest!=NULL)&&(destMiddlePoint.x()<destPoint.x())&&(destMiddlePoint.y()==destPoint.y()))//if source is above of the destination.
+    {
+
+        double distx = abs(destPoint.y()-sourcePoint.y())/2;
+        distx*=(angleVector > 1) ? 1 : angleVector;
+
         m_destTanPoint.setX(destPoint.x()+distx);
         m_destTanPoint.setY(destPoint.y());
     }
-    //    else if((angleVector<3*Pi/4)&&(angleVector>Pi/4)&&above)//if source is below of the destination.
-    //    {
-    //        double disty = (sourcePoint.y()-destPoint.y())/2;
-    //        qDebug() << "disty" << disty;
-    //        disty*=(angleVector > 1) ? 1 : angleVector;
-    //        m_sourceTanPoint.setX(sourcePoint.x());
-    //        m_sourceTanPoint.setY(sourcePoint.y()-disty);
 
-    //        m_destTanPoint.setX(destPoint.x());
-    //        m_destTanPoint.setY(destPoint.y()+disty);
-    //    }
-    //    else //if source is above of the destination.
-    //    {
-    //        double disty = (destPoint.y()-sourcePoint.y())/2;
-    //        disty*=(angleVector > 1) ? 1 : angleVector;
 
-    //        m_sourceTanPoint.setX(sourcePoint.x());
-    //        m_sourceTanPoint.setY(sourcePoint.y()+disty);
 
-    //        m_destTanPoint.setX(destPoint.x());
-    //        m_destTanPoint.setY(destPoint.y()-disty);
-    //    }
+
 
 
 
@@ -401,7 +446,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     {
         pen.setWidth(10);
         painter->setPen(pen);
-        painter->drawPoint(m_destTanPoint);
+        //painter->drawPoint(m_destTanPoint);
         painter->drawPoint(m_sourceTanPoint);
         pen.setWidth(1);
         painter->setPen(pen);
@@ -415,7 +460,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
 
 
-
+    m_path = path;
     painter->drawPath(path);
 }
 void Edge::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event )
@@ -526,33 +571,33 @@ Edge::EndKind  Edge::getKind()
 }
 QPainterPath  Edge::shape() const
 {
-    QPainterPath path;
+//    QPainterPath path;
 
 
-    QLineF line(sourcePoint, destPoint);
+//    QLineF line(sourcePoint, destPoint);
 
-    // Draw the arrows
-    double angle = ::acos(line.dx() / line.length());
-    if (line.dy() >= 0)
-        angle = TwoPi - angle;
-    path.moveTo(sourcePoint);
-    QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angle + Pi / 3) * m_arrowSize,
-                                                  cos(angle + Pi / 3) * m_arrowSize);
+//    // Draw the arrows
+//    double angle = ::acos(line.dx() / line.length());
+//    if (line.dy() >= 0)
+//        angle = TwoPi - angle;
+//    path.moveTo(sourcePoint);
+//    QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angle + Pi / 3) * m_arrowSize,
+//                                                  cos(angle + Pi / 3) * m_arrowSize);
 
-    path.lineTo(sourceArrowP1);
-    QPointF sourceArrowP2 = sourcePoint + QPointF(sin(angle + Pi - Pi / 3) * m_arrowSize,
-                                                  cos(angle + Pi - Pi / 3) * m_arrowSize);
+//    path.lineTo(sourceArrowP1);
+//    QPointF sourceArrowP2 = sourcePoint + QPointF(sin(angle + Pi - Pi / 3) * m_arrowSize,
+//                                                  cos(angle + Pi - Pi / 3) * m_arrowSize);
 
-    QPointF destArrowP1 = destPoint + QPointF(sin(angle - Pi / 3) * m_arrowSize,
-                                              cos(angle - Pi / 3) * m_arrowSize);
-    QPointF destArrowP2 = destPoint + QPointF(sin(angle - Pi + Pi / 3) * m_arrowSize,
-                                              cos(angle - Pi + Pi / 3) * m_arrowSize);
-    path.lineTo(destArrowP1);
-    path.lineTo(destArrowP2);
-    path.lineTo(sourceArrowP2);
-    path.closeSubpath ();
+//    QPointF destArrowP1 = destPoint + QPointF(sin(angle - Pi / 3) * m_arrowSize,
+//                                              cos(angle - Pi / 3) * m_arrowSize);
+//    QPointF destArrowP2 = destPoint + QPointF(sin(angle - Pi + Pi / 3) * m_arrowSize,
+//                                              cos(angle - Pi + Pi / 3) * m_arrowSize);
+//    path.lineTo(destArrowP1);
+//    path.lineTo(destArrowP2);
+//    path.lineTo(sourceArrowP2);
+//    path.closeSubpath ();
 
-    return path;
+    return m_path;
 }
 void Edge::setName(QString&)
 {
