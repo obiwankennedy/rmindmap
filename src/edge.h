@@ -109,6 +109,7 @@ private:
     QRect m_textRect;
 
     EndKind m_endkind;
+    QPainterPath m_path;
 
     QPointF m_sourceTanPoint;
     QPointF m_destTanPoint;
