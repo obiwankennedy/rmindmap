@@ -24,6 +24,8 @@
 #include <QGraphicsItem>
 #include <QSvgGenerator>
 #include <QGraphicsSvgItem>
+#include <QGraphicsSceneHoverEvent>
+#include <QApplication>
 
 #include "graphwidget.h"
 #include "edge.h"
@@ -423,11 +425,23 @@ void GraphWidget::mouseMoveEvent(QMouseEvent* event)
     if(NULL!=lastAddedEdge)
     {
         lastAddedEdge->setDestinationPoint(event->pos() /*event->localPos()*/);
+
+        QGraphicsSceneHoverEvent myEvent(QEvent::GraphicsSceneHoverEnter);
+       // myEvent.setType(QEvent::GraphicsSceneHoverEnter);
+        myEvent.setPos(QPointF(1,1));
+        myEvent.setScenePos(event->pos());
+        myEvent.setScreenPos(event->screenPos().toPoint());
+        myEvent.setModifiers(event->modifiers());
+
+
+        QApplication::sendEvent(scene(), &myEvent);
     }
     else if(NULL!=lastAddedPackage)
     {
         lastAddedPackage->setBottomRight(event->pos() /* event->localPos()*/);
     }
+
+
     QGraphicsView::mouseMoveEvent(event);
 }
 void GraphWidget::readFromData(QDataStream& out)

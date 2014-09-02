@@ -19,9 +19,12 @@
  ***************************************************************************/
 #include "genericmindmapitem.h"
 
+#include <QDebug>
 GenericMindMapItem::GenericMindMapItem()
     : m_stringManager(NULL)
 {
+    setAcceptDrops(true);
+    setAcceptHoverEvents(true);
 
 }
 
@@ -29,4 +32,14 @@ void GenericMindMapItem::setStringManager(StringManager* stringManager)
 
 {
     m_stringManager = stringManager;
+}
+
+void GenericMindMapItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
+{
+    qDebug() << getText() << "GenericMindMapItem::hoverEnterEvent";
+}
+
+void GenericMindMapItem::dragEnterEvent ( QGraphicsSceneDragDropEvent * event )
+{
+    qDebug() << getText() << "GenericMindMapItem::dragEnterEvent";
 }

@@ -42,6 +42,9 @@ public:
 
     virtual void setGeometry(int w,int h) = 0;
 
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
+    virtual void dragEnterEvent ( QGraphicsSceneDragDropEvent * event );
+
 public slots:
    virtual void setText(QString) = 0;
    virtual void setName(QString&) = 0;
