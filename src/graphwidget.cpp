@@ -57,7 +57,7 @@ GraphWidget::GraphWidget(StringManager* stringManager,QWidget *parent)
     m_pointList = new QList<QPoint>();
     m_begunArrow = true;
     m_begunGeo = true;
-    lastAddedEdge=NULL;
+    m_lastAddedEdge=NULL;
     m_nodeList = new QList<Node*>();
     m_edgeList = new QList<Edge*>();
     m_packageList = new QList<PackageItem*>();
@@ -199,39 +199,52 @@ void GraphWidget::manageArrow(QMouseEvent *event)
 
             if(NULL!=dynamic_cast<EdgableItems*>(item))
             {
-                lastAddedEdge = new Edge(dynamic_cast<EdgableItems*>(item));
+                m_lastAddedEdge = new Edge(dynamic_cast<EdgableItems*>(item));
                 if(NULL!=m_currentEdgeBrush)
                 {
-                    lastAddedEdge->setKind(m_currentEdgeBrush->getKind());
+                    m_lastAddedEdge->setKind(m_currentEdgeBrush->getKind());
                 }
 
-                emit itemHasBeenAdded(lastAddedEdge);
-                lastAddedEdge->setGrap(this);
-                m_scene->addItem(lastAddedEdge);
-                m_edgeList->append(lastAddedEdge);
+
+                m_lastAddedEdge->setGrap(this);
+                m_scene->addItem(m_lastAddedEdge);
+
                 m_begunArrow = false;
                 setMouseTracking(true);
-                lastAddedEdge->adjust();
+                m_lastAddedEdge->adjust();
             }
         }
     }
     else
     {
-
-        foreach(QGraphicsItem* item, items(event->pos()))
+        QList<QGraphicsItem*> list = items(event->pos());
+        foreach(QGraphicsItem* item, list)
         {
 
             if(NULL!=dynamic_cast<EdgableItems*>(item))
             {
-                if(NULL!=lastAddedEdge)
+                if(NULL!=m_lastAddedEdge)
                 {
 
-                    lastAddedEdge->setDestination(dynamic_cast<EdgableItems*>(item));
-                    lastAddedEdge=NULL;
+                    m_lastAddedEdge->setDestination(dynamic_cast<EdgableItems*>(item));
+
                     m_begunArrow = true;
                     setMouseTracking(false);
+
+                    emit itemHasBeenAdded(m_lastAddedEdge);
+                    m_edgeList->append(m_lastAddedEdge);
+                    m_lastAddedEdge=NULL;
                 }
             }
+        }
+
+        if(list.isEmpty())
+        {
+            qDebug() << "into list empty";
+           m_begunArrow = true;
+           m_scene->removeItem(m_lastAddedEdge);
+           delete m_lastAddedEdge;
+           m_lastAddedEdge = NULL;
         }
     }
 }
@@ -422,9 +435,9 @@ void  GraphWidget::setCurrentTool(MindToolBar::MINDTOOL tool)
 
 void GraphWidget::mouseMoveEvent(QMouseEvent* event)
 {
-    if(NULL!=lastAddedEdge)
+    if(NULL!=m_lastAddedEdge)
     {
-        lastAddedEdge->setDestinationPoint(event->pos() /*event->localPos()*/);
+        m_lastAddedEdge->setDestinationPoint(event->pos() /*event->localPos()*/);
 
         QGraphicsSceneHoverEvent myEvent(QEvent::GraphicsSceneHoverEnter);
        // myEvent.setType(QEvent::GraphicsSceneHoverEnter);

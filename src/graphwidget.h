@@ -130,7 +130,7 @@ private:
     QList<PackageItem*>* m_packageList;
     QList<EdgeBreak*>* m_edgeBreakList;
 
-    Edge* lastAddedEdge;
+    Edge* m_lastAddedEdge;
     PackageItem* lastAddedPackage;
 
 
