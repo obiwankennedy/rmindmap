@@ -50,6 +50,7 @@ public slots:
     void updateCurrentEdge();
     void updateCurrentPackage();
     void updateGenericItem();
+    void setAlwaysVisible(bool);
     
 private:
     Ui::DetailPanel *ui;
@@ -58,6 +59,7 @@ private:
     Edge* m_currentEdge;
     PackageItem* m_currentPackage;
     GenericMindMapItem* m_currentGenericItem;
+    bool m_alwaysVisible;
 };
 
 #endif // DETAILPANEL_H

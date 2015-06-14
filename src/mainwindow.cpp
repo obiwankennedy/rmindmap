@@ -86,19 +86,33 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::closeEvent ( QCloseEvent * event )
 {
-
-    if (maybeSave()) {
-             writeSettings();
-             event->accept();
-         } else {
-             event->ignore();
-         }
+    if (maybeSave())
+    {
+        writeSettings();
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 bool MainWindow::maybeSave()
 {
     return true;
 }
+void MainWindow::hideDetailsPanel()
+{
+    if(!m_keepDetailsVisible->isChecked())
+    {
+        m_detailpanel->hide();
+    }
 
+}
+void MainWindow::displayDetailsPanel()
+{
+    m_detailpanel->show();
+
+}
 void MainWindow::setupUi()
 {
     setCentralWidget(m_widget);
@@ -180,6 +194,8 @@ void MainWindow::makeMenu()
     m_exportMenu->addAction(m_svgExportAct);
     m_exportMenu->addAction(m_pngExportAct);
     m_fileMenu->addSeparator();
+    m_fileMenu->addAction(m_scenePropertiesAct);
+    m_fileMenu->addSeparator();
     refreshOpenedFile();
     m_fileMenu->addSeparator();
     m_fileMenu->addAction(m_exitAct);
@@ -224,6 +240,11 @@ void MainWindow::makeAction()
     m_saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(m_saveAsAct, SIGNAL(triggered()), this, SLOT(saveAsMindMap()));
 
+
+
+    m_scenePropertiesAct = new QAction(tr("Scene Properties"),this);
+    //connet(m_scenePropertiesAct);
+
     m_exitAct = new QAction(tr("E&xit"), this);
     m_exitAct->setShortcut(tr("Ctrl+Q"));
     m_exitAct->setStatusTip(tr("Exit the application"));
@@ -251,6 +272,10 @@ void MainWindow::makeAction()
     m_detailView = new QAction(tr("Show/Hide Detail view"),this);
 
     m_toolbarView = new QAction(tr("Show/Hide Toolbar"),this);
+
+    m_keepDetailsVisible = new QAction(tr("Always show detail view"),this);
+    m_keepDetailsVisible->setCheckable(true);
+    m_keepDetailsVisible->setChecked(true);
     m_toolbarView->setCheckable(true);
     connect(m_toolbarView,SIGNAL(toggled(bool)),m_dock,SLOT(setVisible(bool)));
 }

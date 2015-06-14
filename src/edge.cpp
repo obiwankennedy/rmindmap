@@ -276,6 +276,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     }
     else if((srcMiddlePoint.x()<sourcePoint.x())&&(srcMiddlePoint.y()==sourcePoint.y())) //(angleVector>=3*Pi/4)//if source is on right of the destination.
     {
+
         double distx = abs(sourcePoint.x()-destPoint.x())/2;
         distx*=(angleVector > 1) ? 1 : angleVector;
         m_sourceTanPoint.setX(sourcePoint.x()+distx);
@@ -292,6 +293,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     }
     else if((srcMiddlePoint.y()<sourcePoint.y())&&(srcMiddlePoint.x()==sourcePoint.x())) //(angleVector>=3*Pi/4)//if source is on right of the destination.
     {
+
         double disty = (sourcePoint.y()-destPoint.y())/2;
         disty*=(angleVector > 1) ? 1 : angleVector;
         m_sourceTanPoint.setX(sourcePoint.x());
@@ -310,8 +312,8 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     if((m_dest!=NULL)&&(destMiddlePoint.y()>destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is below of the destination.
     {
-
         double disty = (sourcePoint.y()-destPoint.y())/2;
+
 
         disty*=(angleVector > 1) ? 1 : angleVector;
 
@@ -320,6 +322,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     }
     else if((m_dest!=NULL)&&(destMiddlePoint.y()<destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is above of the destination.
     {
+
 
         double disty = (destPoint.y()-sourcePoint.y())/2;
         disty*=(angleVector > 1) ? 1 : angleVector;
@@ -346,12 +349,6 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         m_destTanPoint.setX(destPoint.x()+distx);
         m_destTanPoint.setY(destPoint.y());
     }
-
-
-
-
-
-
 
 
 
@@ -395,24 +392,37 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     qreal angleSRC = ::acos(lineSRC.dx() / (lineSRC.length() > 0 ? lineSRC.length() : 1) );
     qreal angleDEST = ::acos(lineDEST.dx() / (lineDEST.length() > 0 ? lineDEST.length() : 1));
 
-    //    if (lineSRC.dy() >= 0)
-    //    {
-    //        angleSRC = TwoPi - angle;
-    //    }
-    //    if (lineDEST.dy() >= 0)
-    //    {
-    //        angleDEST = TwoPi - angle;
-    //    }
+    QPointF sourceArrowP1;
+    QPointF sourceArrowP2;
+    QPointF destArrowP1;
+    QPointF destArrowP2;
+    if((sourcePoint.y() < destPoint.y()) && (lineDEST.dy()!=0))
+    {
 
-
-    QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angleSRC + Pi / 3) * m_arrowSize,
+        sourceArrowP1 = sourcePoint - QPointF(sin(angleSRC + Pi / 3) * m_arrowSize,
                                                   cos(angleSRC + Pi / 3) * m_arrowSize);
-    QPointF sourceArrowP2 = sourcePoint + QPointF(sin(angleSRC + Pi - Pi / 3) * m_arrowSize,
+        sourceArrowP2 = sourcePoint - QPointF(sin(angleSRC + Pi - Pi / 3) * m_arrowSize,
                                                   cos(angleSRC + Pi - Pi / 3) * m_arrowSize);
-    QPointF destArrowP1 = destPoint + QPointF(sin(angleDEST - Pi / 3) * m_arrowSize,
+
+        destArrowP1 = destPoint - QPointF(sin(angleDEST - Pi / 3) * m_arrowSize,
                                               cos(angleDEST - Pi / 3) * m_arrowSize);
-    QPointF destArrowP2 = destPoint + QPointF(sin(angleDEST - Pi + Pi / 3) * m_arrowSize,
+        destArrowP2 = destPoint - QPointF(sin(angleDEST - Pi + Pi / 3) * m_arrowSize,
                                               cos(angleDEST - Pi + Pi / 3) * m_arrowSize);
+
+
+    }
+    else
+    {
+        sourceArrowP1 = sourcePoint + QPointF(sin(angleSRC + Pi / 3) * m_arrowSize,
+                                                  cos(angleSRC + Pi / 3) * m_arrowSize);
+        sourceArrowP2 = sourcePoint + QPointF(sin(angleSRC + Pi - Pi / 3) * m_arrowSize,
+                                                  cos(angleSRC + Pi - Pi / 3) * m_arrowSize);
+
+        destArrowP1 = destPoint + QPointF(sin(angleDEST - Pi / 3) * m_arrowSize,
+                                              cos(angleDEST - Pi / 3) * m_arrowSize);
+        destArrowP2 = destPoint + QPointF(sin(angleDEST - Pi + Pi / 3) * m_arrowSize,
+                                              cos(angleDEST - Pi + Pi / 3) * m_arrowSize);
+    }
 
     painter->setBrush(Qt::black);
     QLineF lineFSrc(sourceArrowP1,sourceArrowP2);
@@ -446,7 +456,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     {
         pen.setWidth(10);
         painter->setPen(pen);
-        //painter->drawPoint(m_destTanPoint);
+        painter->drawPoint(m_destTanPoint);
         painter->drawPoint(m_sourceTanPoint);
         pen.setWidth(1);
         painter->setPen(pen);

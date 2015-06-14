@@ -50,10 +50,9 @@ public:
     void dumpMapInBipmap(QString file);
 
     void cleanScene();
-
-
-
     EdgableItems* getEdgableItemFromUuid(QString id);
+
+    void changeSceneSize(int w,int h);
 
 signals:
     void currentNode(GenericMindMapItem*);

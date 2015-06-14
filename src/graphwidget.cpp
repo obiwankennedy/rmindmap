@@ -87,6 +87,10 @@ void GraphWidget::initAction()
     connect(m_boundItemsAct,SIGNAL(triggered()),this,SLOT(attachedChild()));
 
 }
+void  GraphWidget::changeSceneSize(int w,int h)
+{
+    m_scene->setSceneRect(0, 0, w,h);
+}
 
 void GraphWidget::removeItem()
 {

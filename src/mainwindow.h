@@ -70,6 +70,8 @@ private: //function
     void updateTitle();
     void readFile();
     void addRecentFile();
+    void displayDetailsPanel();
+    void hideDetailsPanel();
 
 
 private://attributs
@@ -95,6 +97,9 @@ private://attributs
 
     QAction* m_toolbarView;
     QAction* m_detailView;
+    QAction* m_scenePropertiesAct;
+
+    QAction* m_keepDetailsVisible;
 
     QList<QAction*>* m_recentFileActions;
 

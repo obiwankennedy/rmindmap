@@ -22,7 +22,7 @@
 
 DetailPanel::DetailPanel(QWidget *parent) :
     QDockWidget(parent),
-    ui(new Ui::DetailPanel)
+    ui(new Ui::DetailPanel),m_alwaysVisible(true)
 {
     m_currentEdge = NULL;
     m_currentNode = NULL;
@@ -160,4 +160,8 @@ void DetailPanel::setCurrentGenericItem(GenericMindMapItem* p)
         setCurrentEdge(dynamic_cast<Edge*>(p));
     }
 
+}
+void DetailPanel::setAlwaysVisible(bool b)
+{
+    m_alwaysVisible = b;
 }
