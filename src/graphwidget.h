@@ -1,8 +1,8 @@
 /***************************************************************************
- *	Copyright (C) 2011 by Renaud Guezennec                             *
+ *	Copyright (C) 2011 by Renaud Guezennec                                 *
  *   http://renaudguezennec.homelinux.org/accueil,3.html                   *
  *                                                                         *
- *   rmindmap is free software; you can redistribute it and/or modify  *
+ *   rmindmap is free software; you can redistribute it and/or modify      *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
@@ -111,6 +111,7 @@ private://functions
     void addBreakAt(QPointF pos);
     Node* getNodeFromUuid(QString);
     PackageItem* getPackageFromUuid(QString id);
+    EdgeBreak* getBreakFromUuid(QString id);
 
 
 private:

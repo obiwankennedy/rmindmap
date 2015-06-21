@@ -258,12 +258,6 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     qreal angleVector = qAcos(abac/(ABdist*ACdist));
 
-    bool above=sourcePoint.y() > destPoint.y() ? true : false;
-
-
-
-
-
     QPointF srcMiddlePoint = mapFromItem(m_source,m_source->middlePoint());
     if((srcMiddlePoint.x()>sourcePoint.x())&&(srcMiddlePoint.y()==sourcePoint.y()))//if(angleVector<=Pi/2)//if source is on left of the destination.
     {

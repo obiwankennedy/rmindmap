@@ -61,6 +61,7 @@ GraphWidget::GraphWidget(StringManager* stringManager,QWidget *parent)
     m_nodeList = new QList<Node*>();
     m_edgeList = new QList<Edge*>();
     m_packageList = new QList<PackageItem*>();
+    m_edgeBreakList = new QList<EdgeBreak*>();
 
 
 }
@@ -333,7 +334,8 @@ void GraphWidget::addBreakAt(QPointF pos)
             tmp2->setKind(endEdge1);
             newedge->setKind(endEdge2);
 
-
+            m_edgeBreakList->append(tmpbreak);
+            m_edgeList->append(newedge);
 
             m_scene->addItem(tmpbreak);
             m_scene->addItem(newedge);
@@ -504,6 +506,18 @@ void GraphWidget::readFromData(QDataStream& out)
         m_packageList->append(pack);
     }
 
+    out >> size;
+    EdgeBreak* tmpBreak=NULL;
+    for(int i=0; i<size;++i)
+    {
+        tmpBreak = new EdgeBreak();
+       // tmpBreak->setGrap(this);
+        emit itemHasBeenAdded(tmpBreak);
+        tmpBreak->readFromData(out);
+        m_scene->addItem(tmpBreak);
+        m_edgeBreakList->append(tmpBreak);
+    }
+
     foreach(Edge* edge, *m_edgeList )
     {
         edge->lookUpPoint();
@@ -517,35 +531,60 @@ void GraphWidget::writeToData(QDataStream& in)
     in << m_scene->sceneRect().width();
     in << m_scene->sceneRect().height();
     in << m_nodeList->size();
+    //node
     for(int i=0;i<m_nodeList->size();i++)
     {
         m_nodeList->at(i)->writeToData(in);
     }
 
     in << m_edgeList->size();
+    //edge
     for(int i=0;i<m_edgeList->size();i++)
     {
         m_edgeList->at(i)->writeToData(in);
     }
-
+    //package
     in << m_packageList->size();
     for(int i=0;i<m_packageList->size();i++)
     {
         m_packageList->at(i)->writeToData(in);
     }
 
+    //package
+    in << m_edgeBreakList->size();
+    for(int i=0;i<m_edgeBreakList->size();i++)
+    {
+        m_edgeBreakList->at(i)->writeToData(in);
+    }
+
+
 }
 EdgableItems* GraphWidget::getEdgableItemFromUuid(QString id)
 {
     EdgableItems* tmp = getNodeFromUuid(id);
+
     if(NULL==tmp)
     {
-        return getPackageFromUuid(id);
+        tmp = getPackageFromUuid(id);
+    }
+    if(NULL==tmp)
+    {
+        tmp = getBreakFromUuid(id);
     }
 
     return tmp;
 }
-
+EdgeBreak* GraphWidget::getBreakFromUuid(QString id)
+{
+    for(int i=0;i<m_edgeBreakList->size();i++)
+    {
+        if(m_edgeBreakList->at(i)->getUuid() == id)
+        {
+            return m_edgeBreakList->at(i);
+        }
+    }
+    return NULL;
+}
 Node* GraphWidget::getNodeFromUuid(QString id)
 {
     for(int i=0;i<m_nodeList->size();i++)
@@ -674,7 +713,6 @@ void GraphWidget::setCurrentEdgeBrush(Edge* edge)
 void GraphWidget::removeGenericMindMapItem(GenericMindMapItem* item)
 {
     m_scene->removeItem(item);
-
 
     Node* node = dynamic_cast<Node*>(item);
     if(NULL!=node)
