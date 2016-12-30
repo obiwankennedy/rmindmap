@@ -173,3 +173,10 @@ void SelectStyleItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         painter->restore();
     }
 }
+void SelectStyleItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+  //  menu;
+ //   menu
+
+
+}

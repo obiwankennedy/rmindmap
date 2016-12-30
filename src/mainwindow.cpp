@@ -39,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_widget->setScene(m_scene);
 
     m_scene->setSceneRect(0,0,1024,768);
+    m_widget->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    m_widget->setRenderHints(QPainter::Antialiasing |QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
    /* m_timeLine = new TimeLineWidget();
 
 
