@@ -1,6 +1,4 @@
 HEADERS += \
-        src/edge.h \
-        src/node.h \
         src/graphwidget.h \
     src/mindtoolbar.h \
     src/graphitemmodel.h \
@@ -8,18 +6,20 @@ HEADERS += \
     src/serializable.h \
     src/graphedgemodel.h \
     src/graphcommonmodel.h \
+    mindmap.h \
+    menustyleitem.h
 
 
 SOURCES += \
-        src/edge.cpp \
         src/main.cpp \
-        src/node.cpp \
         src/graphwidget.cpp \
     src/mindtoolbar.cpp \
     src/graphitemmodel.cpp \
     src/mainwindow.cpp \
     src/graphedgemodel.cpp \
     src/graphcommonmodel.cpp \
+    mindmap.cpp \
+    menustyleitem.cpp
 
 
 
@@ -39,12 +39,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT+= svg
 
 target = bin/rmindmap
-
+CONFIG += c++11
 # install
 #target.path = $$[QT_INSTALL_EXAMPLES]/graphicsview/elasticnodes
 #sources.files = $$SOURCES $$HEADERS $$RESOURCES $$FORMS elasticnodes.pro
 #sources.path = $$[QT_INSTALL_EXAMPLES]/graphicsview/elasticnodes
 #INSTALLS += target sources
+
+FORMS += \
+    menustyleitem.ui
 
 
 

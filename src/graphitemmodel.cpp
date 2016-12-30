@@ -58,7 +58,7 @@ QVariant GraphItemModel::data ( const QModelIndex & index, int role ) const
         }
         else if(Qt::DecorationRole==role)
         {
-            return  m_list->at(index.row())->getIcon();
+            //return  m_list->at(index.row())->getIcon();
         }
         return QVariant();
 }
@@ -80,15 +80,14 @@ void GraphItemModel::readSettings(QSettings& settings)
          tmp->setStringManager(m_stringManager);
          tmp->setUuid(settings.value("id").toString());
          tmp->setText(settings.value("text").toString());
-         tmp->setBgColor(settings.value("bgcolor").value<QColor>());
-         tmp->setColor(settings.value("color").value<QColor>());
+         //tmp->getColorTheme()->readSetting(settings);
          m_list->append(tmp);
      }
      settings.endArray();
      settings.endGroup();
 
 
-    if(m_list->size()==0)
+    /*if(m_list->size()==0)
     {
         Node* tmp=new Node(NULL);
         tmp->setColor(Qt::blue);
@@ -107,7 +106,7 @@ void GraphItemModel::readSettings(QSettings& settings)
         tmp->setText(tr("Place"));
         tmp->setStringManager(m_stringManager);
         addItems(tmp);
-    }
+    }*/
 }
 
 void GraphItemModel::writeSettings(QSettings& settings)
@@ -118,8 +117,8 @@ void GraphItemModel::writeSettings(QSettings& settings)
     {
         settings.setArrayIndex(i);
         settings.setValue("text", m_list->at(i)->getText());
-        settings.setValue("bgcolor", m_list->at(i)->bgColor());
-        settings.setValue("color",m_list->at(i)->color());
+     //   settings.setValue("bgcolor", m_list->at(i)->bgColor());
+       // settings.setValue("color",m_list->at(i)->color());
         settings.setValue("id",m_list->at(i)->getUuid());
 
     }

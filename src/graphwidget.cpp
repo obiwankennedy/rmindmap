@@ -28,8 +28,8 @@
 #include <QApplication>
 
 #include "graphwidget.h"
-#include "edge.h"
-#include "node.h"
+#include "items/edge.h"
+#include "items/node.h"
 #include "items/packageitem.h"
 
 
@@ -39,19 +39,25 @@ GraphWidget::GraphWidget(StringManager* stringManager,QWidget *parent)
     : QGraphicsView(parent),m_stringManager(stringManager)
 {
     lastAddedPackage = NULL;
-    m_currentEdgeBrush = NULL;
+    m_defaultEdgeBrush = NULL;
     initAction();
-    m_scene = new QGraphicsScene(this);
+
     setContextMenuPolicy(Qt::DefaultContextMenu);
     connect(m_scene,SIGNAL(selectionChanged()),this,SLOT(selectionHasChanged()));
 
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    m_scene->setSceneRect(0, 0, width(), height());
+   // m_scene->setSceneRect(0, 0, 800, 600);
     setScene(m_scene);
-    m_currentTool = MindToolBar::NONE;
+    m_currentTool = MindToolBar::HANDLE;
 
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    setRenderHint(QPainter::Antialiasing);
+    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
+    setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
+    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+ //   setDragMode(QGraphicsView::ScrollHandDrag);
 
     setWindowTitle(tr("MapMind"));
     m_pointList = new QList<QPoint>();
@@ -63,7 +69,8 @@ GraphWidget::GraphWidget(StringManager* stringManager,QWidget *parent)
     m_packageList = new QList<PackageItem*>();
     m_edgeBreakList = new QList<EdgeBreak*>();
 
-
+    m_defaultNodeBrush = PreferencesManager::getInstance()->getDefaultNodeColorTheme();
+    addNodeAt(QPoint(200,200));
 }
 
 void GraphWidget::initAction()
@@ -112,7 +119,6 @@ void GraphWidget::removeItem()
             m_packageList->removeAll(dynamic_cast<PackageItem*>(items[i]));
         }
     }
-
 }
 
 void GraphWidget::editItem()
@@ -131,16 +137,52 @@ void GraphWidget::makeBrush()
     }
 }
 
-void  GraphWidget::resizeEvent(QResizeEvent *event)
+void GraphWidget::resizeEvent(QResizeEvent* event)
 {
-    QGraphicsView::resizeEvent(event);
-    if(m_scene->sceneRect().width()<event->size().width())
+    if((NULL!=scene()))
     {
-        m_scene->setSceneRect(0, 0, width(), height());
+        if((geometry().width() > scene()->sceneRect().width())||
+          ((geometry().height() > scene()->sceneRect().height())))
+        {
+            scene()->setSceneRect(geometry());
+            ensureVisible(geometry(),0,0);
+        }
+    }
+
+    setResizeAnchor(QGraphicsView::NoAnchor);
+    setTransformationAnchor(QGraphicsView::NoAnchor);
+    QGraphicsView::resizeEvent(event);
+}
+void GraphWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    qDebug() << "moveMouse";
+    if((event->buttons() & Qt::LeftButton)&&(dragMode()==QGraphicsView::RubberBandDrag))
+    {
+        qDebug() << "moveMouse inside IF";
+
+        if(!m_lastPoint.isNull())
+        {
+            QRectF rect = sceneRect();
+            int dx = event->x() - m_lastPoint.x();
+            int dy = event->y() - m_lastPoint.y();
+            rect.translate(-dx,-dy);
+            m_lastPoint = event->pos();
+            setSceneRect(rect);
+        }
+        m_lastPoint = event->pos();
+    }
+    else
+    {
+        qDebug() << "moveMouse inside else" << event->isAccepted() << m_scene->mouseGrabberItem();
+        QGraphicsView::mouseMoveEvent(event);
     }
 }
-
-
+void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_lastPoint = QPoint();
+    QGraphicsView::mouseReleaseEvent(event);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+}
 void GraphWidget::contextMenuEvent ( QContextMenuEvent * event )
 {
     QMenu menu(this);
@@ -182,10 +224,6 @@ void GraphWidget::scaleView(qreal scaleFactor)
 
     scale(scaleFactor, scaleFactor);
 }
-
-
-
-
 void GraphWidget::zoomIn()
 {
     scaleView(qreal(1.2));
@@ -205,11 +243,7 @@ void GraphWidget::manageArrow(QMouseEvent *event)
             if(NULL!=dynamic_cast<EdgableItems*>(item))
             {
                 m_lastAddedEdge = new Edge(dynamic_cast<EdgableItems*>(item));
-                if(NULL!=m_currentEdgeBrush)
-                {
-                    m_lastAddedEdge->setKind(m_currentEdgeBrush->getKind());
-                }
-
+                m_lastAddedEdge->setKind(Edge::END2);
 
                 m_lastAddedEdge->setGrap(this);
                 m_scene->addItem(m_lastAddedEdge);
@@ -245,7 +279,7 @@ void GraphWidget::manageArrow(QMouseEvent *event)
 
         if(list.isEmpty())
         {
-            qDebug() << "into list empty";
+           // qDebug() << "into list empty";
            m_begunArrow = true;
            m_scene->removeItem(m_lastAddedEdge);
            delete m_lastAddedEdge;
@@ -259,11 +293,18 @@ void GraphWidget::mousePressEvent(QMouseEvent *event)
     if(event->button()== Qt::RightButton)
         return ;
 
-    if((MindToolBar::NONE == m_currentTool)||(MindToolBar::HANDLE == m_currentTool))
+    QGraphicsItem* item = itemAt(event->pos());
+
+    qDebug() << "mousePressEvent" << event->isAccepted() << item;
+    if(nullptr!=item)//(event->isAccepted()||
     {
-        QGraphicsView::mousePressEvent(event);
+        setDragMode(QGraphicsView::NoDrag);
     }
     else
+    {
+         QGraphicsView::mousePressEvent(event);
+    }
+  /*  else
     {
         if(MindToolBar::ADD_ITEM==m_currentTool)
         {
@@ -280,17 +321,17 @@ void GraphWidget::mousePressEvent(QMouseEvent *event)
         {
             if(Qt::LeftButton== event->button())
             {
-                addGeoAt(event->pos() /*event->posF()*/);
+                addGeoAt(event->pos() );
             }
         }
         else if(MindToolBar::ADD_BREAK == m_currentTool)
         {
             if(Qt::LeftButton== event->button())
             {
-                addBreakAt(event->pos() /*event->posF()*/);
+                addBreakAt(event->pos());
             }
         }
-    }
+    }*/
 
 }
 void GraphWidget::addBreakAt(QPointF pos)
@@ -415,10 +456,6 @@ void GraphWidget::buildEdge()
     }
 }
 
-void GraphWidget::setCurrentNodeBrush(Node* node)
-{
-    m_currentNodeBrush = node;
-}
 void GraphWidget::addNodeAt(QPoint pos)
 {
     Node* node = new Node(this);
@@ -427,9 +464,9 @@ void GraphWidget::addNodeAt(QPoint pos)
     m_nodeList->append(node);
     node->setPos(pos.x(),pos.y());
     node->setStringManager(m_stringManager);
-    node->setColor(m_currentNodeBrush->color());
-    node->setBgColor(m_currentNodeBrush->bgColor());
-    node->setText(m_currentNodeBrush->getText());
+
+    node->setColorTheme(m_defaultNodeBrush);
+    node->setText("Root");
 
 
 }
@@ -439,30 +476,7 @@ void  GraphWidget::setCurrentTool(MindToolBar::MINDTOOL tool)
     m_pointList->clear();
 }
 
-void GraphWidget::mouseMoveEvent(QMouseEvent* event)
-{
-    if(NULL!=m_lastAddedEdge)
-    {
-        m_lastAddedEdge->setDestinationPoint(event->pos() /*event->localPos()*/);
 
-        QGraphicsSceneHoverEvent myEvent(QEvent::GraphicsSceneHoverEnter);
-       // myEvent.setType(QEvent::GraphicsSceneHoverEnter);
-        myEvent.setPos(QPointF(1,1));
-        myEvent.setScenePos(event->pos());
-        myEvent.setScreenPos(event->screenPos().toPoint());
-        myEvent.setModifiers(event->modifiers());
-
-
-        QApplication::sendEvent(scene(), &myEvent);
-    }
-    else if(NULL!=lastAddedPackage)
-    {
-        lastAddedPackage->setBottomRight(event->pos() /* event->localPos()*/);
-    }
-
-
-    QGraphicsView::mouseMoveEvent(event);
-}
 void GraphWidget::readFromData(QDataStream& out)
 {
     qreal w,h;
@@ -613,7 +627,7 @@ void GraphWidget::attachedChild()
 
     if(tmp!=NULL)
     {
-        qDebug() << tmp->boundingRect() << tmp->pos();
+        //qDebug() << tmp->boundingRect() << tmp->pos();
         foreach(QGraphicsItem* item,m_scene->items(tmp->boundingRect().translated(tmp->pos()),Qt::IntersectsItemBoundingRect))
         {
             //qDebug()<< item->boundingRect() << item->pos();
@@ -632,7 +646,7 @@ void GraphWidget::attachedChild()
             if(NULL!=dynamic_cast<Edge*>(item))
             {
                 //item->setParentItem(tmp);
-                qDebug() << dynamic_cast<Edge*>(item)->getText();
+                //qDebug() << dynamic_cast<Edge*>(item)->getText();
 
             }
         }
@@ -707,8 +721,7 @@ void GraphWidget::dumpMapInBipmap(QString file)
 }
 void GraphWidget::setCurrentEdgeBrush(Edge* edge)
 {
-    m_currentEdgeBrush = edge;
-    setCurrentTool(MindToolBar::ARROW);
+    //setCurrentTool(MindToolBar::ARROW);
 }
 void GraphWidget::removeGenericMindMapItem(GenericMindMapItem* item)
 {

@@ -28,17 +28,46 @@ PreferencesManager::PreferencesManager()
 {
     m_optionDictionary = new QMap<QString,QVariant>;
     
-    
+    ColorTheme* theme = new ColorTheme();
+    QColor color1;
+    QColor color0;
+
+
+    color0.setHsv(0,20,120);
+    color0.setAlpha(20);
+    color1.setHsv(0,120,255);
+    color1.setAlpha(20);
+    theme->setColorBg0(color0);
+    theme->setColorBg0(color1);
+    theme->setTextColor(QColor(Qt::black));
+    m_colorThemeNodeModel.append(theme);
+
     //Default value
-    /*m_optionDictionary->insert("MusicDirectory",QDir::homePath());
-    m_optionDictionary->insert("ImageDirectory",QDir::homePath());
-    m_optionDictionary->insert("MapDirectory",QDir::homePath());
-    m_optionDictionary->insert("ScriptDirectory",QDir::homePath());
-    m_optionDictionary->insert("MinutesDirectory",QDir::homePath());
-    m_optionDictionary->insert("TchatDirectory",QDir::homePath());
-    m_optionDictionary->insert("DataDirectory",QDir::homePath());*/
+    for(int i=0;i<255;i+=5)
+    {
+        ColorTheme* theme = new ColorTheme();
+        QColor color1;
+        QColor color0;
+
+        color1.setHsv(i,255,255);
+        color0.setHsv(i,255,255);
+
+        theme->setColorBg0(color0);
+        theme->setColorBg0(color1);
+        int a = color0.green()+color0.blue()+color0.red()-381;
+        if(a>0)
+        {
+            theme->setTextColor(QColor(Qt::black));
+        }
+        else
+        {
+            theme->setTextColor(QColor(Qt::white));
+        }
+        m_colorThemeNodeModel.append(theme);
+    }
     
 }
+
 
 PreferencesManager::~PreferencesManager()
 {
@@ -47,7 +76,10 @@ PreferencesManager::~PreferencesManager()
 
 PreferencesManager* PreferencesManager::m_singleton = NULL;
 
-
+ColorTheme* PreferencesManager::getDefaultNodeColorTheme()
+{
+    return m_colorThemeNodeModel.at(0);
+}
 PreferencesManager* PreferencesManager::getInstance()
 {
     
@@ -83,12 +115,12 @@ void PreferencesManager::readSettings(QSettings & settings)
     {
 
         *m_optionDictionary = variant.value<QMap<QString,QVariant> >();
-     }
+    }
     
 
-   for(int i = 0;m_optionDictionary->size()>i;i++)
+    for(int i = 0;m_optionDictionary->size()>i;i++)
     {
-      // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
+        // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
 
 
     }
@@ -103,9 +135,9 @@ void PreferencesManager::writeSettings(QSettings & settings)
     settings.endGroup();
 
     for(int i = 0;m_optionDictionary->size()>i;i++)
-     {
-       // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
+    {
+        // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
 
 
-     }
+    }
 }

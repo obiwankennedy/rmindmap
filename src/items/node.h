@@ -37,7 +37,7 @@ class Node : public EdgableItems
 {
     Q_OBJECT
 public:
-    Node(GraphWidget *graphWidget);
+    Node(QObject* graphWidget = nullptr);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -50,8 +50,6 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     QString getText() const;
-    QColor color() const;
-    QColor bgColor() const;
     QString description() const;
 
     void setDescription(QString desc);
@@ -67,13 +65,15 @@ public:
 
     virtual QPixmap getIcon() const;
     virtual QPointF middlePoint();
-    virtual void setGeometry(int w,int h);
+    //virtual void setGeometry(int w,int h);
+    int getRadius() const;
+
+ /*   GraphWidget* getGraph() const;
+    void setGraph(GraphWidget * graph);*/
 
 public slots:
     void setText(QString text);
     void setName(QString& t);
-    void setColor(QColor);
-    void setBgColor(QColor);
     void updatePainting();
 
 protected:
@@ -85,11 +85,9 @@ protected:
 
     
 private:
-    QList<Edge *> edgeList;
+    QList<Edge *> m_edgeList;
     QPointF newPos;
-    GraphWidget *graph;
-    QColor m_bgcolor;
-    QColor m_color;
+   // GraphWidget *m_graph;
 
     QString m_text;
 
@@ -99,12 +97,16 @@ private:
     qreal m_raduisBigV;
     qreal m_raduisBigH;
     QRect m_textRect;
+    static QRect m_minRect;
 
     QLineEdit* m_tempedit;
 
     QString m_id;
     QString m_description;
     QGraphicsProxyWidget* m_proxyw;
+
+    QList<QGraphicsItem*> m_children;
+
 };
 
 

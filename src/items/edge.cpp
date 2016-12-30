@@ -100,7 +100,6 @@ void Edge::adjust()
     {
         qreal dx = line.dx();
         qreal dy = line.dy();
-        //qDebug() << "dx" << dx << dy;
         if(abs(dx)*1.3>abs(dy))
         {
             dy=0;
@@ -109,10 +108,7 @@ void Edge::adjust()
         {
             dx=0;
         }
-
-        //QPointF edgeOffset((dx * (m_source->boundingRect().width()/2)) / length, (dy * (m_source->boundingRect().height()/2)) / length);
          QPointF middlePoint = mapFromItem(m_source,m_source->middlePoint());
-
         if(dx==0)
         {
             sourcePoint.setX(middlePoint.x());
@@ -137,15 +133,9 @@ void Edge::adjust()
                sourcePoint.setX(middlePoint.x() - m_source->boundingRect().width()/2);
             }
         }
-// qDebug() << "source" << dx << dy <<  "source:"<< m_source << "midlle:"<< mapFromItem(m_source,m_source->middlePoint());
-
-       // sourcePoint = line.p1() + edgeOffset;
         line.setP1(sourcePoint);
         if(NULL!=m_dest)
         {
-           /* edgeOffset.setX((line.dx() * m_dest->boundingRect().width()/2) / length);
-            edgeOffset.setY((line.dy() * m_dest->boundingRect().height()/2) / length);
-            destPoint = line.p2() - edgeOffset;*/
 
             QPointF middlePoint = mapFromItem(m_dest,m_dest->middlePoint());
 
@@ -173,7 +163,6 @@ void Edge::adjust()
                 }
                 destPoint.setY(middlePoint.y());
             }
-            // qDebug() << "destination" << dx << dy << edgeOffset << "dest:"<< destPoint << "midlle:"<< mapFromItem(m_dest,m_dest->middlePoint());
         }
     }
     else
@@ -501,9 +490,9 @@ void Edge::setDestinationPoint(QPointF pos)
     destPoint = pos;
     update();
 }
-void Edge::setGrap(GraphWidget* graph)
+void Edge::setGrap(GraphWidget* m_graph)
 {
-    m_graph = graph;
+    m_graph = m_graph;
 }
 
 void Edge::readFromData(QDataStream& in)

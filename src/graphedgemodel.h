@@ -23,7 +23,7 @@
 #include <QAbstractListModel>
 #include <QSettings>
 
-#include "edge.h"
+#include "items/edge.h"
 #include "serializable.h"
 
 class GraphEdgeModel : public QAbstractListModel, public SettingsUser

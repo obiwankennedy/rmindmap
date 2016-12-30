@@ -36,5 +36,7 @@ int main(int argc, char **argv)
 
     mainWindow.show();
 
+    mainWindow.addNodeAt(QPoint(200,200));
+
     return app.exec();
 }

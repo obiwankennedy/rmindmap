@@ -28,6 +28,9 @@
 #include "serializable.h"
 #include "items/edgebreak.h"
 #include "stringmanager/stringmanager.h"
+#include "preferences/preferencesmanager.h"
+
+#include "mindmap.h"
 
 class Node;
 class QAction;
@@ -76,7 +79,7 @@ public slots:
     void zoomIn();
     void zoomOut();
 
-    void setCurrentNodeBrush(Node*);
+ //   void setCurrentNodeBrush(Node*);
     void setCurrentEdgeBrush(Edge*);
     void setCurrentTool(MindToolBar::MINDTOOL);
 
@@ -97,6 +100,7 @@ protected:
     void contextMenuEvent ( QContextMenuEvent * event );
     void initAction();
 
+    void mouseReleaseEvent(QMouseEvent *event);
 private slots:
     void removeItem();
     void editItem();
@@ -115,9 +119,9 @@ private://functions
 
 
 private:
-    Node* m_currentNodeBrush;
-    Edge* m_currentEdgeBrush;
-    QGraphicsScene* m_scene;
+    ColorTheme* m_defaultNodeBrush;
+    ColorTheme* m_defaultEdgeBrush;
+    MindMap* m_scene;
 
     bool m_begunArrow;
     bool m_begunGeo;
@@ -140,7 +144,7 @@ private:
     QAction* m_boundItemsAct;
 
     QPoint m_point;
-
+    QPoint m_lastPoint;
     StringManager* m_stringManager;
 };
 

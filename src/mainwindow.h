@@ -49,6 +49,7 @@ signals:
     
 public slots:
     void openRecentFile();
+    void addNodeAt(QPoint pos);
 
 
 protected:
@@ -75,7 +76,7 @@ private: //function
 
 
 private://attributs
-    GraphWidget* m_widget;
+    QGraphicsView* m_widget;
     MindToolBar* m_mindtoolbar;
     QString m_title;
 
@@ -113,6 +114,8 @@ private://attributs
    ItemBrowser* m_browser;
    StringManager* m_stringManager;
    TimeLineWidget* m_timeLine;
+
+       MindMap* m_scene;
     
 };
 

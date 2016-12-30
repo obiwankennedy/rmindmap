@@ -23,8 +23,8 @@
 #include <QDockWidget>
 
 
-#include "node.h"
-#include "edge.h"
+#include "items/node.h"
+#include "items/edge.h"
 #include "items/packageitem.h"
 
 #include "colorbutton.h"

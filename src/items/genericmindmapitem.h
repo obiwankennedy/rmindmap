@@ -26,6 +26,31 @@
 
 #include "src/serializable.h"
 
+class ColorTheme
+{
+public:
+    ColorTheme();
+
+    QBrush getBursh(qreal x1, qreal y1, qreal x2, qreal y2);
+
+    QColor getTextColor() const;
+    void setTextColor(const QColor &textColor);
+
+    QColor getColorBg0() const;
+    void setColorBg0(const QColor &colorBg0);
+
+    QColor getColorBg1() const;
+    void setColorBg1(const QColor &colorBg1);
+
+    Qt::PenStyle getLineStyle() const;
+    void setLineStyle(const Qt::PenStyle &lineStyle);
+
+private:
+    QColor m_textColor;
+    QColor m_colorBg0;
+    QColor m_colorBg1;
+    Qt::PenStyle m_lineStyle;
+};
 
 class GenericMindMapItem : public QGraphicsObject,public Serialisable
 {
@@ -40,17 +65,21 @@ public:
 
     virtual void setStringManager(StringManager* stringManager);
 
-    virtual void setGeometry(int w,int h) = 0;
+    virtual void setGeometry(int w,int h);
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
     virtual void dragEnterEvent ( QGraphicsSceneDragDropEvent * event );
 
+    ColorTheme* getColorTheme() const;
+    void setColorTheme(ColorTheme* colorTheme);
+
 public slots:
-   virtual void setText(QString) = 0;
-   virtual void setName(QString&) = 0;
+    virtual void setText(QString) = 0;
+    virtual void setName(QString&) = 0;
 
 protected:
     StringManager* m_stringManager;
+    ColorTheme *m_colorTheme;
 
 };
 

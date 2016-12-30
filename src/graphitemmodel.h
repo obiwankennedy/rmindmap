@@ -23,7 +23,7 @@
 #include <QAbstractListModel>
 #include <QSettings>
 
-#include "node.h"
+#include "items/node.h"
 #include "stringmanager/stringmanager.h"
 
 class PreferencesManager;

@@ -25,7 +25,7 @@
 #include <QMap>
 #include <QSettings>
 
-
+#include "items/genericmindmapitem.h"
 /**
     * @index <h2>How To use the Preference Manager.</h2>
     *  <p>It is always painful to manage of data between two sessions of Rolisteam.
@@ -85,6 +85,8 @@ public:
     * Save parameters for next executions.
     */
     void writeSettings(QSettings & settings);
+
+    ColorTheme* getDefaultNodeColorTheme();
     
 private:
     /**
@@ -110,6 +112,10 @@ private:
     * The key is a QString, the value is a QVariant.
     */
     QMap<QString,QVariant>* m_optionDictionary;
+
+
+    QList<ColorTheme*> m_colorThemeNodeModel;
+    QList<ColorTheme*> m_colorThemeEdgeModel;
 };
 
 #endif // PREFERENCESMANAGER_H

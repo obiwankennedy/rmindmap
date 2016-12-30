@@ -31,24 +31,25 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     m_stringManager = new StringManager();
-    m_widget = new GraphWidget(m_stringManager,this);
+    m_widget = new QGraphicsView(this);// new GraphWidget(m_stringManager,this);
     m_mindtoolbar = new MindToolBar(m_stringManager,this);
     m_detailpanel = new DetailPanel(this);
     m_browser = new ItemBrowser;
-    m_timeLine = new TimeLineWidget();
+    m_scene = new MindMap(this);
+    m_widget->setScene(m_scene);
+
+    m_scene->setSceneRect(0,0,1024,768);
+   /* m_timeLine = new TimeLineWidget();
 
 
     QDockWidget* bottom = new QDockWidget(tr("TimeLine"),this);
     bottom->setWidget(m_timeLine);
-    addDockWidget(Qt::BottomDockWidgetArea,bottom);
+    addDockWidget(Qt::BottomDockWidgetArea,bottom);*/
 
 
     m_title = tr("%1[*] - MindMap Rolisteam - v0.0.1");
     setObjectName("MainWindow");
     setWindowTitle(m_title.arg(tr("untitled")));
-    connect(m_mindtoolbar,SIGNAL(currentNodeBrushChanged(Node*)),m_widget,SLOT(setCurrentNodeBrush(Node*)));
-    connect(m_mindtoolbar,SIGNAL(currentToolChanged(MindToolBar::MINDTOOL)),m_widget,SLOT(setCurrentTool(MindToolBar::MINDTOOL)));
-    connect(m_mindtoolbar,SIGNAL(currentEdgeBrushChanged(Edge*)),m_widget,SLOT(setCurrentEdgeBrush(Edge*)));
 
     connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
     connect(m_widget,SIGNAL(currentNode(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
@@ -64,17 +65,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(m_widget,SIGNAL(itemHasBeenDeleted(GenericMindMapItem*)),m_browser,SLOT(removeItem(GenericMindMapItem*)));
 
-    connect(m_browser,SIGNAL(itemHasBeenDeleted(GenericMindMapItem*)),m_widget,SLOT(removeGenericMindMapItem(GenericMindMapItem*)));
-
 
     m_preferences = PreferencesManager::getInstance();
 
-    connect(m_browser,SIGNAL(selectionChanged(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
-    connect(m_browser,SIGNAL(selectionChanged(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
-
     m_recentFileActions = new QList<QAction*>();
-
-
 
     setupUi();
 
@@ -116,7 +110,7 @@ void MainWindow::displayDetailsPanel()
 void MainWindow::setupUi()
 {
     setCentralWidget(m_widget);
-    m_dock = new QDockWidget(this);
+   /* m_dock = new QDockWidget(this);
     m_dock->setWidget(m_mindtoolbar);
     m_dock->setObjectName("ToolBar");
     m_dock->setWindowTitle(tr("ToolBar"));
@@ -129,7 +123,7 @@ void MainWindow::setupUi()
     m_dock->setWindowTitle(tr("Item Browser"));
 
     addDockWidget(Qt::LeftDockWidgetArea,m_dock);
-    addDockWidget(Qt::RightDockWidgetArea,m_detailpanel);
+    addDockWidget(Qt::RightDockWidgetArea,m_detailpanel);*/
 }
 
 
@@ -277,7 +271,7 @@ void MainWindow::makeAction()
     m_keepDetailsVisible->setCheckable(true);
     m_keepDetailsVisible->setChecked(true);
     m_toolbarView->setCheckable(true);
-    connect(m_toolbarView,SIGNAL(toggled(bool)),m_dock,SLOT(setVisible(bool)));
+    //connect(m_toolbarView,SIGNAL(toggled(bool)),m_dock,SLOT(setVisible(bool)));
 }
 void MainWindow::updateTitle()
 {
@@ -325,7 +319,7 @@ void MainWindow::readFile()
     {
         QDataStream in(&file);
         m_stringManager->readFromData(in);
-        m_widget->readFromData(in);
+        //m_widget->readFromData(in);
         file.close();
 
     }
@@ -347,9 +341,23 @@ void MainWindow::openMindMap()
         updateTitle();
     }
 }
+void MainWindow::addNodeAt(QPoint pos)
+{
+    Node* node = new Node(this);
+    //emit itemHasBeenAdded(node);
+    m_scene->addItem(node);
+    //m_nodeList->append(node);
+    node->setPos(pos.x(),pos.y());
+    node->setStringManager(m_stringManager);
+
+    node->setColorTheme(m_preferences->getDefaultNodeColorTheme());
+    node->setText("Root");
+
+
+}
 void MainWindow::newMindMap()
 {
-    m_widget->cleanScene();
+    //m_widget->cleanScene();
     m_browser->clear();
 }
 void MainWindow::saveMindMap()
@@ -378,7 +386,7 @@ void MainWindow::saveMindMap()
     {
         QDataStream in(&file);
         m_stringManager->writeToData(in);
-        m_widget->writeToData(in);
+        //m_widget->writeToData(in);
         file.close();
     }
 }
@@ -399,12 +407,12 @@ void MainWindow::exportMap()
     {
         QString uri = QFileDialog::getSaveFileName(this, tr("export Mind Map as SVG"), m_preferences->value("MindMapDirectory",QDir::homePath()).toString(), tr("SVG file (*.svg)"));
 
-        m_widget->dumpMapInSvg(uri);
+        //m_widget->dumpMapInSvg(uri);
 
     }
     else if(obj == m_pngExportAct)
     {
         QString uri = QFileDialog::getSaveFileName(this, tr("export Mind Map as Image"), m_preferences->value("MindMapDirectory",QDir::homePath()).toString(), tr("Bipmap file (*.png, *.jpg, *.bmp)"));
-        m_widget->dumpMapInBipmap(uri);
+       //m_widget->dumpMapInBipmap(uri);
     }
 }

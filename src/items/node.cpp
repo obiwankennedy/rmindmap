@@ -24,27 +24,21 @@
 #include <QStyleOption>
 #include <QUuid>
 #include <QGraphicsProxyWidget>
-
-
-
- #include <QPainterPath>
+#include <QPainterPath>
 
 #include "edge.h"
 #include "node.h"
 #include "graphwidget.h"
+#include "selectionitem.h"
 
-
-
-Node::Node(GraphWidget *graphWidget)
-    : graph(graphWidget),m_bgcolor(255,255,255),m_color(0,0,0)
+#define RADIUS 5
+QRect Node::m_minRect = QRect(0,0,60,20);
+Node::Node(QObject *graphWidget)
 {
     m_proxyw = NULL;
     m_text="test";
-    setFlag(ItemIsMovable);
-    setFlag(ItemIsSelectable);
-    setFlag(ItemSendsGeometryChanges);
-    //setCacheMode(DeviceCoordinateCache);
-    setCacheMode(NoCache);
+    m_textRect = m_minRect;
+    setFlags(QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemSendsGeometryChanges|QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsFocusable);
     setZValue(-1);
     m_id = QUuid::createUuid().toString();
 
@@ -57,6 +51,9 @@ Node::Node(GraphWidget *graphWidget)
     connect(m_tempedit,SIGNAL(editingFinished()),m_tempedit,SLOT(hide()));
     connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(updatePainting()));
 
+    SelectionItem* selector = new SelectionItem(this);
+
+    m_children.append(selector);
 }
 QString Node::getUuid()
 {
@@ -65,98 +62,61 @@ QString Node::getUuid()
 
 void Node::addEdge(Edge *edge)
 {
-    edgeList << edge;
+    m_edgeList << edge;
     edge->adjust();
 }
 
 QList<Edge *> Node::edges() const
 {
-    return edgeList;
+    return m_edgeList;
 }
 
 QRectF Node::boundingRect() const
 {
-    QRectF tmp=m_textRect;
+   // qDebug() << "bounding rect" << m_textRect;
 
-
-    tmp.setWidth(tmp.width()*2);
-    tmp.moveRight(tmp.width()/2);
-    tmp.setHeight(tmp.height()*2);
-
-    return tmp;
+    return m_textRect;
 }
 
 QPainterPath Node::shape() const
 {
-    QPainterPath path;
-
-
-    QRectF tmp=m_textRect;
-    tmp.setWidth(tmp.width()*2);
-    tmp.moveRight(tmp.width()/2);
-    tmp.setHeight(tmp.height()*2);
-
-    path.addEllipse(tmp);
-
-    return path;
+    return QGraphicsItem::shape();
 }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     QRect tmp=m_textRect;
+    painter->save();
 
+    QPainterPath myPainterPath;
+    painter->setPen(Qt::NoPen);
 
-    tmp.setWidth(tmp.width()*2);
-    tmp.moveRight(tmp.width()/2);
-    tmp.setHeight(tmp.height()*2);
+     bool showChild = (QStyle::State_Selected & option->state);
+    // qDebug() << showChild << isSelected();
 
-
-
-
-
-
-
-    if(QStyle::State_Selected & option->state)
+    for(auto item : m_children)
     {
-        painter->setPen(QPen(m_color));
-        QBrush brush(Qt::black);
-
-        painter->save();
-        painter->setBrush(brush);
-
-
-        painter->drawEllipse(tmp);
-        painter->restore();
-
-        painter->setPen(QPen(Qt::white));
-        painter->drawText(tmp,Qt::AlignCenter,m_text);
+        item->setVisible(showChild);
     }
-    else
-    {
-        //painter->setBackgroundMode(Qt::OpaqueMode);
-       // painter->setBackground(QBrush(m_bgcolor));
-
-        QPainterPath myPainterPath;
-        painter->setPen(QPen(m_color));
 
 
+    myPainterPath.addRoundedRect(tmp,RADIUS,RADIUS);
+    QBrush bgBrush = m_colorTheme->getBursh(0+tmp.width()/2,0,0+tmp.width()/2,tmp.height()*2);
+    //mybrush.
+    painter->fillPath(myPainterPath,bgBrush);
+   // painter->drawRoundedRect(tmp,RADIUS,RADIUS);
+    painter->restore();
+    painter->save();
 
-        myPainterPath.addEllipse(tmp);
-        QBrush mybrush(m_bgcolor);
-        //mybrush.
-        painter->fillPath(myPainterPath,mybrush);
-        painter->drawEllipse(tmp);
-       // painter->drawEllipse(-10,-10,20,20);
-
-
-        painter->setPen(QPen(Qt::black));
-        painter->drawText(tmp,Qt::AlignCenter,m_text);
-    }
+    painter->setPen(QPen(m_colorTheme->getTextColor()));
+    painter->drawText(tmp,Qt::AlignCenter,m_text);
+    painter->restore();
 }
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    switch (change) {
+    switch (change)
+    {
     case ItemScenePositionHasChanged:
     case ItemPositionHasChanged:
          updateEdges();
@@ -169,7 +129,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 }
 void Node::updateEdges()
 {
-    foreach (Edge *edge, edgeList)
+    foreach (Edge *edge, m_edgeList)
     {
         edge->adjust();
     }
@@ -177,6 +137,7 @@ void Node::updateEdges()
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << "Node mousePressEvent";
     update();
     QGraphicsItem::mousePressEvent(event);
 }
@@ -198,15 +159,34 @@ void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event )
     m_tempedit->selectAll();
     m_tempedit->setFocus(Qt::OtherFocusReason);
     m_tempedit->show();
+    QGraphicsItem::mouseDoubleClickEvent(event);
 
 }
+
+/*GraphWidget *Node::getGraph() const
+{
+    return m_graph;
+}
+
+void Node::setGraph(GraphWidget *graph)
+{
+    m_graph = graph;
+}*/
 
 void Node::setText(QString text)
 {
     m_text=text;
     QFont font;
     QFontMetrics info(font);
-    m_textRect = info.boundingRect(m_text);
+
+    m_textRect = info.boundingRect(QString(" %1 ").arg(m_text));
+    m_textRect.setHeight(m_textRect.height()*1.5);
+
+    if(m_minRect.height()*m_minRect.width()>m_textRect.height()*m_textRect.width())
+    {
+        m_textRect = m_minRect;
+    }
+
     if(NULL!=m_stringManager)
     {
         m_stringManager->setValue(tr("%1_%2").arg(m_id).arg("text"),text);
@@ -220,29 +200,6 @@ QString Node::getText() const
         return m_stringManager->getValue(tr("%1_%2").arg(m_id).arg("text"));
     }
     return QString();
-}
-
-
-void Node::setColor(QColor color)
-{
-    m_color = color;
-    update();
-}
-
-QColor Node::color() const
-{
-    return m_color;
-}
-
-void Node::setBgColor(QColor color)
-{
-   m_bgcolor = color;
-   update();
-}
-
-QColor Node::bgColor() const
-{
-    return m_bgcolor;
 }
 void  Node::updatePainting()
 {
@@ -261,8 +218,9 @@ void Node::setDescription(QString desc)
 void Node::readFromData(QDataStream& in)
 {
     in >> m_text;
-    in >> m_bgcolor;
-    in >> m_color;
+    QColor color;
+    in >> color;
+    in >> color;
     in >> m_id;
     setText(m_text);
     QPointF point;
@@ -276,8 +234,9 @@ void Node::readFromData(QDataStream& in)
 void Node::writeToData(QDataStream& out)
 {
     out << m_text;
-    out << m_bgcolor;
-    out << m_color;
+    QColor color;
+    out << color;
+    out << color;
     out << m_id;
     out << pos();
     out << m_description;
@@ -296,21 +255,26 @@ QPixmap Node::getIcon() const
     QPixmap pixmap(30,20);
     QPainter painter(&pixmap);
     painter.fillRect(pixmap.rect(),Qt::white);
-    painter.setPen(color());
+    painter.setPen(m_colorTheme->getTextColor());
     painter.drawEllipse(pixmap.rect().adjusted(0,0,-1,-1));
     painter.end();
     return pixmap;
 }
 QPointF Node::middlePoint()
 {
-    return QPointF(0,0);
+    return m_textRect.center();
 }
 void Node::setUuid(QString uuid)
 {
    // qDebug() << "uuid" << uuid;
     m_id = uuid;
 }
-void Node::setGeometry(int w,int h)
+/*void Node::setGeometry(int w,int h)
 {
 
+}
+*/
+int Node::getRadius() const
+{
+    return RADIUS;
 }

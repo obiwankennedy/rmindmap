@@ -56,8 +56,8 @@ void DetailPanel::setCurrentNode(Node* node)
     ui->m_stackedWidget->setCurrentIndex(0);
     ui->m_nodeDescriptionEdit->setText(node->description());
     ui->m_textEdit->setText(node->getText());
-    ui->m_bgColorChooser->setColor(node->bgColor());
-    ui->m_borderColorChooser->setColor(node->color());
+ //   ui->m_bgColorChooser->setColor(node->bgColor());
+ //   ui->m_borderColorChooser->setColor(node->color());
 
     m_currentNode=node;
 }
@@ -81,8 +81,8 @@ void DetailPanel::updateCurrentNode()
     if(NULL!=m_currentNode)
     {
         m_currentNode->setDescription(ui->m_nodeDescriptionEdit->document()->toHtml());
-        m_currentNode->setColor(ui->m_borderColorChooser->color());
-        m_currentNode->setBgColor(ui->m_bgColorChooser->color());
+      //  m_currentNode->setColor(ui->m_borderColorChooser->color());
+       // m_currentNode->setBgColor(ui->m_bgColorChooser->color());
     }
 
 }

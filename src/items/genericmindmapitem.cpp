@@ -20,8 +20,73 @@
 #include "genericmindmapitem.h"
 
 #include <QDebug>
+#include <QLinearGradient>
+/////////////////////////////////////////
+//
+//      Code of ColorTheme
+//
+/////////////////////////////////////////
+ColorTheme::ColorTheme()
+    : m_lineStyle(Qt::SolidLine)
+{
+
+}
+
+QBrush ColorTheme::getBursh(qreal x1, qreal y1, qreal x2, qreal y2)
+{
+    QLinearGradient linear(x1,y1,x2,y2);
+    linear.setColorAt(0,m_colorBg0);
+    linear.setColorAt(1,m_colorBg1);
+    return QBrush(linear);
+}
+QColor ColorTheme::getTextColor() const
+{
+    return m_textColor;
+}
+void ColorTheme::setTextColor(const QColor &textColor)
+{
+    m_textColor = textColor;
+}
+
+QColor ColorTheme::getColorBg0() const
+{
+    return m_colorBg0;
+}
+void ColorTheme::setColorBg0(const QColor &colorBg0)
+{
+    m_colorBg0 = colorBg0;
+}
+
+QColor ColorTheme::getColorBg1() const
+{
+    return m_colorBg1;
+}
+void ColorTheme::setColorBg1(const QColor &colorBg1)
+{
+    m_colorBg1 = colorBg1;
+}
+
+Qt::PenStyle ColorTheme::getLineStyle() const
+{
+    return m_lineStyle;
+}
+
+void ColorTheme::setLineStyle(const Qt::PenStyle &lineStyle)
+{
+    m_lineStyle = lineStyle;
+}
+
+
+
+
+
+/////////////////////////////////////////
+//
+//      Code of GenericMindMapItem
+//
+/////////////////////////////////////////
 GenericMindMapItem::GenericMindMapItem()
-    : m_stringManager(NULL)
+    : m_stringManager(NULL),m_colorTheme(NULL)
 {
     setAcceptDrops(true);
     setAcceptHoverEvents(true);
@@ -36,10 +101,24 @@ void GenericMindMapItem::setStringManager(StringManager* stringManager)
 
 void GenericMindMapItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
-    qDebug() << getText() << "GenericMindMapItem::hoverEnterEvent";
+    //qDebug() << getText() << "GenericMindMapItem::hoverEnterEvent";
 }
 
 void GenericMindMapItem::dragEnterEvent ( QGraphicsSceneDragDropEvent * event )
 {
-    qDebug() << getText() << "GenericMindMapItem::dragEnterEvent";
+    //qDebug() << getText() << "GenericMindMapItem::dragEnterEvent";
+}
+
+ColorTheme *GenericMindMapItem::getColorTheme() const
+{
+    return m_colorTheme;
+}
+
+void GenericMindMapItem::setColorTheme(ColorTheme *colorTheme)
+{
+    m_colorTheme = colorTheme;
+}
+void  GenericMindMapItem::setGeometry(int w,int h)
+{
+    qDebug() << w << h;
 }
