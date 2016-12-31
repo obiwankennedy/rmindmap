@@ -18,14 +18,15 @@
     *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
     ***************************************************************************/
 
-#include "selectionitem.h"
 #include <QPainter>
 #include <QDebug>
+#include <QGraphicsScene>
 
 #define PEN_WIDTH 4
 #define BUTTON_SIZE 15
 
-#include <QGraphicsScene>
+#include "selectionitem.h"
+#include "menustyleitem.h"
 
 SelectionItem::SelectionItem(Node *parent)
     : m_parent(parent)
@@ -38,6 +39,11 @@ SelectionItem::SelectionItem(Node *parent)
     m_menu = new SelectStyleItem(parent);
     m_menu->setParentItem(this);
 
+
+    m_folder = new FoldItem(parent);
+    m_folder->setParentItem(this);
+    m_folder->setZValue(1);
+
 }
 
 QRectF SelectionItem::boundingRect() const
@@ -49,11 +55,15 @@ QRectF SelectionItem::boundingRect() const
 
 void SelectionItem::paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    qDebug() << "paint ";
     if(m_parent->isSelected())
     {
-        m_child->setPos(boundingRect().width()/2-7/2,boundingRect().height()-(7));
+        qreal x = boundingRect().width()/2.0-3.5;
+        qreal y = boundingRect().height()-(7.0);
+
+        m_child->setPos(x,y);
         m_menu->setPos(boundingRect().topRight().x()-BUTTON_SIZE/2,boundingRect().topRight().y()-BUTTON_SIZE/2);
+        m_folder->setPos(boundingRect().width()/2-BUTTON_SIZE/2,boundingRect().height());
+
         painter->save();
         QPen pen;
         pen.setColor(Qt::blue);
@@ -112,11 +122,13 @@ void AddChildItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "mouse Press Addchild";
+   // qDebug() << "mouse Press Addchild";
     m_currentNode = new Node();
+    m_currentNode->setParentItem(m_parent);
     m_currentNode->setColorTheme(m_parent->getColorTheme());
     Edge* edge = new Edge(m_parent,m_currentNode);
     edge->setText(" ");
+    edge->setParentItem(m_parent);
     m_currentNode->setText(" ");
     scene()->addItem(m_currentNode);
     scene()->addItem(edge);
@@ -127,13 +139,13 @@ void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AddChildItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-    qDebug() << "mouseReleaseEvent";
+   // qDebug() << "mouseReleaseEvent";
     m_currentNode = NULL;
     QGraphicsItem::mouseReleaseEvent(event);
 }
 void AddChildItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    qDebug() << "AddChildItem mouseMoveEvent" << event->scenePos();
+//    qDebug() << "AddChildItem mouseMoveEvent" << event->scenePos();
     if(nullptr != m_currentNode)
     {
         m_currentNode->setPos(event->scenePos());
@@ -177,6 +189,61 @@ void SelectStyleItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   //  menu;
  //   menu
+   // qDebug() << boundingRect().contains(event->pos()) << "#################";
+    if(boundingRect().contains(event->pos()))
+    {
+        MenuStyleItem menu;
+        menu.setItem(m_parent);
+        menu.move(event->screenPos());
 
+       menu.exec();
+    }
+}
 
+FoldItem::FoldItem(Node *parent)
+: m_parent(parent),m_fold(true)
+{
+    setFlags(QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemSendsGeometryChanges|QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsFocusable);
+}
+
+QRectF FoldItem::boundingRect() const
+{
+    QRectF rect;
+    rect.setCoords(0,0,BUTTON_SIZE,BUTTON_SIZE);
+    return rect;
+}
+
+void FoldItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    if((m_parent->isUnderMouse()||isUnderMouse()))
+    {
+        painter->save();
+        QPen pen;
+        pen.setColor(Qt::red);
+
+        painter->setPen(pen);
+        painter->setBrush(Qt::red);
+        painter->drawEllipse(boundingRect());
+        painter->setPen(Qt::white);
+        painter->drawText(boundingRect(),Qt::AlignCenter,m_fold ? "-":"+");
+        painter->restore();
+    }
+}
+
+void FoldItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+        m_fold = !m_fold;
+
+        for(auto item : m_parent->childItems())
+        {
+            GenericMindMapItem* eItem = dynamic_cast<GenericMindMapItem*>(item);
+           // qDebug() << "item" << item << "eItem" << eItem;
+            if(nullptr != eItem)
+            {
+                eItem->setVisible(m_fold);
+            }
+        }
+    }
 }

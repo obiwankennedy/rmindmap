@@ -33,7 +33,7 @@ class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 
-class Node : public EdgableItems
+class Node : public EdgableItem
 {
     Q_OBJECT
 public:
@@ -54,8 +54,8 @@ public:
 
     void setDescription(QString desc);
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&);
+    virtual void writeToData(QJsonObject&);
 
     QString getUuid();
     void setUuid(QString uuid);
@@ -82,6 +82,7 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event );
+    virtual void keyPressEvent(QKeyEvent* event);
 
     
 private:
@@ -91,11 +92,11 @@ private:
 
     QString m_text;
 
-    qreal m_raduisv;
+ /*   qreal m_raduisv;
     qreal m_raduish;
 
     qreal m_raduisBigV;
-    qreal m_raduisBigH;
+    qreal m_raduisBigH;*/
     QRect m_textRect;
     static QRect m_minRect;
 

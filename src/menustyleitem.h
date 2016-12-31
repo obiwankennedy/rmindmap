@@ -21,13 +21,15 @@
 #ifndef MENUSTYLEITEM_H
 #define MENUSTYLEITEM_H
 
-#include <QWidget>
+#include <QDialog>
+#include "preferences/preferencesmanager.h"
+#include "items/genericmindmapitem.h"
 
 namespace Ui {
 class MenuStyleItem;
 }
 
-class MenuStyleItem : public QWidget
+class MenuStyleItem : public QDialog
 {
     Q_OBJECT
 
@@ -35,8 +37,23 @@ public:
     explicit MenuStyleItem(QWidget *parent = 0);
     ~MenuStyleItem();
 
+    void initActions();
+
+    void setItem(EdgableItem* item);
+    EdgableItem* getItem()const;
+
 private:
     Ui::MenuStyleItem *ui;
+
+    QAction* m_menuAct;
+    QAction* m_fontAct;
+    QAction* m_patelleAct;
+    QAction* m_hierarchyAct;
+    QAction* m_shapeAct;
+    QAction* m_gatheringAct;
+
+    PreferencesManager* m_preferences;
+    EdgableItem* m_element;
 };
 
 #endif // MENUSTYLEITEM_H

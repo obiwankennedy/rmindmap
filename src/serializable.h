@@ -22,6 +22,7 @@
 
 #include <QSettings>
 #include <QDataStream>
+#include <QJsonObject>
 
 class SettingsUser
 {
@@ -33,8 +34,8 @@ public:
 class Serialisable
 {
 public:
-    virtual void readFromData(QDataStream&) = 0;
-    virtual void writeToData(QDataStream&) = 0;
+    virtual void readFromData(QJsonObject&) = 0;
+    virtual void writeToData(QJsonObject&) = 0;
 };
 
 #endif // SERIALIZABLE_H

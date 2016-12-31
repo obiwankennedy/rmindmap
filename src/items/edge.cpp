@@ -18,24 +18,24 @@ static double TwoPi = 2.0 * Pi;
 static const int Arrow_Size = 8;
 
 Edge::Edge()
-    : m_arrowSize(Arrow_Size)
+    : m_arrowSize(Arrow_Size),m_source(nullptr),m_dest(nullptr)
 {
     init();
 }
 
-Edge::Edge(EdgableItems *sourceNode,EdgableItems *destNode)
-    : m_arrowSize(Arrow_Size)
+Edge::Edge(EdgableItem* sourceNode,EdgableItem* destNode)
+    : m_arrowSize(Arrow_Size),m_source(sourceNode),m_dest(destNode)
 {
     init();
-    m_source = sourceNode;
-    m_dest = destNode;
+   // m_source = sourceNode;
+   // m_dest = destNode;
     m_source->addEdge(this);
     m_dest->addEdge(this);
     adjust();
 
 }
-Edge::Edge(EdgableItems *sourceNode)
-    : m_arrowSize(Arrow_Size)
+Edge::Edge(EdgableItem *sourceNode)
+    : m_arrowSize(Arrow_Size),m_source(sourceNode),m_dest(nullptr)
 {
     init();
 
@@ -51,6 +51,9 @@ Edge::Edge(EdgableItems *sourceNode)
 }
 void Edge::init()
 {
+
+    m_type = Straight;
+
     m_showTanPoints= false;
     setFlag(ItemIsSelectable);
     setFlag(ItemSendsGeometryChanges);
@@ -59,7 +62,7 @@ void Edge::init()
 
 
 
-    m_endkind = BOTH;
+    m_arrowHead = BOTH;
     m_proxyw =NULL;
     m_tempedit = new QLineEdit();
     m_tempedit->setFrame(false);
@@ -70,12 +73,12 @@ void Edge::init()
     connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(updatePainting()));
 }
 
-EdgableItems *Edge::sourceNode() const
+EdgableItem *Edge::sourceNode() const
 {
     return m_source;
 }
 
-EdgableItems *Edge::destNode() const
+EdgableItem *Edge::destNode() const
 {
     return m_dest;
 }
@@ -179,14 +182,14 @@ void Edge::adjust()
 
 
 }
-void  Edge::setDestination(EdgableItems *destNode)
+void  Edge::setDestination(EdgableItem *destNode)
 {
     m_dest = destNode;
     m_dest->addEdge(this);
     adjust();
 
 }
-void  Edge::setSource(EdgableItems *srcNode)
+void  Edge::setSource(EdgableItem *srcNode)
 {
     m_source = srcNode;
     m_source->addEdge(this);
@@ -223,6 +226,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 {
     if (!m_source)
         return;
+
     if(destPoint.isNull())
     {
         destPoint = sourcePoint;
@@ -344,10 +348,21 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     // Draw the line itself
     painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    //painter->drawLine(line);
 
+    painter->save();
+    painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    QFont font;
+    QFontMetrics info(font);
 
-    painter->drawText(line.pointAt(0.5),m_text);
+    QRect textRect = info.boundingRect(QString("__%1__").arg(m_text));
+    textRect.translate(line.pointAt(0.5).toPoint());
+    textRect.translate(-textRect.width()/2,0);
+    painter->drawText(textRect,Qt::AlignCenter,m_text);
+    //if(!m_text.isEmpty())
+    {
+        painter->fillRect(textRect,Qt::black);
+    }
+    painter->restore();
 
     /// TEST of BOUNDING RECT
     if(option->state & QStyle::State_Selected)
@@ -369,9 +384,19 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     // Draw the arrows
-    QLineF lineSRC(sourcePoint, m_sourceTanPoint);
-    QLineF lineDEST(m_destTanPoint, destPoint);
+    QLineF lineSRC;
+    QLineF lineDEST;
 
+    if(Curve == m_type)
+    {
+        lineSRC.setPoints(sourcePoint, m_sourceTanPoint);
+        lineDEST.setPoints(m_destTanPoint, destPoint);
+    }
+    else  if(Straight == m_type)
+    {
+        lineSRC.setPoints(sourcePoint, destPoint);
+        lineDEST.setPoints(sourcePoint, destPoint);
+    }
     qreal angleSRC = ::acos(lineSRC.dx() / (lineSRC.length() > 0 ? lineSRC.length() : 1) );
     qreal angleDEST = ::acos(lineDEST.dx() / (lineDEST.length() > 0 ? lineDEST.length() : 1));
 
@@ -413,7 +438,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     QPainterPath path;
     QPointF endPath;
 
-    if((m_endkind == Edge::BOTH)||(m_endkind == Edge::END1))
+    if((m_arrowHead == Edge::BOTH)||(m_arrowHead == Edge::END1))
     {
         painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
         path.moveTo(lineFSrc.pointAt(0.5));
@@ -423,7 +448,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         path.moveTo(sourcePoint);
     }
 
-    if((m_endkind == Edge::BOTH)||(m_endkind == Edge::END2))
+    if((m_arrowHead == Edge::BOTH)||(m_arrowHead == Edge::END2))
     {
         painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
         endPath=lineFDest.pointAt(0.5);
@@ -448,8 +473,14 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
 
 
-
-    path.cubicTo(m_sourceTanPoint,m_destTanPoint,endPath);
+    if(Straight == m_type)
+    {
+        painter->drawLine(line);
+    }
+    else if(Curve == m_type)
+    {
+        path.cubicTo(m_sourceTanPoint,m_destTanPoint,endPath);
+    }
 
 
 
@@ -495,9 +526,34 @@ void Edge::setGrap(GraphWidget* m_graph)
     m_graph = m_graph;
 }
 
-void Edge::readFromData(QDataStream& in)
+
+void Edge::writeToData(QJsonObject& obj)
 {
-    in >> m_arrowSize;
+    obj["arrowSize"]=m_arrowSize;
+    obj["text"]=m_text;
+    obj["arrowHead"]=m_arrowHead;
+    obj["SrcId"]=m_source->getUuid();
+    obj["dstId"]=m_dest->getUuid();
+/*    out << m_arrowSize;
+    out << m_text;
+    out << (int)m_endkind;
+    out << m_source->getUuid();
+    out << m_dest->getUuid();*/
+}
+void Edge::readFromData(QJsonObject& in)
+{
+
+    m_arrowSize = in["arrowSize"].toInt();
+    m_text=in["text"].toString();
+    m_arrowHead=(ArrowHead)in["arrowHead"].toInt();
+    m_uuidSrc = in["SrcId"].toString();
+    m_uuidDst = in["dstId"].toString();
+
+    lookUpPoint();
+    adjust();
+    update();
+
+  /*  in >> m_arrowSize;
     in >> m_text;
     setText(m_text);
     QString uuid;
@@ -508,38 +564,33 @@ void Edge::readFromData(QDataStream& in)
 
     in >>m_uuidDst;
 
-    lookUpPoint();
 
     adjust();
-    update();
+    update();*/
 }
+QString Edge::getDestId() const
+{
+    return m_uuidDst;
+}
+
 void Edge::lookUpPoint()
 {
-    m_source= m_graph->getEdgableItemFromUuid(m_uuidSrc);
-    m_dest=  m_graph->getEdgableItemFromUuid(m_uuidDst);
-    if(NULL!=m_source)
+    //m_source= m_graph->getEdgableItemFromUuid(m_uuidSrc);
+   // m_dest=  m_graph->getEdgableItemFromUuid(m_uuidDst);
+/*    if(NULL!=m_source)
     {
         m_source->addEdge(this);
     }
     if(NULL!=m_dest)
     {
         m_dest->addEdge(this);
-    }
+    }*/
 }
 
 QString Edge::getText() const
 {
 
     return m_text;
-}
-
-void Edge::writeToData(QDataStream& out)
-{
-    out << m_arrowSize;
-    out << m_text;
-    out << (int)m_endkind;
-    out << m_source->getUuid();
-    out << m_dest->getUuid();
 }
 void Edge::updatePainting()
 {
@@ -552,15 +603,15 @@ void Edge::setText(QString t)
     QFontMetrics info(font);
     m_textRect = info.boundingRect(m_text);
 }
-void Edge::setKind(Edge::EndKind kind)
+void Edge::setKind(Edge::ArrowHead kind)
 {
-    m_endkind = kind;
+    m_arrowHead = kind;
     updatePainting();
 }
 
-Edge::EndKind  Edge::getKind()
+Edge::ArrowHead  Edge::getKind()
 {
-    return m_endkind;
+    return m_arrowHead;
 }
 QPainterPath  Edge::shape() const
 {
@@ -634,11 +685,11 @@ QPixmap Edge::getIcon() const
                                               cos(angle - Pi + Pi / 3) * arrowSize);
 
     painter.setBrush(Qt::black);
-    if((m_endkind == Edge::BOTH)||(m_endkind == Edge::END1))
+    if((m_arrowHead == Edge::BOTH)||(m_arrowHead == Edge::END1))
     {
         painter.drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
     }
-    if((m_endkind == Edge::BOTH)||(m_endkind == Edge::END2))
+    if((m_arrowHead == Edge::BOTH)||(m_arrowHead == Edge::END2))
     {
         painter.drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
     }
@@ -651,12 +702,12 @@ QPixmap Edge::getIcon() const
 
 
 
-EdgableItems* Edge::getDestination()
+EdgableItem* Edge::getDestination()
 {
     return m_dest;
 }
 
-EdgableItems* Edge::getSource()
+EdgableItem* Edge::getSource()
 {
     return m_source;
 }

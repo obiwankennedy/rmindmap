@@ -22,13 +22,41 @@
 #define MINDMAP_H
 
 #include <QGraphicsScene>
+#include <QTextStream>
+#include <QList>
 
-class MindMap : public QGraphicsScene
+#include "preferences/preferencesmanager.h"
+#include "items/node.h"
+#include "items/edge.h"
+#include "serializable.h"
+
+/**
+ * @brief The MindMap class
+ */
+class MindMap : public QGraphicsScene, public Serialisable
 {
 public:
     MindMap(QObject* parent);
 
+    void readFromText(QTextStream& in);
+
+
+    void appendRoot(Node* root);
+
+    int getDepth(QString line);
+    Node *addNodeAt(QPoint pos);
+
+    StringManager *getStringManager() const;
+    void setStringManager(StringManager *stringManager);
+
+    void linkItem(Node *first, Node *second);
+
+    virtual void readFromData(QJsonObject&);
+    virtual void writeToData(QJsonObject&);
 private:
+    QList<Node*> m_roots;
+    PreferencesManager* m_preferences;
+    StringManager* m_stringManager;
 
 };
 

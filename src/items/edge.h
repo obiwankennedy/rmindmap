@@ -33,13 +33,14 @@ class Edge : public GenericMindMapItem
     Q_OBJECT
 
 public:
-    enum EndKind {BOTH,END1,END2,NONE};
-    Edge(EdgableItems *sourceNode, EdgableItems *destNode);
-    Edge(EdgableItems *sourceNode);
+    enum ArrowHead {BOTH,END1,END2,NONE};
+    enum LineType {Straight, Curve};
+    Edge(EdgableItem *sourceNode, EdgableItem *destNode);
+    Edge(EdgableItem *sourceNode);
     Edge();
 
-    EdgableItems *sourceNode() const;
-    EdgableItems *destNode() const;
+    EdgableItem *sourceNode() const;
+    EdgableItem *destNode() const;
     QPainterPath shape() const;
     void setGrap(GraphWidget*);
 
@@ -55,20 +56,22 @@ public:
     virtual QString getName() const;
 
 
-    void setKind(Edge::EndKind);
-    Edge::EndKind getKind();
+    void setKind(Edge::ArrowHead);
+    Edge::ArrowHead getKind();
 
-    void setDestination(EdgableItems *destNode);
-    void setSource(EdgableItems *srcNode);
+    void setDestination(EdgableItem *destNode);
+    void setSource(EdgableItem *srcNode);
 
 
-    EdgableItems* getDestination();
-    EdgableItems* getSource();
+    EdgableItem* getDestination();
+    EdgableItem* getSource();
+
+    QString getDestId() const;
 
     void setDestinationPoint(QPointF);
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&);
+    virtual void writeToData(QJsonObject&);
 
     virtual QPixmap getIcon() const;
     void lookUpPoint();
@@ -93,7 +96,7 @@ private: //function;
     void init();
 
 private:
-    EdgableItems *m_source, *m_dest;
+    EdgableItem *m_source, *m_dest;
 
     QPointF sourcePoint;
     QPointF destPoint;
@@ -101,14 +104,14 @@ private:
     QString m_uuidSrc;
     QString m_uuidDst;
 
-    GraphWidget* m_graph;
+   // GraphWidget* m_graph;
 
     QString m_text;
     QLineEdit* m_tempedit;
     QGraphicsProxyWidget* m_proxyw;
     QRect m_textRect;
 
-    EndKind m_endkind;
+    ArrowHead m_arrowHead;
     QPainterPath m_path;
 
     QPointF m_sourceTanPoint;
@@ -117,7 +120,7 @@ private:
     bool m_showTanPoints;
 
 
-
+    LineType m_type;
 };
 
 

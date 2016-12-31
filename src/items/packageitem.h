@@ -25,7 +25,7 @@
 
 class GraphWidget;
 class Edge;
-class PackageItem : public EdgableItems
+class PackageItem : public EdgableItem
 {
 public:
     enum Border {STRONG,TINY,MIDDLE};
@@ -45,8 +45,8 @@ public:
 
     QRectF rect();
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&);
+    virtual void writeToData(QJsonObject&);
     void setGrap(GraphWidget*);
 
     virtual QPixmap getIcon() const;

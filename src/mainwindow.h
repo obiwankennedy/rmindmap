@@ -25,6 +25,7 @@
 #include <QFileInfo>
 
 #include "graphwidget.h"
+#include "mindmapview.h"
 #include "mindtoolbar.h"
 #include "preferences/preferencesmanager.h"
 
@@ -45,6 +46,7 @@ public:
     void writeSettings();
 
     
+    void readFileText();
 signals:
     
 public slots:
@@ -76,7 +78,7 @@ private: //function
 
 
 private://attributs
-    QGraphicsView* m_widget;
+    MindMapView* m_mindmapView;
     MindToolBar* m_mindtoolbar;
     QString m_title;
 
@@ -115,7 +117,9 @@ private://attributs
    StringManager* m_stringManager;
    TimeLineWidget* m_timeLine;
 
-       MindMap* m_scene;
+   MindMap* m_scene;
+
+
     
 };
 

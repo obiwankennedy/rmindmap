@@ -124,10 +124,10 @@ void PackageItem::setBorder(PackageItem::Border b)
 {
     m_border= b;
 }
-void PackageItem::readFromData(QDataStream& in)
+void PackageItem::readFromData(QJsonObject& in)
 {
 
-    in >> m_title;
+  /*  in >> m_title;
     in >> m_id;
     QPointF pos;
     in >> pos;
@@ -143,7 +143,7 @@ void PackageItem::readFromData(QDataStream& in)
     {
         in >> uuid;
 
-        EdgableItems*  node = m_graph->getEdgableItemFromUuid(uuid);
+        EdgableItem*  node = m_graph->getEdgableItemFromUuid(uuid);
         if(NULL!=node)
         {
             node->setParentItem(this);
@@ -151,8 +151,25 @@ void PackageItem::readFromData(QDataStream& in)
 
     }
     setPos(pos);
-    updateHW();
+    updateHW();*/
 
+}
+void PackageItem::writeToData(QJsonObject& out)
+{
+/*    out << m_title;
+    out << m_id;
+    out << pos();
+    out << m_topLeft;
+    out << m_bottomRight;
+    out << childItems().size();
+    foreach(QGraphicsItem* item,childItems())
+    {
+        if(NULL!=dynamic_cast<Node*>(item))
+        {
+            out << dynamic_cast<Node*>(item)->getUuid();
+
+        }
+    }*/
 }
 QVariant PackageItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
@@ -180,23 +197,6 @@ void PackageItem::updateEdges()
     foreach (Edge *edge, m_edgeList)
     {
         edge->adjust();
-    }
-}
-void PackageItem::writeToData(QDataStream& out)
-{
-    out << m_title;
-    out << m_id;
-    out << pos();
-    out << m_topLeft;
-    out << m_bottomRight;
-    out << childItems().size();
-    foreach(QGraphicsItem* item,childItems())
-    {
-        if(NULL!=dynamic_cast<Node*>(item))
-        {
-            out << dynamic_cast<Node*>(item)->getUuid();
-
-        }
     }
 }
 QPixmap PackageItem::getIcon() const

@@ -83,18 +83,18 @@ void EdgeBreak::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     painter->fillRect(boundingRect(),Qt::black);
 }
-void EdgeBreak::readFromData(QDataStream& in)
+void EdgeBreak::readFromData(QJsonObject& in)
 {
-    in >> m_id;
+   /* in >> m_id;
     QPointF center;
     in >> center;
-    setPos(center);
+    setPos(center);*/
 }
 
-void EdgeBreak::writeToData(QDataStream& out)
+void EdgeBreak::writeToData(QJsonObject& out)
 {
-    out << m_id;
-    out << pos();
+  /*  out << m_id;
+    out << pos();*/
 }
 QVariant EdgeBreak::itemChange(GraphicsItemChange change, const QVariant &value)
 {

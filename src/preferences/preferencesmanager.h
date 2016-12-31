@@ -48,15 +48,11 @@ public:
     *
     * @return instance of PreferencesManager
     */
-    static PreferencesManager* getInstance();
-    
-    
+    static PreferencesManager* getInstance();  
     /**
     * @brief  desturctor
     */
     ~PreferencesManager();
-    
-    
     /**
     * @brief register a couple key/value in the map.
     *
@@ -85,23 +81,23 @@ public:
     * Save parameters for next executions.
     */
     void writeSettings(QSettings & settings);
-
+    /**
+     * @brief getDefaultNodeColorTheme
+     * @return
+     */
     ColorTheme* getDefaultNodeColorTheme();
+
+    int getColorThemeCount();
+
+    ColorTheme* getColorThemeById(int);
+
+    int indexOf(ColorTheme* theme);
     
 private:
     /**
     * @brief Private constructor to make sure there is only one instance of this.
     */
-    PreferencesManager();
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    PreferencesManager();   
     /**
     * Static reference, part of the singleton pattern
     */

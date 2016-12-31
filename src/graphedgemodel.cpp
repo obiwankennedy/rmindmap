@@ -70,7 +70,7 @@ void GraphEdgeModel::readSettings(QSettings& settings)
          settings.setArrayIndex(i);
          tmp=new Edge(NULL);
          tmp->setText(settings.value("text").toString());
-         tmp->setKind((Edge::EndKind)settings.value("kind").toInt());
+         tmp->setKind((Edge::ArrowHead)settings.value("kind").toInt());
          //tmp->setBgColor(settings.value("bgcolor").value<QColor>());
          m_list->append(tmp);
      }

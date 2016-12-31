@@ -22,7 +22,7 @@
 
 #include "genericmindmapitem.h"
 
-class EdgeBreak : public EdgableItems
+class EdgeBreak : public EdgableItem
 {
 public:
     EdgeBreak();
@@ -41,8 +41,8 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&);
+    virtual void writeToData(QJsonObject&);
 
     void setGeometry(int w,int h);
 

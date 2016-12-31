@@ -80,6 +80,26 @@ ColorTheme* PreferencesManager::getDefaultNodeColorTheme()
 {
     return m_colorThemeNodeModel.at(0);
 }
+
+int PreferencesManager::getColorThemeCount()
+{
+    return m_colorThemeNodeModel.size();
+}
+
+ColorTheme* PreferencesManager::getColorThemeById(int i)
+{
+    if(i>=0 && i<getColorThemeCount())
+    {
+        return m_colorThemeNodeModel.at(i);
+    }
+    else
+        return nullptr;
+}
+
+int PreferencesManager::indexOf(ColorTheme* theme)
+{
+   return m_colorThemeNodeModel.indexOf(theme);
+}
 PreferencesManager* PreferencesManager::getInstance()
 {
     

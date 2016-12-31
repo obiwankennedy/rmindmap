@@ -31,7 +31,7 @@ class ColorTheme
 public:
     ColorTheme();
 
-    QBrush getBursh(qreal x1, qreal y1, qreal x2, qreal y2);
+    QBrush getBrush(qreal x1, qreal y1, qreal x2, qreal y2);
 
     QColor getTextColor() const;
     void setTextColor(const QColor &textColor);
@@ -45,11 +45,15 @@ public:
     Qt::PenStyle getLineStyle() const;
     void setLineStyle(const Qt::PenStyle &lineStyle);
 
+    QPixmap getPixmap();
+
 private:
     QColor m_textColor;
     QColor m_colorBg0;
     QColor m_colorBg1;
     Qt::PenStyle m_lineStyle;
+
+    QPixmap m_pix;
 };
 
 class GenericMindMapItem : public QGraphicsObject,public Serialisable
@@ -84,7 +88,7 @@ protected:
 };
 
 class Edge;
-class EdgableItems : public GenericMindMapItem
+class EdgableItem : public GenericMindMapItem
 {
 public:
     virtual void addEdge(Edge* ) = 0;

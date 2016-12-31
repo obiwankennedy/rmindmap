@@ -91,7 +91,7 @@ void DetailPanel::updateCurrentEdge()
 {
     if(NULL!=m_currentEdge)
     {
-        m_currentEdge->setKind((Edge::EndKind)ui->m_edgeArrowType->currentIndex());
+        m_currentEdge->setKind((Edge::ArrowHead)ui->m_edgeArrowType->currentIndex());
     }
 }
 

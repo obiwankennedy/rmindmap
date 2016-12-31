@@ -53,7 +53,7 @@ public:
     void dumpMapInBipmap(QString file);
 
     void cleanScene();
-    EdgableItems* getEdgableItemFromUuid(QString id);
+    EdgableItem* getEdgableItemFromUuid(QString id);
 
     void changeSceneSize(int w,int h);
 

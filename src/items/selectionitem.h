@@ -59,14 +59,29 @@ class SelectStyleItem : public QGraphicsObject
 public:
     SelectStyleItem(Node* parent);
     QRectF boundingRect() const;
-
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 private:
     Node* m_parent;
+};
+/////////////////////////////////
+/// \brief HandleItem::HandleItem
+/// \param parent
+//////////////////////////////////
+class FoldItem : public QGraphicsObject
+{
+public:
+    FoldItem(Node* parent);
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+private:
+    Node* m_parent;
+    bool m_fold;
 };
 /////////////////////////////////
 /// \brief HandleItem::HandleItem
@@ -84,5 +99,7 @@ private:
     Node* m_parent;
     AddChildItem* m_child;
     SelectStyleItem* m_menu;
+    FoldItem* m_folder;
 };
+
 #endif // SELECTIONITEM_H

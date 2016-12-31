@@ -20,8 +20,72 @@
 
 #include "mindmapview.h"
 
-MindMapView::MindMapView()
+MindMapView::MindMapView(QWidget* parent)
+    : QGraphicsView(parent),m_counterZoom(0)
 {
-
+    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
+    setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
+    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
+
+
+void MindMapView::wheelEvent(QWheelEvent *event)
+{
+    if(event->modifiers() & Qt::ShiftModifier)
+    {
+        setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        // Scale the view / do the zoom
+        double scaleFactor = 1.1;
+
+        if((event->delta() > 0)&&(m_counterZoom<20))
+        {
+            scale(scaleFactor, scaleFactor);
+            ++m_counterZoom;
+
+        }
+        else if(m_counterZoom>-20)
+        {
+            --m_counterZoom;
+            scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+        }
+
+        setResizeAnchor(QGraphicsView::NoAnchor);
+        setTransformationAnchor(QGraphicsView::NoAnchor);
+    }
+    else
+        QGraphicsView::wheelEvent(event);
+}
+void MindMapView::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_lastPoint = QPoint();
+    QGraphicsView::mouseReleaseEvent(event);
+    if(dragMode()==QGraphicsView::ScrollHandDrag)
+    {
+        setDragMode(QGraphicsView::RubberBandDrag);
+    }
+}
+void MindMapView::mouseMoveEvent(QMouseEvent *event)
+{
+    if((event->modifiers() & Qt::ShiftModifier)&&
+       (event->buttons() & Qt::LeftButton))
+    {
+        if(!m_lastPoint.isNull())
+        {
+            QRectF rect = sceneRect();
+            int dx = event->x() - m_lastPoint.x();
+            int dy = event->y() - m_lastPoint.y();
+            rect.translate(-dx,-dy);
+            m_lastPoint = event->pos();
+            setSceneRect(rect);
+        }
+        m_lastPoint = event->pos();
+    }
+    else
+    {
+        QGraphicsView::mouseMoveEvent(event);
+    }
+}

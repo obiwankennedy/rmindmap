@@ -21,11 +21,27 @@
 #ifndef MINDMAPVIEW_H
 #define MINDMAPVIEW_H
 
+#include <QGraphicsView>
+#include <QWheelEvent>
 
+
+/**
+ * @brief The MindMapView class
+ */
 class MindMapView : public QGraphicsView
 {
 public:
-    MindMapView();
+    MindMapView(QWidget* parent = nullptr);
+
+protected:
+     void wheelEvent(QWheelEvent *event);
+     void mouseMoveEvent(QMouseEvent *event);
+     void mouseReleaseEvent(QMouseEvent *event);
+
+
+private:
+    int m_counterZoom;
+    QPoint m_lastPoint;
 };
 
 #endif // MINDMAPVIEW_H

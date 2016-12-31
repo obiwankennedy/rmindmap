@@ -25,7 +25,9 @@
 #include <QUuid>
 #include <QGraphicsProxyWidget>
 #include <QPainterPath>
+#include <QJsonArray>
 
+#include "preferences/preferencesmanager.h"
 #include "edge.h"
 #include "node.h"
 #include "graphwidget.h"
@@ -91,7 +93,7 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     QPainterPath myPainterPath;
     painter->setPen(Qt::NoPen);
 
-     bool showChild = (QStyle::State_Selected & option->state);
+    bool showChild = (QStyle::State_Selected & option->state);
     // qDebug() << showChild << isSelected();
 
     for(auto item : m_children)
@@ -101,7 +103,7 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
 
     myPainterPath.addRoundedRect(tmp,RADIUS,RADIUS);
-    QBrush bgBrush = m_colorTheme->getBursh(0+tmp.width()/2,0,0+tmp.width()/2,tmp.height()*2);
+    QBrush bgBrush = m_colorTheme->getBrush(0+tmp.width()/2,0,0+tmp.width()/2,tmp.height()*2);
     //mybrush.
     painter->fillPath(myPainterPath,bgBrush);
    // painter->drawRoundedRect(tmp,RADIUS,RADIUS);
@@ -137,7 +139,7 @@ void Node::updateEdges()
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "Node mousePressEvent";
+//    qDebug() << "Node mousePressEvent";
     update();
     QGraphicsItem::mousePressEvent(event);
 }
@@ -163,6 +165,14 @@ void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event )
 
 }
 
+void Node::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Delete)
+    {
+        scene()->removeItem(this);
+    }
+}
+
 /*GraphWidget *Node::getGraph() const
 {
     return m_graph;
@@ -179,7 +189,12 @@ void Node::setText(QString text)
     QFont font;
     QFontMetrics info(font);
 
-    m_textRect = info.boundingRect(QString(" %1 ").arg(m_text));
+    m_textRect = info.boundingRect(QString("__%1__").arg(m_text));
+ //   qDebug() << "setText"<<m_textRect << m_minRect;
+    int y = m_textRect.y();
+    m_textRect.adjust(0,-y,0,-y);
+
+    //qDebug() << "setText2" <<m_textRect << m_minRect;
     m_textRect.setHeight(m_textRect.height()*1.5);
 
     if(m_minRect.height()*m_minRect.width()>m_textRect.height()*m_textRect.width())
@@ -199,6 +214,10 @@ QString Node::getText() const
     {
         return m_stringManager->getValue(tr("%1_%2").arg(m_id).arg("text"));
     }
+    else
+    {
+        return m_text;
+    }
     return QString();
 }
 void  Node::updatePainting()
@@ -215,31 +234,79 @@ void Node::setDescription(QString desc)
     m_description = desc;
 }
 
-void Node::readFromData(QDataStream& in)
+void Node::readFromData(QJsonObject& nodeJson)
 {
-    in >> m_text;
-    QColor color;
-    in >> color;
-    in >> color;
-    in >> m_id;
-    setText(m_text);
-    QPointF point;
-    in >> point;
 
-    setPos(point);
-    in >> m_description;
+    setText(nodeJson["text"].toString());
+    m_id=nodeJson["id"].toString();
+    int x = nodeJson["x"].toInt();
+    int y = nodeJson["y"].toInt();
+    setPos(x,y);
+    m_description=nodeJson["desc"].toString();
+    int idColor = nodeJson["colorThemeId"].toInt();
+    m_colorTheme = PreferencesManager::getInstance()->getColorThemeById(idColor);
 
+    QHash<QString,Edge*> data;
+
+    QJsonArray children = nodeJson["children"].toArray();
+    for(auto it = children.begin(); it != children.end(); ++it )
+    {
+        QJsonObject child = it->toObject();
+        if(child.contains("id"))
+        {
+            Node* node = new Node();
+            node->setParentItem(this);
+            node->readFromData(child);
+        }
+        else
+        {
+            Edge* edge = new Edge();
+            edge->setParentItem(this);
+            edge->readFromData(child);
+            edge->setSource(this);
+            QString id = edge->getDestId();
+            data.insertMulti(id,edge);
+        }
+
+
+    }
+
+    for(auto item : childItems())
+    {
+        Node* nodeItem= dynamic_cast<Node*>(item);
+        if(nullptr!=nodeItem)
+        {
+            QList<Edge*> edges = data.values(nodeItem->getUuid());
+            for(Edge* edge : edges)
+            {
+                edge->setDestination(nodeItem);
+            }
+        }
+    }
 }
-
-void Node::writeToData(QDataStream& out)
+void Node::writeToData(QJsonObject& nodeJson)
 {
-    out << m_text;
-    QColor color;
-    out << color;
-    out << color;
-    out << m_id;
-    out << pos();
-    out << m_description;
+    nodeJson["text"]=m_text;
+    nodeJson["id"]=m_id;
+    nodeJson["x"]=pos().x();
+    nodeJson["y"]=pos().y();
+    nodeJson["desc"]=m_description;
+
+    int idColor = PreferencesManager::getInstance()->indexOf(m_colorTheme);
+    nodeJson["colorThemeId"]=idColor;
+
+    QJsonArray children;
+    for(auto item : childItems())
+    {
+        QJsonObject child;
+        Serialisable* serialItem= dynamic_cast<Serialisable*>(item);
+        if(nullptr!=serialItem)
+        {
+            serialItem->writeToData(child);
+            children.append(child);
+        }
+    }
+    nodeJson["children"]=children;
 }
 void Node::setName(QString&)
 {

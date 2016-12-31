@@ -21,6 +21,11 @@
 
 #include <QDebug>
 #include <QLinearGradient>
+#include <QPainter>
+#include <QPixmap>
+
+#define default_w 60
+#define default_h 20
 /////////////////////////////////////////
 //
 //      Code of ColorTheme
@@ -32,7 +37,7 @@ ColorTheme::ColorTheme()
 
 }
 
-QBrush ColorTheme::getBursh(qreal x1, qreal y1, qreal x2, qreal y2)
+QBrush ColorTheme::getBrush(qreal x1, qreal y1, qreal x2, qreal y2)
 {
     QLinearGradient linear(x1,y1,x2,y2);
     linear.setColorAt(0,m_colorBg0);
@@ -76,9 +81,28 @@ void ColorTheme::setLineStyle(const Qt::PenStyle &lineStyle)
     m_lineStyle = lineStyle;
 }
 
+QPixmap ColorTheme::getPixmap()
+{
+    if(m_pix.isNull())
+    {
+        m_pix = QPixmap(default_w,default_h);
+        m_pix.fill(Qt::transparent);
+        QPainter painter(&m_pix);
 
+        QRect rect(0,0,default_w,default_h);
+        QBrush brush = getBrush(default_w/2,0,default_w/2,default_h*2);
+        painter.setBrush(brush);
+        painter.drawRoundedRect(rect,5,5);
 
+        painter.setPen(m_textColor);
+        painter.drawText(rect,Qt::AlignCenter,"Text");
+        painter.end();
 
+    }
+
+    return m_pix;
+
+}
 
 /////////////////////////////////////////
 //
@@ -117,6 +141,7 @@ ColorTheme *GenericMindMapItem::getColorTheme() const
 void GenericMindMapItem::setColorTheme(ColorTheme *colorTheme)
 {
     m_colorTheme = colorTheme;
+    update();
 }
 void  GenericMindMapItem::setGeometry(int w,int h)
 {
