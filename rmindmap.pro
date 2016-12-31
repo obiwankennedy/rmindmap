@@ -6,8 +6,9 @@ HEADERS += \
     src/serializable.h \
     src/graphedgemodel.h \
     src/graphcommonmodel.h \
-    mindmap.h \
-    menustyleitem.h
+    src/mindmap.h \
+    src/menustyleitem.h \
+    src/mindmapview.h
 
 
 SOURCES += \
@@ -18,8 +19,9 @@ SOURCES += \
     src/mainwindow.cpp \
     src/graphedgemodel.cpp \
     src/graphcommonmodel.cpp \
-    mindmap.cpp \
-    menustyleitem.cpp
+    src/mindmap.cpp \
+    src/menustyleitem.cpp \
+    src/mindmapview.cpp
 
 
 
@@ -47,7 +49,13 @@ CONFIG += c++11
 #INSTALLS += target sources
 
 FORMS += \
-    menustyleitem.ui
+    src/menustyleitem.ui
+
+RESOURCES += \
+    rmindmap.qrc
+
+DISTFILES += \
+    resources/icons/shape.png
 
 
 
