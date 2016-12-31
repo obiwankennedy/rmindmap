@@ -1,2 +1,10 @@
-<RCC/>
-
+<RCC>
+    <qresource prefix="/icons">
+        <file>resources/icons/font.png</file>
+        <file>resources/icons/gathering.png</file>
+        <file>resources/icons/hierarchy.png</file>
+        <file>resources/icons/menu.png</file>
+        <file>resources/icons/palette.png</file>
+        <file>resources/icons/shape.png</file>
+    </qresource>
+</RCC>
