@@ -21,13 +21,14 @@
 
 #include <QDebug>
 #include <QLinearGradient>
+#include <QUuid>
 /////////////////////////////////////////
 //
 //      Code of ColorTheme
 //
 /////////////////////////////////////////
 ColorTheme::ColorTheme()
-    : m_lineStyle(Qt::SolidLine)
+    : m_lineStyle(Qt::SolidLine),m_id(QUuid::createUuid().toString())
 {
 
 }
@@ -74,6 +75,16 @@ Qt::PenStyle ColorTheme::getLineStyle() const
 void ColorTheme::setLineStyle(const Qt::PenStyle &lineStyle)
 {
     m_lineStyle = lineStyle;
+}
+
+QString ColorTheme::getId() const
+{
+    return m_id;
+}
+
+void ColorTheme::setId(const QString &id)
+{
+    m_id = id;
 }
 
 

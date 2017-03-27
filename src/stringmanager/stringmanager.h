@@ -40,8 +40,8 @@ public:
 
     void setCurrentLang(int);
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&,EdgableItems*);
+    virtual void writeToData(QJsonObject&,EdgableItems*);
 
 
 private:

@@ -495,9 +495,9 @@ void Edge::setGrap(GraphWidget* m_graph)
     m_graph = m_graph;
 }
 
-void Edge::readFromData(QDataStream& in)
+void Edge::readFromData(QJsonObject&,EdgableItems *destNode)
 {
-    in >> m_arrowSize;
+   /* in >> m_arrowSize;
     in >> m_text;
     setText(m_text);
     QString uuid;
@@ -511,7 +511,7 @@ void Edge::readFromData(QDataStream& in)
     lookUpPoint();
 
     adjust();
-    update();
+    update();*/
 }
 void Edge::lookUpPoint()
 {
@@ -533,13 +533,22 @@ QString Edge::getText() const
     return m_text;
 }
 
-void Edge::writeToData(QDataStream& out)
+void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode)
 {
-    out << m_arrowSize;
+   obj["arrowSize"]=m_arrowSize;
+   obj["text"]=m_text;
+   obj["endKind"]=(int)m_endkind;
+   obj["sourceId"]=m_source->getUuid();
+   obj["destinationId"]=m_dest->getUuid();
+
+   QJsonObject destJson;
+   m_dest->writeToData(destJson,m_source);
+
+ /* out << m_arrowSize;
     out << m_text;
     out << (int)m_endkind;
     out << m_source->getUuid();
-    out << m_dest->getUuid();
+    out << m_dest->getUuid();*/
 }
 void Edge::updatePainting()
 {

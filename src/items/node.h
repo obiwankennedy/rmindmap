@@ -54,8 +54,8 @@ public:
 
     void setDescription(QString desc);
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&,EdgableItems* parent);
+    virtual void writeToData(QJsonObject&,EdgableItems* parent);
 
     QString getUuid();
     void setUuid(QString uuid);
@@ -67,9 +67,6 @@ public:
     virtual QPointF middlePoint();
     //virtual void setGeometry(int w,int h);
     int getRadius() const;
-
- /*   GraphWidget* getGraph() const;
-    void setGraph(GraphWidget * graph);*/
 
 public slots:
     void setText(QString text);
@@ -105,7 +102,6 @@ private:
     QString m_description;
     QGraphicsProxyWidget* m_proxyw;
 
-    QList<QGraphicsItem*> m_children;
 
 };
 

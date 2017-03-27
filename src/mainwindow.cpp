@@ -318,7 +318,7 @@ void MainWindow::readFile()
     if (file.open(QIODevice::ReadOnly))
     {
         QDataStream in(&file);
-        m_stringManager->readFromData(in);
+        //m_stringManager->readFromData(in);
         //m_widget->readFromData(in);
         file.close();
 
@@ -353,6 +353,8 @@ void MainWindow::addNodeAt(QPoint pos)
     node->setColorTheme(m_preferences->getDefaultNodeColorTheme());
     node->setText("Root");
 
+    m_roots.append(node);
+
 
 }
 void MainWindow::newMindMap()
@@ -360,6 +362,9 @@ void MainWindow::newMindMap()
     //m_widget->cleanScene();
     m_browser->clear();
 }
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 void MainWindow::saveMindMap()
 {
 
@@ -384,9 +389,24 @@ void MainWindow::saveMindMap()
 
     if (file.open(QIODevice::WriteOnly))
     {
-        QDataStream in(&file);
-        m_stringManager->writeToData(in);
-        //m_widget->writeToData(in);
+
+        QJsonObject root;
+        QJsonObject stringManager;
+        m_stringManager->writeToData(stringManager,nullptr);
+        QJsonArray children;
+        for(auto node : m_roots)
+        {
+            QJsonObject obj;
+            node->writeToData(obj,nullptr);
+            children.append(obj);
+        }
+        root["children"]=children;
+        root["srings"]=stringManager;
+
+        QJsonDocument doc;
+        doc.setObject(root);
+        //QByteArray baJson = ;
+        file.write(doc.toJson());
         file.close();
     }
 }

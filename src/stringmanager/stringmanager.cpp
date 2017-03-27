@@ -28,27 +28,29 @@ StringManager::StringManager(QObject *parent) :
 }
 
 
-void StringManager::readFromData(QDataStream& out)
+void StringManager::readFromData(QJsonObject&,EdgableItems*)
 {
     /*settings.beginGroup("StringManager");
     m_availableLang = settings.value("Availablelang");
     m_currentLang = settings.value("currentlang");*/
-    out >> m_availableLang;
+
+
+    /*out >> m_availableLang;
     QMap<QString,QString> lang;
     out >> lang;
-    m_currentLang.unite(lang);
+    m_currentLang.unite(lang);*/
 
    // qDebug()<< m_currentLang.size() << m_availableLang.size();
 
 }
 
-void StringManager::writeToData(QDataStream& in)
+void StringManager::writeToData(QJsonObject&,EdgableItems*)
 {
     /*settings.beginGroup("StringManager");
     settings.setValue("Availablelang",m_availableLang);
     settings.setValue("currentlang",m_currentLang);*/
-    in << m_availableLang;
-    in << m_currentLang;
+   /* in << m_availableLang;
+    in << m_currentLang;*/
 
 }
 void StringManager::setValue(QString key, QString value)

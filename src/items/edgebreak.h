@@ -41,8 +41,8 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&,EdgableItems *destNode);
+    virtual void writeToData(QJsonObject&,EdgableItems *destNode);
 
     void setGeometry(int w,int h);
 

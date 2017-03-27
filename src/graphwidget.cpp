@@ -491,7 +491,7 @@ void GraphWidget::readFromData(QDataStream& out)
         node = new Node(this);
         node->setStringManager(m_stringManager);
         emit itemHasBeenAdded(node);
-        node->readFromData(out);
+        //node->readFromData(out);
         m_scene->addItem(node);
         m_nodeList->append(node);
     }
@@ -503,7 +503,7 @@ void GraphWidget::readFromData(QDataStream& out)
         edge = new Edge();
         emit itemHasBeenAdded(edge);
         edge->setGrap(this);
-        edge->readFromData(out);
+       // edge->readFromData(out);
         m_scene->addItem(edge);
         m_edgeList->append(edge);
     }
@@ -515,7 +515,7 @@ void GraphWidget::readFromData(QDataStream& out)
         pack = new PackageItem();
         pack->setGrap(this);
         emit itemHasBeenAdded(pack);
-        pack->readFromData(out);
+//        pack->readFromData(out);
         m_scene->addItem(pack);
         m_packageList->append(pack);
     }
@@ -527,7 +527,7 @@ void GraphWidget::readFromData(QDataStream& out)
         tmpBreak = new EdgeBreak();
        // tmpBreak->setGrap(this);
         emit itemHasBeenAdded(tmpBreak);
-        tmpBreak->readFromData(out);
+//        tmpBreak->readFromData(out);
         m_scene->addItem(tmpBreak);
         m_edgeBreakList->append(tmpBreak);
     }
@@ -548,27 +548,27 @@ void GraphWidget::writeToData(QDataStream& in)
     //node
     for(int i=0;i<m_nodeList->size();i++)
     {
-        m_nodeList->at(i)->writeToData(in);
+//        m_nodeList->at(i)->writeToData(in);
     }
 
     in << m_edgeList->size();
     //edge
     for(int i=0;i<m_edgeList->size();i++)
     {
-        m_edgeList->at(i)->writeToData(in);
+//        m_edgeList->at(i)->writeToData(in);
     }
     //package
     in << m_packageList->size();
     for(int i=0;i<m_packageList->size();i++)
     {
-        m_packageList->at(i)->writeToData(in);
+ //       m_packageList->at(i)->writeToData(in);
     }
 
     //package
     in << m_edgeBreakList->size();
     for(int i=0;i<m_edgeBreakList->size();i++)
     {
-        m_edgeBreakList->at(i)->writeToData(in);
+//        m_edgeBreakList->at(i)->writeToData(in);
     }
 
 

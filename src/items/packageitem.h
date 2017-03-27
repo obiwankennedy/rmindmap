@@ -45,8 +45,8 @@ public:
 
     QRectF rect();
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&,EdgableItems*);
+    virtual void writeToData(QJsonObject&,EdgableItems*);
     void setGrap(GraphWidget*);
 
     virtual QPixmap getIcon() const;

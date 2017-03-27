@@ -45,11 +45,18 @@ public:
     Qt::PenStyle getLineStyle() const;
     void setLineStyle(const Qt::PenStyle &lineStyle);
 
+    void writeToJson(QJsonObject& obj);
+
+
+    QString getId() const;
+    void setId(const QString &id);
+
 private:
     QColor m_textColor;
     QColor m_colorBg0;
     QColor m_colorBg1;
     Qt::PenStyle m_lineStyle;
+    QString m_id;
 };
 
 class GenericMindMapItem : public QGraphicsObject,public Serialisable

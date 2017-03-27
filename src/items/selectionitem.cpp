@@ -49,10 +49,9 @@ QRectF SelectionItem::boundingRect() const
 
 void SelectionItem::paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    qDebug() << "paint ";
     if(m_parent->isSelected())
     {
-        m_child->setPos(boundingRect().width()/2-7/2,boundingRect().height()-(7));
+        m_child->setPos(boundingRect().width()/2-7/2,boundingRect().height());
         m_menu->setPos(boundingRect().topRight().x()-BUTTON_SIZE/2,boundingRect().topRight().y()-BUTTON_SIZE/2);
         painter->save();
         QPen pen;
@@ -122,6 +121,9 @@ void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     scene()->addItem(edge);
     m_currentNode->setPos(m_parent->pos());
     m_currentNode->setFocus(Qt::MouseFocusReason);
+
+    m_parent->addEdge(edge);
+    //edge->addEdgableItem(m_currentNode);
    // QGraphicsItem::mousePressEvent(event);
 }
 

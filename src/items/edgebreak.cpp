@@ -83,22 +83,27 @@ void EdgeBreak::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     painter->fillRect(boundingRect(),Qt::black);
 }
-void EdgeBreak::readFromData(QDataStream& in)
+void EdgeBreak::readFromData(QJsonObject&,EdgableItems *destNode)
 {
-    in >> m_id;
+  /*  in >> m_id;
     QPointF center;
     in >> center;
-    setPos(center);
+    setPos(center);*/
 }
 
-void EdgeBreak::writeToData(QDataStream& out)
+void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode)
 {
-    out << m_id;
-    out << pos();
+    obj["x"] = pos().x();
+    obj["y"] = pos().y();
+    obj["id"] = m_id;
+
+   /* out << m_id;
+    out << pos();*/
 }
 QVariant EdgeBreak::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    switch (change) {
+    switch (change)
+    {
     case ItemScenePositionHasChanged:
     case ItemPositionHasChanged:
          updateEdges();

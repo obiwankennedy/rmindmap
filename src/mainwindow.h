@@ -104,6 +104,8 @@ private://attributs
 
     QList<QAction*>* m_recentFileActions;
 
+    QList<Node*> m_roots;
+
 
    QDockWidget* m_dock;
 

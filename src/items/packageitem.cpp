@@ -124,10 +124,10 @@ void PackageItem::setBorder(PackageItem::Border b)
 {
     m_border= b;
 }
-void PackageItem::readFromData(QDataStream& in)
+void PackageItem::readFromData(QJsonObject&,EdgableItems*)
 {
 
-    in >> m_title;
+ /*   in >> m_title;
     in >> m_id;
     QPointF pos;
     in >> pos;
@@ -151,7 +151,7 @@ void PackageItem::readFromData(QDataStream& in)
 
     }
     setPos(pos);
-    updateHW();
+    updateHW();*/
 
 }
 QVariant PackageItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -182,9 +182,44 @@ void PackageItem::updateEdges()
         edge->adjust();
     }
 }
-void PackageItem::writeToData(QDataStream& out)
+#include <QJsonArray>
+void PackageItem::writeToData(QJsonObject& obj,EdgableItems*)
 {
-    out << m_title;
+    obj["title"] = m_title;
+    obj["id"] = m_id;
+    obj["x"] = pos().x();
+    obj["y"] = pos().y();
+    obj["tlx"] = m_topLeft.x();
+    obj["tly"] = m_topLeft.y();
+    obj["brx"] = m_bottomRight.x();
+    obj["bry"] = m_bottomRight.y();
+
+    QJsonArray children;
+    for(QGraphicsItem* item : childItems())
+    {
+        if(NULL!=dynamic_cast<Node*>(item))
+        {
+            QJsonObject child;
+            child["id"] =  dynamic_cast<Node*>(item)->getUuid();
+            children.append(child["id"]);
+
+        }
+    }
+     obj["children"] = children;
+
+    QJsonArray edges;
+    for(auto edge : m_edgeList)
+    {
+
+        if(edge->getSource() == this)
+        {
+            QJsonObject edgeJson;
+            edge->writeToData(edgeJson,nullptr);
+            edges.append(edgeJson);
+        }
+    }
+    obj["edges"] = edges;
+/*    out << m_title;
     out << m_id;
     out << pos();
     out << m_topLeft;
@@ -197,7 +232,7 @@ void PackageItem::writeToData(QDataStream& out)
             out << dynamic_cast<Node*>(item)->getUuid();
 
         }
-    }
+    }*/
 }
 QPixmap PackageItem::getIcon() const
 {

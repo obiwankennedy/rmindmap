@@ -52,8 +52,9 @@ Node::Node(QObject *graphWidget)
     connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(updatePainting()));
 
     SelectionItem* selector = new SelectionItem(this);
+    //selector
 
-    m_children.append(selector);
+    //m_children.append(selector);
 }
 QString Node::getUuid()
 {
@@ -92,9 +93,8 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->setPen(Qt::NoPen);
 
      bool showChild = (QStyle::State_Selected & option->state);
-    // qDebug() << showChild << isSelected();
 
-    for(auto item : m_children)
+    for(auto item : childItems())
     {
         item->setVisible(showChild);
     }
@@ -215,9 +215,9 @@ void Node::setDescription(QString desc)
     m_description = desc;
 }
 
-void Node::readFromData(QDataStream& in)
+void Node::readFromData(QJsonObject&,EdgableItems* parent)
 {
-    in >> m_text;
+    /*in >> m_text;
     QColor color;
     in >> color;
     in >> color;
@@ -227,19 +227,41 @@ void Node::readFromData(QDataStream& in)
     in >> point;
 
     setPos(point);
-    in >> m_description;
+    in >> m_description;*/
 
 }
-
-void Node::writeToData(QDataStream& out)
+#include <QJsonArray>
+void Node::writeToData(QJsonObject& obj,EdgableItems* parent)
 {
-    out << m_text;
+    obj["text"] =  m_text;
+    obj["type"] = "node";
+    obj["id"] =  m_id;
+    obj["x"] =  pos().x();
+    obj["y"] =  pos().y();
+    obj["description"] =  m_description;
+    obj["colorThemeId"] =  m_colorTheme->getId();
+
+    QJsonArray edges;
+    for(auto edge : m_edgeList)
+    {
+
+        if(edge->getSource() == this)
+        {
+            QJsonObject edgeJson;
+            edge->writeToData(edgeJson,nullptr);
+            edges.append(edgeJson);
+        }
+    }
+    obj["edges"] = edges;
+
+
+ /*   out << m_text;
     QColor color;
     out << color;
     out << color;
     out << m_id;
     out << pos();
-    out << m_description;
+    out << m_description;*/
 }
 void Node::setName(QString&)
 {

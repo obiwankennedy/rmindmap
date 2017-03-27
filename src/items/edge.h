@@ -67,8 +67,8 @@ public:
 
     void setDestinationPoint(QPointF);
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&,EdgableItems *destNode);
+    virtual void writeToData(QJsonObject&,EdgableItems *destNode);
 
     virtual QPixmap getIcon() const;
     void lookUpPoint();
@@ -115,9 +115,6 @@ private:
     QPointF m_destTanPoint;
 
     bool m_showTanPoints;
-
-
-
 };
 
 
