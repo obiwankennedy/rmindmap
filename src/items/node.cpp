@@ -215,8 +215,24 @@ void Node::setDescription(QString desc)
     m_description = desc;
 }
 
-void Node::readFromData(QJsonObject&,EdgableItems* parent)
+void Node::readFromData(QJsonObject& obj,EdgableItems* parent)
 {
+    m_text = obj["text"].toString();
+    QString type = obj["type"].toString();
+    m_id = obj["id"].toString();
+    qreal x = obj["x"].toDouble();
+    qreal y = obj["y"].toDouble();
+    setPos(x,y);
+    m_description = obj["description"].toString();
+    QString colorId= obj["colorThemeId"].toString();
+
+    QJsonArray edges = obj["edges"].toArray();
+    for(auto edgeJson : edges)
+    {
+        Edge* edge = new Edge();
+        edge->readFromData(edgeJson,nullptr);
+        m_edgeList.append(edge);
+    }
     /*in >> m_text;
     QColor color;
     in >> color;
