@@ -549,17 +549,19 @@ void Edge::readFromData(QJsonObject& obj,EdgableItems *destNode,QGraphicsScene* 
 }
 void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {
-   obj["arrowSize"]=m_arrowSize;
-   obj["text"]=m_text;
-   obj["endKind"]=(int)m_endkind;
-   obj["sourceId"]=m_source->getId();
-   obj["destinationId"]=m_dest->getId();
+    if(!done->contains(m_id))
+    {
+       obj["arrowSize"]=m_arrowSize;
+       obj["text"]=m_text;
+       obj["endKind"]=(int)m_endkind;
+       obj["sourceId"]=m_source->getId();
+       obj["destinationId"]=m_dest->getId();
 
-   QJsonObject destJson;
-   m_dest->writeToData(destJson,m_source,done);
+       QJsonObject destJson;
+       m_dest->writeToData(destJson,m_source,done);
 
-   obj["dest"] = destJson;
-
+       obj["dest"] = destJson;
+    }
  /* out << m_arrowSize;
     out << m_text;
     out << (int)m_endkind;

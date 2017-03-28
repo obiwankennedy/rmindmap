@@ -181,6 +181,9 @@ void PackageItem::updateEdges()
 #include <QJsonArray>
 void PackageItem::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
 {
+    if(!done->contains(m_id))
+    {
+        obj["type"] = "package";
     obj["title"] = m_title;
     obj["id"] = m_id;
     obj["x"] = pos().x();
@@ -215,6 +218,7 @@ void PackageItem::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QStrin
         }
     }
     obj["edges"] = edges;
+    }
 /*    out << m_title;
     out << m_id;
     out << pos();

@@ -93,9 +93,13 @@ void EdgeBreak::readFromData(QJsonObject&,EdgableItems *destNode,QGraphicsScene*
 
 void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {
-    obj["x"] = pos().x();
-    obj["y"] = pos().y();
-    obj["id"] = m_id;
+    if(!done->contains(m_id))
+    {
+        obj["type"] = "egdebreak";
+        obj["x"] = pos().x();
+        obj["y"] = pos().y();
+        obj["id"] = m_id;
+    }
 
    /* out << m_id;
     out << pos();*/

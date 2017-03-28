@@ -252,28 +252,30 @@ void Node::readFromData(QJsonObject& obj,EdgableItems* parent,QGraphicsScene* m_
 #include <QJsonArray>
 void Node::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
 {
-    obj["text"] =  m_text;
-    obj["type"] = "node";
-    obj["id"] =  m_id;
-    obj["x"] =  pos().x();
-    obj["y"] =  pos().y();
-    obj["description"] =  m_description;
-    obj["colorThemeId"] =  m_colorTheme->getId();
-
-    QJsonArray edges;
-    for(auto edge : m_edgeList)
+    if(!done->contains(m_id))
     {
+        obj["text"] =  m_text;
+        obj["type"] = "node";
+        obj["id"] =  m_id;
+        obj["x"] =  pos().x();
+        obj["y"] =  pos().y();
+        obj["description"] =  m_description;
+        obj["colorThemeId"] =  m_colorTheme->getId();
 
-        if(edge->getSource() == this)
+        QJsonArray edges;
+        for(auto edge : m_edgeList)
         {
-            QJsonObject edgeJson;
-            edge->writeToData(edgeJson,nullptr,done);
-            edges.append(edgeJson);
+
+            if(edge->getSource() == this)
+            {
+                QJsonObject edgeJson;
+                edge->writeToData(edgeJson,nullptr,done);
+                edges.append(edgeJson);
+            }
         }
+        obj["edges"] = edges;
+
     }
-    obj["edges"] = edges;
-
-
  /*   out << m_text;
     QColor color;
     out << color;
