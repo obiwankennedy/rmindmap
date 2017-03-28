@@ -32,6 +32,8 @@ PreferencesManager::PreferencesManager()
     QColor color1;
     QColor color0;
 
+    m_defaultTheme = theme->getId();
+
 
     color0.setHsv(0,20,120);
     color0.setAlpha(20);
@@ -40,7 +42,7 @@ PreferencesManager::PreferencesManager()
     theme->setColorBg0(color0);
     theme->setColorBg0(color1);
     theme->setTextColor(QColor(Qt::black));
-    m_colorThemeNodeModel.append(theme);
+    m_colorThemeNodeModel.insert(theme->getId(),theme);
 
     //Default value
     for(int i=0;i<255;i+=5)
@@ -63,10 +65,11 @@ PreferencesManager::PreferencesManager()
         {
             theme->setTextColor(QColor(Qt::white));
         }
-        m_colorThemeNodeModel.append(theme);
+        m_colorThemeNodeModel.insert(theme->getId(),theme);
     }
     
 }
+
 
 
 PreferencesManager::~PreferencesManager()
@@ -78,7 +81,7 @@ PreferencesManager* PreferencesManager::m_singleton = NULL;
 
 ColorTheme* PreferencesManager::getDefaultNodeColorTheme()
 {
-    return m_colorThemeNodeModel.at(0);
+    return m_colorThemeNodeModel.value(m_defaultTheme);
 }
 PreferencesManager* PreferencesManager::getInstance()
 {
@@ -139,5 +142,28 @@ void PreferencesManager::writeSettings(QSettings & settings)
         // qDebug() << "key " << m_optionDictionary->keys().at(i) << "value: " << m_optionDictionary->value(m_optionDictionary->keys().at(i),true).toString();
 
 
+    }
+}
+ColorTheme* PreferencesManager::getNodeColorTheme(QString id)
+{
+    if(m_colorThemeNodeModel.contains(id))
+    {
+        return m_colorThemeNodeModel.value(id);
+    }
+    else
+    {
+        return getDefaultNodeColorTheme();
+    }
+}
+
+ColorTheme* PreferencesManager::getEdgeColorTheme(QString id)
+{
+    if(m_colorThemeEdgeModel.contains(id))
+    {
+        return m_colorThemeEdgeModel.value(id);
+    }
+    else
+    {
+        return getDefaultNodeColorTheme();
     }
 }

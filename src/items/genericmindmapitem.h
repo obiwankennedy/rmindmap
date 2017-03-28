@@ -80,6 +80,9 @@ public:
     ColorTheme* getColorTheme() const;
     void setColorTheme(ColorTheme* colorTheme);
 
+    QString getId() const;
+    void setId(const QString &id);
+
 public slots:
     virtual void setText(QString) = 0;
     virtual void setName(QString&) = 0;
@@ -87,7 +90,7 @@ public slots:
 protected:
     StringManager* m_stringManager;
     ColorTheme *m_colorTheme;
-
+    QString m_id;
 };
 
 class Edge;
@@ -95,8 +98,6 @@ class EdgableItems : public GenericMindMapItem
 {
 public:
     virtual void addEdge(Edge* ) = 0;
-
-    virtual QString getUuid() = 0;
     virtual QPointF middlePoint() = 0;
 };
 

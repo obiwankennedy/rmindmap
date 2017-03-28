@@ -97,7 +97,7 @@ void ColorTheme::setId(const QString &id)
 //
 /////////////////////////////////////////
 GenericMindMapItem::GenericMindMapItem()
-    : m_stringManager(NULL),m_colorTheme(NULL)
+    : m_stringManager(NULL),m_colorTheme(NULL),m_id(QUuid::createUuid().toString())
 {
     setAcceptDrops(true);
     setAcceptHoverEvents(true);
@@ -128,6 +128,16 @@ ColorTheme *GenericMindMapItem::getColorTheme() const
 void GenericMindMapItem::setColorTheme(ColorTheme *colorTheme)
 {
     m_colorTheme = colorTheme;
+}
+
+QString GenericMindMapItem::getId() const
+{
+    return m_id;
+}
+
+void GenericMindMapItem::setId(const QString &id)
+{
+    m_id = id;
 }
 void  GenericMindMapItem::setGeometry(int w,int h)
 {

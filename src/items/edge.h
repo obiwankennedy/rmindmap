@@ -67,8 +67,8 @@ public:
 
     void setDestinationPoint(QPointF);
 
-    virtual void readFromData(QJsonObject&,EdgableItems *destNode);
-    virtual void writeToData(QJsonObject&,EdgableItems *destNode);
+    virtual void readFromData(QJsonObject&,EdgableItems *destNode,QGraphicsScene* m_scene);
+    virtual void writeToData(QJsonObject&,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>*);
 
     virtual QPixmap getIcon() const;
     void lookUpPoint();

@@ -109,10 +109,6 @@ void PackageItem::setTopLeft(QPointF p )
 
 
 }
-void  PackageItem::setGrap(GraphWidget* g)
-{
-    m_graph=g;
-}
 
 void PackageItem::setBottomRight(QPointF p)
 {
@@ -124,10 +120,10 @@ void PackageItem::setBorder(PackageItem::Border b)
 {
     m_border= b;
 }
-void PackageItem::readFromData(QJsonObject&,EdgableItems*)
+void PackageItem::readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* m_scene)
 {
 
- /*   in >> m_title;
+ /* in >> m_title;
     in >> m_id;
     QPointF pos;
     in >> pos;
@@ -183,7 +179,7 @@ void PackageItem::updateEdges()
     }
 }
 #include <QJsonArray>
-void PackageItem::writeToData(QJsonObject& obj,EdgableItems*)
+void PackageItem::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
 {
     obj["title"] = m_title;
     obj["id"] = m_id;
@@ -200,7 +196,7 @@ void PackageItem::writeToData(QJsonObject& obj,EdgableItems*)
         if(NULL!=dynamic_cast<Node*>(item))
         {
             QJsonObject child;
-            child["id"] =  dynamic_cast<Node*>(item)->getUuid();
+            child["id"] =  dynamic_cast<Node*>(item)->getId();
             children.append(child["id"]);
 
         }
@@ -214,7 +210,7 @@ void PackageItem::writeToData(QJsonObject& obj,EdgableItems*)
         if(edge->getSource() == this)
         {
             QJsonObject edgeJson;
-            edge->writeToData(edgeJson,nullptr);
+            edge->writeToData(edgeJson,nullptr,done);
             edges.append(edgeJson);
         }
     }
@@ -253,10 +249,6 @@ void PackageItem::addEdge(Edge* edge)
     edge->adjust();
 }
 
-QString PackageItem::getUuid()
-{
-    return m_id;
-}
 QPointF PackageItem::middlePoint()
 {
     return boundingRect().center();

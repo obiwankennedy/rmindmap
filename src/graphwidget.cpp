@@ -513,7 +513,7 @@ void GraphWidget::readFromData(QDataStream& out)
     for(int i=0; i<size;++i)
     {
         pack = new PackageItem();
-        pack->setGrap(this);
+        //pack->setGrap(this);
         emit itemHasBeenAdded(pack);
 //        pack->readFromData(out);
         m_scene->addItem(pack);
@@ -603,7 +603,7 @@ Node* GraphWidget::getNodeFromUuid(QString id)
 {
     for(int i=0;i<m_nodeList->size();i++)
     {
-        if(m_nodeList->at(i)->getUuid() == id)
+        if(m_nodeList->at(i)->getId() == id)
         {
             return m_nodeList->at(i);
         }
@@ -614,7 +614,7 @@ PackageItem* GraphWidget::getPackageFromUuid(QString id)
 {
     for(int i=0;i<m_packageList->size();i++)
     {
-        if(m_packageList->at(i)->getUuid() == id)
+        if(m_packageList->at(i)->getId() == id)
         {
             return m_packageList->at(i);
         }

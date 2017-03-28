@@ -495,24 +495,7 @@ void Edge::setGrap(GraphWidget* m_graph)
     m_graph = m_graph;
 }
 
-void Edge::readFromData(QJsonObject&,EdgableItems *destNode)
-{
-   /* in >> m_arrowSize;
-    in >> m_text;
-    setText(m_text);
-    QString uuid;
-    int i;
-    in >> i;
-    setKind((Edge::EndKind)i);
-    in >>m_uuidSrc;
 
-    in >>m_uuidDst;
-
-    lookUpPoint();
-
-    adjust();
-    update();*/
-}
 void Edge::lookUpPoint()
 {
     m_source= m_graph->getEdgableItemFromUuid(m_uuidSrc);
@@ -532,17 +515,50 @@ QString Edge::getText() const
 
     return m_text;
 }
+void Edge::readFromData(QJsonObject& obj,EdgableItems *destNode,QGraphicsScene* scene)
+{
+    m_arrowSize = obj["arrowSize"].toString();
+    m_text = obj["text"].toString();
+    m_endkind = obj["endKind"].toInt();
+    QString srcId = obj["sourceId"].toString();
+    QString destId = obj["destinationId"].toString();
 
-void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode)
+
+    //
+
+    Node* node = new Node();
+    scene->addItem(this);
+    QJsonObject destJson = obj["dest"].toObject();
+    node->readFromData(destJson,this,scene);
+
+   /* in >> m_arrowSize;
+    in >> m_text;
+    setText(m_text);
+    QString uuid;
+    int i;
+    in >> i;
+    setKind((Edge::EndKind)i);
+    in >>m_uuidSrc;
+
+    in >>m_uuidDst;
+
+    lookUpPoint();
+
+    adjust();
+    update();*/
+}
+void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {
    obj["arrowSize"]=m_arrowSize;
    obj["text"]=m_text;
    obj["endKind"]=(int)m_endkind;
-   obj["sourceId"]=m_source->getUuid();
-   obj["destinationId"]=m_dest->getUuid();
+   obj["sourceId"]=m_source->getId();
+   obj["destinationId"]=m_dest->getId();
 
    QJsonObject destJson;
-   m_dest->writeToData(destJson,m_source);
+   m_dest->writeToData(destJson,m_source,done);
+
+   obj["dest"] = destJson;
 
  /* out << m_arrowSize;
     out << m_text;

@@ -117,7 +117,7 @@ private://attributs
    StringManager* m_stringManager;
    TimeLineWidget* m_timeLine;
 
-       MindMap* m_scene;
+   MindMap* m_scene;
     
 };
 

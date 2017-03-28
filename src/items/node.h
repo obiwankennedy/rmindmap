@@ -54,11 +54,8 @@ public:
 
     void setDescription(QString desc);
 
-    virtual void readFromData(QJsonObject&,EdgableItems* parent);
-    virtual void writeToData(QJsonObject&,EdgableItems* parent);
-
-    QString getUuid();
-    void setUuid(QString uuid);
+    virtual void readFromData(QJsonObject&,EdgableItems* parent,QGraphicsScene* m_scene);
+    virtual void writeToData(QJsonObject&,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done);
 
     void updateEdges();
     virtual QString getName() const;
@@ -98,7 +95,6 @@ private:
 
     QLineEdit* m_tempedit;
 
-    QString m_id;
     QString m_description;
     QGraphicsProxyWidget* m_proxyw;
 

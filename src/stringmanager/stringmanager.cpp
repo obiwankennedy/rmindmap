@@ -28,7 +28,7 @@ StringManager::StringManager(QObject *parent) :
 }
 
 
-void StringManager::readFromData(QJsonObject&,EdgableItems*)
+void StringManager::readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* scene)
 {
     /*settings.beginGroup("StringManager");
     m_availableLang = settings.value("Availablelang");
@@ -44,7 +44,7 @@ void StringManager::readFromData(QJsonObject&,EdgableItems*)
 
 }
 
-void StringManager::writeToData(QJsonObject&,EdgableItems*)
+void StringManager::writeToData(QJsonObject&,EdgableItems*,QHash<QString,GenericMindMapItem*>* done)
 {
     /*settings.beginGroup("StringManager");
     settings.setValue("Availablelang",m_availableLang);

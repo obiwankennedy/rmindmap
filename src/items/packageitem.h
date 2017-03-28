@@ -31,34 +31,20 @@ public:
     enum Border {STRONG,TINY,MIDDLE};
     PackageItem();
 
-
-
     QString getName() const;
-
     QString getText() const;
     QRectF boundingRect() const;
-
     void setTopLeft(QPointF);
     void setBottomRight(QPointF);
-
     void setBorder(PackageItem::Border);
-
     QRectF rect();
-
-    virtual void readFromData(QJsonObject&,EdgableItems*);
-    virtual void writeToData(QJsonObject&,EdgableItems*);
-    void setGrap(GraphWidget*);
-
+    virtual void readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* m_scene);
+    virtual void writeToData(QJsonObject&,EdgableItems*,QHash<QString,GenericMindMapItem*>* done);
+    //void setGrap(GraphWidget*);
     virtual QPixmap getIcon() const;
-
     virtual void addEdge(Edge* );
-
-    virtual QString getUuid();
-
     virtual QPointF middlePoint();
-
     virtual void setGeometry(int w, int h);
-
     virtual void updateHW();
 
 public slots:
@@ -68,18 +54,12 @@ public slots:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-
-
 private:
     void updateEdges();
-
 private:
     QString m_name;
     QString m_title;
-    QString m_id;
-    GraphWidget* m_graph;
-
-
+//    GraphWidget* m_graph;
     QPointF m_topLeft;
     QPointF m_bottomRight;
     PackageItem::Border m_border;

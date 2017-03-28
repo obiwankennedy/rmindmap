@@ -25,7 +25,9 @@
 
 #include "mainwindow.h"
 #include "detailpanel/detailpanel.h"
-
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -312,18 +314,7 @@ void MainWindow::addRecentFile()
     }
     m_recentFileActions->append(tmp);
 }
-void MainWindow::readFile()
-{
-    QFile file(m_currentMindMapPath);
-    if (file.open(QIODevice::ReadOnly))
-    {
-        QDataStream in(&file);
-        //m_stringManager->readFromData(in);
-        //m_widget->readFromData(in);
-        file.close();
 
-    }
-}
 
 void MainWindow::openMindMap()
 {
@@ -362,9 +353,7 @@ void MainWindow::newMindMap()
     //m_widget->cleanScene();
     m_browser->clear();
 }
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
+
 void MainWindow::saveMindMap()
 {
 
@@ -377,12 +366,9 @@ void MainWindow::saveMindMap()
     {
             m_currentMindMapPath += ".rmap";
     }
-
-
-
-
-
     QFile file(m_currentMindMapPath);
+
+    QHash<QString,GenericMindMapItem*>* done = new QHash<QString,GenericMindMapItem*>();
 
     QFileInfo fileinfo(file);
     m_preferences->registerValue("MindMapDirectory",fileinfo.absoluteDir().canonicalPath());
@@ -392,12 +378,12 @@ void MainWindow::saveMindMap()
 
         QJsonObject root;
         QJsonObject stringManager;
-        m_stringManager->writeToData(stringManager,nullptr);
+        m_stringManager->writeToData(stringManager,nullptr,done);
         QJsonArray children;
         for(auto node : m_roots)
         {
             QJsonObject obj;
-            node->writeToData(obj,nullptr);
+            node->writeToData(obj,nullptr,done);
             children.append(obj);
         }
         root["children"]=children;
@@ -408,6 +394,38 @@ void MainWindow::saveMindMap()
         //QByteArray baJson = ;
         file.write(doc.toJson());
         file.close();
+    }
+}
+void MainWindow::readFile()
+{
+    qDeleteAll(m_roots);
+    m_roots.clear();
+    QFile file(m_currentMindMapPath);
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        QJsonObject root = doc.object();
+        QJsonObject obj = root["strings"].toObject();
+        QJsonArray children = root["children"].toArray();
+        m_stringManager->readFromData(obj,nullptr,m_scene);
+
+        for(auto i : children)
+        {
+            QJsonObject child = i.toObject();
+            QString type = child["type"].toString();
+            if(type == "node")
+            {
+                Node* node = new Node();
+                m_scene->addItem(node);
+                node->readFromData(child,nullptr,m_scene);
+                m_roots.append(node);
+            }
+        }
+
+
+
+        file.close();
+
     }
 }
 void MainWindow::saveAsMindMap()

@@ -25,6 +25,8 @@
 #include <QUuid>
 #include <QGraphicsProxyWidget>
 #include <QPainterPath>
+#include <QJsonArray>
+
 
 #include "edge.h"
 #include "node.h"
@@ -55,10 +57,6 @@ Node::Node(QObject *graphWidget)
     //selector
 
     //m_children.append(selector);
-}
-QString Node::getUuid()
-{
-    return m_id;
 }
 
 void Node::addEdge(Edge *edge)
@@ -215,7 +213,7 @@ void Node::setDescription(QString desc)
     m_description = desc;
 }
 
-void Node::readFromData(QJsonObject& obj,EdgableItems* parent)
+void Node::readFromData(QJsonObject& obj,EdgableItems* parent,QGraphicsScene* m_scene)
 {
     m_text = obj["text"].toString();
     QString type = obj["type"].toString();
@@ -226,11 +224,16 @@ void Node::readFromData(QJsonObject& obj,EdgableItems* parent)
     m_description = obj["description"].toString();
     QString colorId= obj["colorThemeId"].toString();
 
+    m_colorTheme = PreferencesManager::getInstance()->getNodeColorTheme(colorId);
+
     QJsonArray edges = obj["edges"].toArray();
-    for(auto edgeJson : edges)
+    for(auto e : edges)
     {
         Edge* edge = new Edge();
-        edge->readFromData(edgeJson,nullptr);
+        m_scene->addItem(edge);
+        QJsonObject edgeJson = e.toObject();
+        edge->readFromData(edgeJson,this,m_scene);
+        //
         m_edgeList.append(edge);
     }
     /*in >> m_text;
@@ -247,7 +250,7 @@ void Node::readFromData(QJsonObject& obj,EdgableItems* parent)
 
 }
 #include <QJsonArray>
-void Node::writeToData(QJsonObject& obj,EdgableItems* parent)
+void Node::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
 {
     obj["text"] =  m_text;
     obj["type"] = "node";
@@ -264,7 +267,7 @@ void Node::writeToData(QJsonObject& obj,EdgableItems* parent)
         if(edge->getSource() == this)
         {
             QJsonObject edgeJson;
-            edge->writeToData(edgeJson,nullptr);
+            edge->writeToData(edgeJson,nullptr,done);
             edges.append(edgeJson);
         }
     }
@@ -302,11 +305,7 @@ QPointF Node::middlePoint()
 {
     return m_textRect.center();
 }
-void Node::setUuid(QString uuid)
-{
-   // qDebug() << "uuid" << uuid;
-    m_id = uuid;
-}
+
 /*void Node::setGeometry(int w,int h)
 {
 

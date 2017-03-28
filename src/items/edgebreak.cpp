@@ -83,7 +83,7 @@ void EdgeBreak::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     painter->fillRect(boundingRect(),Qt::black);
 }
-void EdgeBreak::readFromData(QJsonObject&,EdgableItems *destNode)
+void EdgeBreak::readFromData(QJsonObject&,EdgableItems *destNode,QGraphicsScene* m_scene)
 {
   /*  in >> m_id;
     QPointF center;
@@ -91,7 +91,7 @@ void EdgeBreak::readFromData(QJsonObject&,EdgableItems *destNode)
     setPos(center);*/
 }
 
-void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode)
+void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {
     obj["x"] = pos().x();
     obj["y"] = pos().y();
