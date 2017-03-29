@@ -18,16 +18,15 @@ static double TwoPi = 2.0 * Pi;
 static const int Arrow_Size = 8;
 
 Edge::Edge()
-    : m_arrowSize(Arrow_Size)
+    : m_arrowSize(Arrow_Size),m_source(nullptr)
 {
     init();
 }
 
 Edge::Edge(EdgableItems *sourceNode,EdgableItems *destNode)
-    : m_arrowSize(Arrow_Size)
+    : m_arrowSize(Arrow_Size),m_source(sourceNode)
 {
     init();
-    m_source = sourceNode;
     m_dest = destNode;
     m_source->addEdge(this);
     m_dest->addEdge(this);
@@ -35,7 +34,7 @@ Edge::Edge(EdgableItems *sourceNode,EdgableItems *destNode)
 
 }
 Edge::Edge(EdgableItems *sourceNode)
-    : m_arrowSize(Arrow_Size)
+    : m_arrowSize(Arrow_Size),m_source(nullptr)
 {
     init();
 
@@ -498,8 +497,8 @@ void Edge::setGrap(GraphWidget* m_graph)
 
 void Edge::lookUpPoint()
 {
-    m_source= m_graph->getEdgableItemFromUuid(m_uuidSrc);
-    m_dest=  m_graph->getEdgableItemFromUuid(m_uuidDst);
+    /*m_source= m_graph->getEdgableItemFromUuid(m_uuidSrc);
+    m_dest=  m_graph->getEdgableItemFromUuid(m_uuidDst);*/
     if(NULL!=m_source)
     {
         m_source->addEdge(this);
@@ -515,37 +514,23 @@ QString Edge::getText() const
 
     return m_text;
 }
-void Edge::readFromData(QJsonObject& obj,EdgableItems *destNode,QGraphicsScene* scene)
+void Edge::readFromData(QJsonObject& obj,EdgableItems* srcNode,QGraphicsScene* scene)
 {
-    m_arrowSize = obj["arrowSize"].toString();
+    m_arrowSize = obj["arrowSize"].toDouble();
     m_text = obj["text"].toString();
-    m_endkind = obj["endKind"].toInt();
+    m_endkind = static_cast<Edge::EndKind>(obj["endKind"].toInt());
     QString srcId = obj["sourceId"].toString();
     QString destId = obj["destinationId"].toString();
 
 
-    //
+    m_source = srcNode;
 
-    Node* node = new Node();
-    scene->addItem(this);
+    m_dest = new Node();
     QJsonObject destJson = obj["dest"].toObject();
-    node->readFromData(destJson,this,scene);
-
-   /* in >> m_arrowSize;
-    in >> m_text;
-    setText(m_text);
-    QString uuid;
-    int i;
-    in >> i;
-    setKind((Edge::EndKind)i);
-    in >>m_uuidSrc;
-
-    in >>m_uuidDst;
+    scene->addItem(m_dest);
+    m_dest->readFromData(destJson,nullptr,scene);
 
     lookUpPoint();
-
-    adjust();
-    update();*/
 }
 void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {

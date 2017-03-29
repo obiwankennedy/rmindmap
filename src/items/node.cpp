@@ -230,30 +230,19 @@ void Node::readFromData(QJsonObject& obj,EdgableItems* parent,QGraphicsScene* m_
     for(auto e : edges)
     {
         Edge* edge = new Edge();
-        m_scene->addItem(edge);
         QJsonObject edgeJson = e.toObject();
         edge->readFromData(edgeJson,this,m_scene);
-        //
+        qDebug() << "add item to map";
+        m_scene->addItem(edge);
         m_edgeList.append(edge);
     }
-    /*in >> m_text;
-    QColor color;
-    in >> color;
-    in >> color;
-    in >> m_id;
-    setText(m_text);
-    QPointF point;
-    in >> point;
-
-    setPos(point);
-    in >> m_description;*/
-
 }
 #include <QJsonArray>
 void Node::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
 {
     if(!done->contains(m_id))
     {
+        done->insert(m_id,this);
         obj["text"] =  m_text;
         obj["type"] = "node";
         obj["id"] =  m_id;
@@ -265,12 +254,14 @@ void Node::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,Gener
         QJsonArray edges;
         for(auto edge : m_edgeList)
         {
-
             if(edge->getSource() == this)
             {
-                QJsonObject edgeJson;
-                edge->writeToData(edgeJson,nullptr,done);
-                edges.append(edgeJson);
+                if(!done->contains(edge->getId()))
+                {
+                    QJsonObject edgeJson;
+                    edge->writeToData(edgeJson,nullptr,done);
+                    edges.append(edgeJson);
+                }
             }
         }
         obj["edges"] = edges;
