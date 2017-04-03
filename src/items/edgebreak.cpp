@@ -93,7 +93,7 @@ void EdgeBreak::readFromData(QJsonObject& obj,EdgableItems *destNode,QGraphicsSc
     qreal x = obj["x"].toDouble();
     qreal y = obj["y"].toDouble();
     setPos(x,y);
-    scene->addItem(this);
+   // scene->addItem(this);
 
     //scene->addItem(this);
     QJsonArray array = obj["edges"].toArray();

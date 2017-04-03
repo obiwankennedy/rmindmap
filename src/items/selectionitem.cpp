@@ -122,7 +122,7 @@ void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     m_currentNode->setPos(m_parent->pos());
     m_currentNode->setFocus(Qt::MouseFocusReason);
 
-    m_parent->addEdge(edge);
+    //m_parent->addEdge(edge);
     //edge->addEdgableItem(m_currentNode);
    // QGraphicsItem::mousePressEvent(event);
 }

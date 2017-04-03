@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setObjectName("MainWindow");
     setWindowTitle(m_title.arg(tr("untitled")));
 
-    connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
+   /* connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
     connect(m_widget,SIGNAL(currentNode(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
     connect(m_widget,SIGNAL(currentPackage(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
 
@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(m_widget,SIGNAL(itemHasBeenAdded(GenericMindMapItem*)),m_browser,SLOT(addItem(GenericMindMapItem*)));
 
-    connect(m_widget,SIGNAL(itemHasBeenDeleted(GenericMindMapItem*)),m_browser,SLOT(removeItem(GenericMindMapItem*)));
+    connect(m_widget,SIGNAL(itemHasBeenDeleted(GenericMindMapItem*)),m_browser,SLOT(removeItem(GenericMindMapItem*)));*/
 
 
     m_preferences = PreferencesManager::getInstance();
@@ -257,13 +257,13 @@ void MainWindow::makeAction()
     m_zoomInAct = new QAction(tr("Zoom In"),this);
     m_zoomInAct->setShortcut(tr("Ctrl++"));
     m_zoomInAct->setStatusTip(tr("Zoom in the map"));
-    connect(m_zoomInAct,SIGNAL(triggered()),m_widget,SLOT(zoomIn()));
+    //connect(m_zoomInAct,SIGNAL(triggered()),m_widget,SLOT(zoomIn()));
 
 
     m_zoomOutAct = new QAction(tr("Zoom Out"),this);
     m_zoomOutAct->setStatusTip(tr("Zoom out of the map"));
     m_zoomOutAct->setShortcut(tr("Ctrl+-"));
-    connect(m_zoomOutAct,SIGNAL(triggered()),m_widget,SLOT(zoomOut()));
+    //connect(m_zoomOutAct,SIGNAL(triggered()),m_widget,SLOT(zoomOut()));
 
     m_detailView = new QAction(tr("Show/Hide Detail view"),this);
 

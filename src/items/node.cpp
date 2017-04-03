@@ -232,7 +232,7 @@ void Node::readFromData(QJsonObject& obj,EdgableItems* parent,QGraphicsScene* m_
         Edge* edge = new Edge();
         QJsonObject edgeJson = e.toObject();
         edge->readFromData(edgeJson,this,m_scene);
-        qDebug() << "add item to map";
+        qDebug() << "add item to map" << edge->getId();
         m_scene->addItem(edge);
         m_edgeList.append(edge);
     }
@@ -252,6 +252,7 @@ void Node::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,Gener
         obj["colorThemeId"] =  m_colorTheme->getId();
 
         QJsonArray edges;
+        qDebug() << "Size of edges:" <<m_edgeList.size();
         for(auto edge : m_edgeList)
         {
             if(edge->getSource() == this)
