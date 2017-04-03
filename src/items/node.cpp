@@ -252,7 +252,6 @@ void Node::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,Gener
         obj["colorThemeId"] =  m_colorTheme->getId();
 
         QJsonArray edges;
-        qDebug() << "Size of edges:" <<m_edgeList.size();
         for(auto edge : m_edgeList)
         {
             if(edge->getSource() == this)

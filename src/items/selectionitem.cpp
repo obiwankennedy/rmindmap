@@ -24,6 +24,7 @@
 
 #define PEN_WIDTH 4
 #define BUTTON_SIZE 15
+#define ARROW_SIZE 10
 
 #include <QGraphicsScene>
 
@@ -51,7 +52,7 @@ void SelectionItem::paint(QPainter* painter, const QStyleOptionGraphicsItem *opt
 {
     if(m_parent->isSelected())
     {
-        m_child->setPos(boundingRect().width()/2-7/2,boundingRect().height());
+        m_child->setPos(boundingRect().width()/2-ARROW_SIZE/2,boundingRect().height()-ARROW_SIZE);
         m_menu->setPos(boundingRect().topRight().x()-BUTTON_SIZE/2,boundingRect().topRight().y()-BUTTON_SIZE/2);
         painter->save();
         QPen pen;
@@ -77,7 +78,7 @@ AddChildItem::AddChildItem(Node *parent)
 QRectF AddChildItem::boundingRect() const
 {
     QRectF rect;
-    rect.setCoords(0,0,7,7);
+    rect.setCoords(0,0,ARROW_SIZE,ARROW_SIZE);
     return rect;
 }
 
@@ -94,9 +95,9 @@ void AddChildItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         painter->setPen(pen);
         QPainterPath path;
 
-        QPointF point1(7/2,0);
-        QPointF point2(7,7);
-        QPointF point3(0,7);
+        QPointF point1(ARROW_SIZE/2,0);
+        QPointF point2(ARROW_SIZE,ARROW_SIZE);
+        QPointF point3(0,ARROW_SIZE);
 
         path.moveTo(point1);
         path.lineTo(point2);
