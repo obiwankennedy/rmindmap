@@ -112,7 +112,7 @@ void AddChildItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "mouse Press Addchild";
+    //qDebug() << "mouse Press Addchild";
     m_currentNode = new Node();
     m_currentNode->setColorTheme(m_parent->getColorTheme());
     Edge* edge = new Edge(m_parent,m_currentNode);
@@ -130,13 +130,13 @@ void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AddChildItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-    qDebug() << "mouseReleaseEvent";
+//    qDebug() << "mouseReleaseEvent";
     m_currentNode = NULL;
     QGraphicsItem::mouseReleaseEvent(event);
 }
 void AddChildItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    qDebug() << "AddChildItem mouseMoveEvent" << event->scenePos();
+ //   qDebug() << "AddChildItem mouseMoveEvent" << event->scenePos();
     if(nullptr != m_currentNode)
     {
         m_currentNode->setPos(event->scenePos());

@@ -61,7 +61,9 @@ QString PackageItem::getText() const
 }
 QRectF PackageItem::boundingRect() const
 {
-    QRectF r(m_topLeft.x(), m_topLeft.y(), m_w,m_h);
+    QRectF r(0, 0, m_w,m_h);
+
+  // qDebug() << "rect package" <<r;
     //rect.translate(lastAddedPackage->pos());
 
 
@@ -104,6 +106,7 @@ void PackageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 }
 void PackageItem::setTopLeft(QPointF p )
 {
+    qDebug() << p;
     m_topLeft=p;
     updateHW();
 
@@ -259,8 +262,8 @@ QPointF PackageItem::middlePoint()
 }
 void PackageItem::updateHW()
 {
-    m_w = m_bottomRight.x()-m_topLeft.x();
-    m_h = m_bottomRight.y()-m_topLeft.y();
+    m_w = m_bottomRight.x()-pos().x();
+    m_h = m_bottomRight.y()-pos().y();
 }
 void PackageItem::setGeometry(int w, int h)
 {

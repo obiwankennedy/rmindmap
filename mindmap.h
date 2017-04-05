@@ -22,14 +22,33 @@
 #define MINDMAP_H
 
 #include <QGraphicsScene>
+#include "items/node.h"
+#include "stringmanager/stringmanager.h"
+#include "preferences/preferencesmanager.h"
+#include "items/packageitem.h"
 
 class MindMap : public QGraphicsScene
 {
 public:
     MindMap(QObject* parent);
 
-private:
+    void readFromData(QJsonObject &root);
+    void writeToData(QJsonObject &root);
+    void clearRoots();
+    StringManager* getStringManager() const;
+    void setStringManager(StringManager *stringManager);
 
+    void addNodeAt(QPoint pos);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+
+private:
+    QList<Node*> m_roots;
+    StringManager* m_stringManager;
+    PreferencesManager* m_preferences;
+    PackageItem* m_currentPackage;
 };
 
 #endif // MINDMAP_H

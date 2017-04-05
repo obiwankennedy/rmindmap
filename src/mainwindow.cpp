@@ -32,13 +32,16 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    m_stringManager = new StringManager();
+
     m_widget = new QGraphicsView(this);// new GraphWidget(m_stringManager,this);
-    m_mindtoolbar = new MindToolBar(m_stringManager,this);
+    m_widget->setCacheMode(QGraphicsView::CacheNone);
+    m_widget->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     m_detailpanel = new DetailPanel(this);
     m_browser = new ItemBrowser;
     m_scene = new MindMap(this);
+    m_mindtoolbar = new MindToolBar(m_scene->getStringManager(),this);
     m_widget->setScene(m_scene);
+    m_scene->addNodeAt(QPoint(200,200));
 
     m_scene->setSceneRect(0,0,1024,768);
    /* m_timeLine = new TimeLineWidget();
@@ -52,21 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_title = tr("%1[*] - MindMap Rolisteam - v0.0.1");
     setObjectName("MainWindow");
     setWindowTitle(m_title.arg(tr("untitled")));
-
-   /* connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
-    connect(m_widget,SIGNAL(currentNode(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
-    connect(m_widget,SIGNAL(currentPackage(GenericMindMapItem*)),m_detailpanel,SLOT(setCurrentGenericItem(GenericMindMapItem*)));
-
-    connect(m_widget,SIGNAL(currentPackage(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
-    connect(m_widget,SIGNAL(currentEdge(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
-    connect(m_widget,SIGNAL(currentNode(GenericMindMapItem*)),m_detailpanel,SLOT(show()));
-    connect(m_widget,SIGNAL(selectionIsEmpty()),m_detailpanel,SLOT(hide()));
-    connect(m_widget,SIGNAL(nodeAsBrush(Node*)),m_mindtoolbar,SLOT(addNodeBrush(Node*)));
-
-    connect(m_widget,SIGNAL(itemHasBeenAdded(GenericMindMapItem*)),m_browser,SLOT(addItem(GenericMindMapItem*)));
-
-    connect(m_widget,SIGNAL(itemHasBeenDeleted(GenericMindMapItem*)),m_browser,SLOT(removeItem(GenericMindMapItem*)));*/
-
 
     m_preferences = PreferencesManager::getInstance();
 
@@ -332,25 +320,9 @@ void MainWindow::openMindMap()
         updateTitle();
     }
 }
-void MainWindow::addNodeAt(QPoint pos)
-{
-    Node* node = new Node(this);
-    //emit itemHasBeenAdded(node);
-    m_scene->addItem(node);
-    //m_nodeList->append(node);
-    node->setPos(pos.x(),pos.y());
-    node->setStringManager(m_stringManager);
 
-    node->setColorTheme(m_preferences->getDefaultNodeColorTheme());
-    node->setText("Root");
-
-    m_roots.append(node);
-
-
-}
 void MainWindow::newMindMap()
 {
-    //m_widget->cleanScene();
     m_browser->clear();
 }
 
@@ -368,7 +340,6 @@ void MainWindow::saveMindMap()
     }
     QFile file(m_currentMindMapPath);
 
-    QHash<QString,GenericMindMapItem*>* done = new QHash<QString,GenericMindMapItem*>();
 
     QFileInfo fileinfo(file);
     m_preferences->registerValue("MindMapDirectory",fileinfo.absoluteDir().canonicalPath());
@@ -377,51 +348,26 @@ void MainWindow::saveMindMap()
     {
 
         QJsonObject root;
-        QJsonObject stringManager;
-        m_stringManager->writeToData(stringManager,nullptr,done);
-        QJsonArray children;
-        for(auto node : m_roots)
-        {
-            QJsonObject obj;
-            node->writeToData(obj,nullptr,done);
-            children.append(obj);
-        }
-        root["children"]=children;
-        root["srings"]=stringManager;
+
+        m_scene->writeToData(root);
 
         QJsonDocument doc;
         doc.setObject(root);
-        //QByteArray baJson = ;
         file.write(doc.toJson());
         file.close();
     }
 }
 void MainWindow::readFile()
 {
-    qDeleteAll(m_roots);
-    m_roots.clear();
+    m_scene->clearRoots();
+
     QFile file(m_currentMindMapPath);
     if (file.open(QIODevice::ReadOnly))
     {
         QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         QJsonObject root = doc.object();
-        QJsonObject obj = root["strings"].toObject();
-        QJsonArray children = root["children"].toArray();
-        m_stringManager->readFromData(obj,nullptr,m_scene);
 
-        for(auto i : children)
-        {
-            QJsonObject child = i.toObject();
-            QString type = child["type"].toString();
-            if(type == "node")
-            {
-                Node* node = new Node();
-                m_scene->addItem(node);
-                node->readFromData(child,nullptr,m_scene);
-                m_roots.append(node);
-            }
-        }
-
+        m_scene->readFromData(root);
 
 
         file.close();

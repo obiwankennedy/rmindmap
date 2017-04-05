@@ -29,7 +29,6 @@
 #include "preferences/preferencesmanager.h"
 
 #include "browser/itembrowser.h"
-#include "stringmanager/stringmanager.h"
 
 #include "widgets/timelinewidget.h"
 class DetailPanel;
@@ -49,7 +48,7 @@ signals:
     
 public slots:
     void openRecentFile();
-    void addNodeAt(QPoint pos);
+    //void addNodeAt(QPoint pos);
 
 
 protected:
@@ -104,9 +103,6 @@ private://attributs
 
     QList<QAction*>* m_recentFileActions;
 
-    QList<Node*> m_roots;
-
-
    QDockWidget* m_dock;
 
    PreferencesManager* m_preferences;
@@ -114,7 +110,7 @@ private://attributs
 
    DetailPanel* m_detailpanel;
    ItemBrowser* m_browser;
-   StringManager* m_stringManager;
+
    TimeLineWidget* m_timeLine;
 
    MindMap* m_scene;
