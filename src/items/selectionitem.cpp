@@ -132,7 +132,7 @@ void AddChildItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     m_currentNode->setText(" ");
     scene()->addItem(m_currentNode);
     scene()->addItem(edge);
-    m_currentNode->setPos(m_parent->pos());
+    m_currentNode->setPos(event->pos());
     m_currentNode->setFocus(Qt::MouseFocusReason);
    // QGraphicsItem::mousePressEvent(event);
 }
@@ -148,7 +148,7 @@ void AddChildItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 //    qDebug() << "AddChildItem mouseMoveEvent" << event->scenePos();
     if(nullptr != m_currentNode)
     {
-        m_currentNode->setPos(event->scenePos());
+        m_currentNode->setPos(event->pos());
     }
     //QGraphicsItem::mouseMoveEvent(event);
 }
