@@ -406,15 +406,14 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
     QPointF destArrowP2;
     if((sourcePoint.y() < destPoint.y()) && (lineDEST.dy()!=0))
     {
-
-        sourceArrowP1 = sourcePoint - QPointF(sin(angleSRC + Pi / 3) * m_arrowSize,
+        sourceArrowP1 = sourcePoint - QPointF(-sin(angleSRC + Pi / 3) * m_arrowSize,
                                                   cos(angleSRC + Pi / 3) * m_arrowSize);
-        sourceArrowP2 = sourcePoint - QPointF(sin(angleSRC + Pi - Pi / 3) * m_arrowSize,
+        sourceArrowP2 = sourcePoint - QPointF(-sin(angleSRC + Pi - Pi / 3) * m_arrowSize,
                                                   cos(angleSRC + Pi - Pi / 3) * m_arrowSize);
 
-        destArrowP1 = destPoint - QPointF(sin(angleDEST - Pi / 3) * m_arrowSize,
+        destArrowP1 = destPoint - QPointF(-sin(angleDEST - Pi / 3) * m_arrowSize,
                                               cos(angleDEST - Pi / 3) * m_arrowSize);
-        destArrowP2 = destPoint - QPointF(sin(angleDEST - Pi + Pi / 3) * m_arrowSize,
+        destArrowP2 = destPoint - QPointF(-sin(angleDEST - Pi + Pi / 3) * m_arrowSize,
                                               cos(angleDEST - Pi + Pi / 3) * m_arrowSize);
 
 
