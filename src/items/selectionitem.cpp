@@ -48,13 +48,15 @@ SelectionItem::SelectionItem(Node *parent)
 
 QRectF SelectionItem::boundingRect() const
 {
-    qreal penW = PEN_WIDTH/2;
+    //qreal penW = PEN_WIDTH/2;
 
     return m_parent->boundingRect();//.adjusted(-penW,-penW,penW,penW);
 }
 
 void SelectionItem::paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
     if(m_parent->isSelected())
     {
         qreal x = boundingRect().width()/2.0-3.5;
