@@ -53,6 +53,7 @@ public:
 
     virtual void readFromData(QJsonObject&);
     virtual void writeToData(QJsonObject&);
+    void dumpMapInBipmap(QString file);
 private:
     QList<Node*> m_roots;
     PreferencesManager* m_preferences;

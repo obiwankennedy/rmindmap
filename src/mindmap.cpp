@@ -58,7 +58,8 @@ void MindMap::readFromText(QTextStream& in)
                 if(depth>currentD)//on level under
                 {
                     parent = current;
-                    current = addNodeAt(QPoint(parent->childItems().count()*20,currentD*40));
+                    //current = addNodeAt(QPoint(parent->childItems().count()*20,currentD*40));
+                    current = addNodeAt(QPoint(currentD*100,parent->childItems().count()*40));
                     m_listOfAncestor.append(current);
                     currentD = depth;
                 }
@@ -66,7 +67,8 @@ void MindMap::readFromText(QTextStream& in)
                 {
     //                qDebug() << "$$$$$$$$$$$$$$" << "parent:" << (parent==nullptr ? "null" : parent->getText());
                     m_listOfAncestor.removeLast();
-                    current = addNodeAt(QPoint(parent->childItems().count()*20,currentD*40));
+                    //current = addNodeAt(QPoint(parent->childItems().count()*20,currentD*40));
+                    current = addNodeAt(QPoint(currentD*100,parent->childItems().count()*40));
                     m_listOfAncestor.append(current);
                 }
                 else if(depth<currentD)//many level above
@@ -83,7 +85,9 @@ void MindMap::readFromText(QTextStream& in)
                         parent = nullptr;
                     }
              //       qDebug() << "////////////////" << "parent:" << (parent==nullptr ? "null" : parent->getText());
-                    current = addNodeAt(QPoint(0,currentD*40));
+                    //current = addNodeAt(QPoint(0,currentD*40));
+                    current = addNodeAt(QPoint(currentD*100,currentD*40));
+
                     if(nullptr==parent)
                     {
                         m_listOfAncestor.clear();
@@ -103,6 +107,7 @@ void MindMap::readFromText(QTextStream& in)
             }
             else
             {
+
                 current = addNodeAt(QPoint(sceneRect().width()/2,sceneRect().height()/2));
                 current->setText(data);
                 m_roots.append(current);
@@ -177,8 +182,9 @@ void MindMap::readFromData(QJsonObject& obj)
         Node* node=new Node();
         addItem(node);
         node->readFromData(root);
-        m_roots.append(node);
 
+        node->setPos(node->getX(),node->getY());
+        m_roots.append(node);
     }
 }
 
@@ -192,4 +198,16 @@ void MindMap::writeToData(QJsonObject& obj)
         rootListJson.append(root);
     }
     obj["roots"]=rootListJson;
+}
+#include <QPainter>
+void MindMap::dumpMapInBipmap(QString file)
+{
+    clearSelection();
+    setSceneRect(itemsBoundingRect());
+    QImage image(sceneRect().size().toSize(), QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+    QPainter painter(&image);
+    render(&painter);
+    image.save(file);
 }
