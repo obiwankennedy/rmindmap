@@ -441,6 +441,6 @@ void MainWindow::exportMap()
     else if(obj == m_pngExportAct)
     {
         QString uri = QFileDialog::getSaveFileName(this, tr("export Mind Map as Image"), m_preferences->value("MindMapDirectory",QDir::homePath()).toString(), tr("Bipmap file (*.png, *.jpg, *.bmp)"));
-       //m_mindmapView->dumpMapInBipmap(uri);
+        m_scene->dumpMapInBipmap(uri);
     }
 }
