@@ -32,6 +32,7 @@
 //////////////////////////////////
 class AddChildItem : public QGraphicsObject
 {
+    Q_OBJECT
 public:
     AddChildItem(Node* parent);
     QRectF boundingRect() const;
@@ -72,16 +73,24 @@ private:
 //////////////////////////////////
 class FoldItem : public QGraphicsObject
 {
+    Q_OBJECT
 public:
     FoldItem(Node* parent);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    bool isFold() const;
+    void setFold(bool fold);
+
+    bool hasChild() const;
+    void setHasChild(bool hasChild);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 private:
     Node* m_parent;
     bool m_fold;
+    bool m_hasChild;
 };
 /////////////////////////////////
 /// \brief HandleItem::HandleItem
@@ -95,11 +104,20 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    AddChildItem *child() const;
+    void setChild(AddChildItem *child);
+
+    FoldItem *folder() const;
+    void setFolder(FoldItem *folder);
+
+    void setVisibleStatus(bool isSelected);
+
 private:
     Node* m_parent;
     AddChildItem* m_child;
     SelectStyleItem* m_menu;
     FoldItem* m_folder;
+
 };
 
 #endif // SELECTIONITEM_H

@@ -44,6 +44,13 @@ SelectionItem::SelectionItem(Node *parent)
     m_folder->setParentItem(this);
     m_folder->setZValue(1);
 
+    m_folder->setPos(boundingRect().width()/2-BUTTON_SIZE/2,boundingRect().height());
+
+
+    connect(m_child,&AddChildItem::addNode,[=](){
+         m_folder->setHasChild(true);
+    });
+
 }
 
 QRectF SelectionItem::boundingRect() const
@@ -75,6 +82,40 @@ void SelectionItem::paint(QPainter* painter, const QStyleOptionGraphicsItem *opt
         painter->drawRoundedRect(boundingRect(),m_parent->getRadius(),m_parent->getRadius());
         painter->restore();
     }
+}
+
+AddChildItem *SelectionItem::child() const
+{
+    return m_child;
+}
+
+void SelectionItem::setChild(AddChildItem *child)
+{
+    m_child = child;
+}
+
+FoldItem *SelectionItem::folder() const
+{
+    return m_folder;
+}
+
+void SelectionItem::setFolder(FoldItem *folder)
+{
+    m_folder = folder;
+}
+
+void SelectionItem::setVisibleStatus(bool isSelected)
+{
+    if(isSelected)
+    {
+        m_folder->setVisible(isSelected);
+    }
+    else
+    {
+        m_folder->setVisible(m_folder->isFold());
+    }
+    m_child->setVisible(isSelected);
+    m_menu->setVisible(false);
 }
 /////////////////////////////////
 /// \brief HandleItem::HandleItem
@@ -203,7 +244,7 @@ void SelectStyleItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 }
 
 FoldItem::FoldItem(Node *parent)
-: m_parent(parent),m_fold(true)
+: m_parent(parent),m_fold(false),m_hasChild(false)
 {
     setFlags(QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemSendsGeometryChanges|QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsFocusable);
 }
@@ -217,19 +258,24 @@ QRectF FoldItem::boundingRect() const
 
 void FoldItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if((m_parent->isUnderMouse()||isUnderMouse()))
-    {
         painter->save();
         QPen pen;
-        pen.setColor(Qt::red);
+        pen.setColor(Qt::black);
+        pen.setWidth(1);
 
         painter->setPen(pen);
-        painter->setBrush(Qt::red);
+        //painter->setBrush(Qt::red);
         painter->drawEllipse(boundingRect());
-        painter->setPen(Qt::white);
-        painter->drawText(boundingRect(),Qt::AlignCenter,m_fold ? "-":"+");
+        painter->setPen(Qt::black);
+
+        QFont font = painter->font();
+        font.setBold(true);
+        font.setPixelSize(15);
+        painter->setFont(font);
+
+        painter->drawText(boundingRect(),Qt::AlignCenter,m_fold ? "+":"-");
+        painter->drawRect(boundingRect());
         painter->restore();
-    }
 }
 
 void FoldItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -244,8 +290,29 @@ void FoldItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
            // qDebug() << "item" << item << "eItem" << eItem;
             if(nullptr != eItem)
             {
-                eItem->setVisible(m_fold);
+                eItem->setVisible(!m_fold);
             }
         }
+        event->accept();
     }
+}
+
+bool FoldItem::hasChild() const
+{
+    return m_hasChild;
+}
+
+void FoldItem::setHasChild(bool hasChild)
+{
+    m_hasChild = hasChild;
+}
+
+bool FoldItem::isFold() const
+{
+    return m_fold;
+}
+
+void FoldItem::setFold(bool fold)
+{
+    m_fold = fold;
 }
