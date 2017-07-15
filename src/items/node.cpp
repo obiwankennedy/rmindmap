@@ -53,9 +53,9 @@ Node::Node(QObject *graphWidget)
     connect(m_tempedit,SIGNAL(editingFinished()),m_tempedit,SLOT(hide()));
     connect(m_tempedit,SIGNAL(textChanged(QString)),this,SLOT(updatePainting()));
 
-    SelectionItem* selector = new SelectionItem(this);
+    m_selector = new SelectionItem(this);
 
-    m_children.append(selector);
+    m_children.append(m_selector);
 }
 QString Node::getUuid()
 {
@@ -96,9 +96,9 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     bool showChild = (QStyle::State_Selected & option->state);
     // qDebug() << showChild << isSelected();
 
-    for(auto item : m_children)
+    //for(auto item : m_children)
     {
-        item->setVisible(showChild);
+        m_selector->setVisibleStatus(showChild);
     }
 
 
@@ -173,6 +173,26 @@ void Node::keyPressEvent(QKeyEvent *event)
     }
 }
 
+int Node::getY() const
+{
+    return m_y;
+}
+
+void Node::setY(int y)
+{
+    m_y = y;
+}
+
+int Node::getX() const
+{
+    return m_x;
+}
+
+void Node::setX(int x)
+{
+    m_x = x;
+}
+
 /*GraphWidget *Node::getGraph() const
 {
     return m_graph;
@@ -236,11 +256,12 @@ void Node::setDescription(QString desc)
 
 void Node::readFromData(QJsonObject& nodeJson)
 {
-
     setText(nodeJson["text"].toString());
     m_id=nodeJson["id"].toString();
-    int x = nodeJson["x"].toInt();
-    int y = nodeJson["y"].toInt();
+    qreal x = nodeJson["x"].toDouble();
+    qreal y = nodeJson["y"].toDouble();
+    m_y = y;
+    m_x = x;
     setPos(x,y);
     m_description=nodeJson["desc"].toString();
     int idColor = nodeJson["colorThemeId"].toInt();
@@ -257,6 +278,7 @@ void Node::readFromData(QJsonObject& nodeJson)
             Node* node = new Node();
             node->setParentItem(this);
             node->readFromData(child);
+            node->setPos(node->getX(),node->getY());
         }
         else
         {

@@ -27,6 +27,7 @@
 #include "items/genericmindmapitem.h"
 
 class Edge;
+class SelectionItem;
 class GraphWidget;
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -68,8 +69,11 @@ public:
     //virtual void setGeometry(int w,int h);
     int getRadius() const;
 
- /*   GraphWidget* getGraph() const;
-    void setGraph(GraphWidget * graph);*/
+    int getX() const;
+    void setX(int x);
+
+    int getY() const;
+    void setY(int y);
 
 public slots:
     void setText(QString text);
@@ -88,26 +92,17 @@ protected:
 private:
     QList<Edge *> m_edgeList;
     QPointF newPos;
-   // GraphWidget *m_graph;
-
     QString m_text;
-
- /*   qreal m_raduisv;
-    qreal m_raduish;
-
-    qreal m_raduisBigV;
-    qreal m_raduisBigH;*/
     QRect m_textRect;
     static QRect m_minRect;
-
     QLineEdit* m_tempedit;
-
     QString m_id;
     QString m_description;
     QGraphicsProxyWidget* m_proxyw;
-
     QList<QGraphicsItem*> m_children;
-
+    SelectionItem* m_selector;
+    qreal m_x;
+    qreal m_y;
 };
 
 
