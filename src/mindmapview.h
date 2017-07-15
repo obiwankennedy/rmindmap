@@ -30,8 +30,14 @@
  */
 class MindMapView : public QGraphicsView
 {
+    Q_OBJECT
 public:
     MindMapView(QWidget* parent = nullptr);
+
+
+public slots:
+    void zoomIn();
+    void zoomOut();
 
 protected:
      void wheelEvent(QWheelEvent *event);
@@ -39,6 +45,7 @@ protected:
      void mouseReleaseEvent(QMouseEvent *event);
 
 
+     void scaleView(qreal scaleFactor);
 private:
     int m_counterZoom;
     QPoint m_lastPoint;

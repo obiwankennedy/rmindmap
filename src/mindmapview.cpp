@@ -30,6 +30,23 @@ MindMapView::MindMapView(QWidget* parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
+void MindMapView::zoomIn()
+{
+    scaleView(qreal(1.2));
+}
+
+void MindMapView::zoomOut()
+{
+    scaleView(1 / qreal(1.2));
+}
+void MindMapView::scaleView(qreal scaleFactor)
+{
+    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+    if (factor < 0.07 || factor > 100)
+        return;
+
+    scale(scaleFactor, scaleFactor);
+}
 
 
 void MindMapView::wheelEvent(QWheelEvent *event)
