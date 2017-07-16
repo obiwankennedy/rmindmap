@@ -591,16 +591,16 @@ QString Edge::getText() const
 
     return m_text;
 }
-void Edge::writeToData(QDataStream& out)
+/*void Edge::writeToData(QDataStream& out)
 {
     out << m_arrowSize;
     out << m_text;
     out << (int)m_endkind;
     out << m_source->getUuid();
     out << m_dest->getUuid();
-}
+}*/
 
-void Edge::readFromData(QJsonObject& obj,EdgableItems* srcNode,QGraphicsScene* scene)
+/*void Edge::readFromData(QJsonObject& obj,EdgableItems* srcNode,QGraphicsScene* scene)
 {
     m_arrowSize = obj["arrowSize"].toDouble();
     m_text = obj["text"].toString();
@@ -617,7 +617,8 @@ void Edge::readFromData(QJsonObject& obj,EdgableItems* srcNode,QGraphicsScene* s
     m_dest->readFromData(destJson,nullptr,scene);
 
     lookUpPoint();
-}
+}*/
+/*
 void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {
     if(!done->contains(m_id))
@@ -633,12 +634,7 @@ void Edge::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,Gen
 
        obj["dest"] = destJson;
     }
- /* out << m_arrowSize;
-    out << m_text;
-    out << (int)m_endkind;
-    out << m_source->getUuid();
-    out << m_dest->getUuid();*/
-}
+}*/
 void Edge::updatePainting()
 {
     update();

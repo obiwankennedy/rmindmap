@@ -40,10 +40,13 @@ public:
 
     void setCurrentLang(int);
 
-    virtual void readFromData(QDataStream&);
-    virtual void writeToData(QDataStream&);
-    //virtual void readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* scene);
-    //virtual void writeToData(QJsonObject&,EdgableItems*,QHash<QString,GenericMindMapItem*>* done);
+    //virtual void readFromData(QDataStream&);
+   // virtual void writeToData(QDataStream&);
+    virtual void readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* scene);
+    virtual void writeToData(QJsonObject&,EdgableItems*,QHash<QString,GenericMindMapItem*>* done);
+
+    virtual void readFromData(QJsonObject&);
+    virtual void writeToData(QJsonObject&);
 
 
 private:

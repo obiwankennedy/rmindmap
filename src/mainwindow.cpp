@@ -329,7 +329,7 @@ void MainWindow::readFile()
         QJsonObject jsonObj = json.object();
 
 
-        m_stringManager->readFromData(jsonObj);
+        //m_stringManager->readFromData(jsonObj);
         m_scene->readFromData(jsonObj);
         file.close();
     }
@@ -417,13 +417,13 @@ void MainWindow::saveMindMap()
 
     QJsonDocument doc;
     QJsonObject root;
-    m_stringManager->writeToData(root);
+    //m_stringManager->writeToData(root);
     m_scene->writeToData(root);
 
     doc.setObject(root);
 
 
-    QFile file(m_currentMindMapPath);
+    //QFile file(m_currentMindMapPath);
     if (file.open(QIODevice::WriteOnly))
     {
         QFileInfo fileinfo(file);

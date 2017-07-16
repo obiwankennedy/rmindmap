@@ -38,22 +38,22 @@ public:
     void setBottomRight(QPointF);
     void setBorder(PackageItem::Border);
     QRectF rect();
+  //  void setGrap(GraphWidget*);
+
+
+
+    //virtual void readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* m_scene);
+    virtual void writeToData(QJsonObject&,EdgableItems*,QHash<QString,GenericMindMapItem*>* done);
 
     virtual void readFromData(QJsonObject&);
     virtual void writeToData(QJsonObject&);
-    void setGrap(GraphWidget*);
-
-
-
-    virtual void readFromData(QJsonObject&,EdgableItems*,QGraphicsScene* m_scene);
-    virtual void writeToData(QJsonObject&,EdgableItems*,QHash<QString,GenericMindMapItem*>* done);
 
     virtual QPixmap getIcon() const;
     virtual void addEdge(Edge* );
     virtual QPointF middlePoint();
     virtual void setGeometry(int w, int h);
     virtual void updateHW();
-
+    virtual QString getUuid();
 public slots:
     void setName(QString&);
     void setText(QString q);

@@ -83,7 +83,8 @@ void EdgeBreak::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     painter->fillRect(boundingRect(),Qt::black);
 }
-void EdgeBreak::readFromData(QJsonObject& in)
+#include <QJsonArray>
+void EdgeBreak::readFromData(QJsonObject& obj)
 {
     m_id = obj["id"].toString();
     qreal x = obj["x"].toDouble();
@@ -97,7 +98,7 @@ void EdgeBreak::readFromData(QJsonObject& in)
     {
         QJsonObject edgeJson = i.toObject();
         Edge* edge = new Edge();
-        edge->readFromData(edgeJson,nullptr,scene);
+        edge->readFromData(edgeJson/*,nullptr,scene*/);
     }
 
   /*  in >> m_id;
@@ -107,11 +108,11 @@ void EdgeBreak::readFromData(QJsonObject& in)
 }
 
 
-void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
+void EdgeBreak::writeToData(QJsonObject& obj/*,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done*/)
 {
-    if(!done->contains(m_id))
+   // if(!done->contains(m_id))
     {
-        done->insert(m_id,this);
+        //done->insert(m_id,this);
         obj["type"] = "egdebreak";
         obj["x"] = pos().x();
         obj["y"] = pos().y();
@@ -121,7 +122,7 @@ void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QStrin
         for(auto i : m_edgeList)
         {
             QJsonObject item;
-            i->writeToData(item,nullptr,done);
+            i->writeToData(item/*,nullptr,done*/);
             array.append(item);
         }
         obj["edges"] = array;

@@ -197,7 +197,7 @@ void PackageItem::updateEdges()
         edge->adjust();
     }
 }
-void PackageItem::writeToData(QDataStream& out)
+/*void PackageItem::writeToData(QDataStream& out)
 {
     out << m_title;
     out << m_id;
@@ -213,7 +213,7 @@ void PackageItem::writeToData(QDataStream& out)
 
         }
     }
-}
+}*/
 #include <QJsonArray>
 void PackageItem::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
 {
@@ -249,7 +249,7 @@ void PackageItem::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QStrin
         if(edge->getSource() == this)
         {
             QJsonObject edgeJson;
-            edge->writeToData(edgeJson,nullptr,done);
+            edge->writeToData(edgeJson/*,nullptr,done*/);
             edges.append(edgeJson);
         }
     }

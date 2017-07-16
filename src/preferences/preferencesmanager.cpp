@@ -93,7 +93,7 @@ ColorTheme* PreferencesManager::getColorThemeById(int i)
 {
     if(i>=0 && i<getColorThemeCount())
     {
-        return m_colorThemeNodeModel.at(i);
+        return m_colorThemeNodeModel.value(m_colorThemeNodeModel.keys().at(i));
     }
     else
         return nullptr;
@@ -101,7 +101,8 @@ ColorTheme* PreferencesManager::getColorThemeById(int i)
 
 int PreferencesManager::indexOf(ColorTheme* theme)
 {
-   return m_colorThemeNodeModel.indexOf(theme);
+    return -1;
+   //return m_colorThemeNodeModel.indexOf(theme);
 }
 PreferencesManager* PreferencesManager::getInstance()
 {
