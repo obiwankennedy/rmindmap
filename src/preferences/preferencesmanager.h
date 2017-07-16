@@ -112,8 +112,8 @@ private:
     QMap<QString,QVariant>* m_optionDictionary;
 
 
-    QHash<QString,ColorTheme*> m_colorThemeNodeModel;
-    QHash<QString,ColorTheme*> m_colorThemeEdgeModel;
+    QMap<QString,ColorTheme*> m_colorThemeNodeModel;
+    QMap<QString,ColorTheme*> m_colorThemeEdgeModel;
 
     QString m_defaultTheme;
 };
