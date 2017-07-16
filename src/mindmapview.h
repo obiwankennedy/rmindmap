@@ -23,6 +23,11 @@
 
 #include <QGraphicsView>
 #include <QWheelEvent>
+#include <QGraphicsScene>
+#include "items/node.h"
+#include "stringmanager/stringmanager.h"
+#include "preferences/preferencesmanager.h"
+#include "items/packageitem.h"
 
 
 /**
@@ -34,6 +39,17 @@ class MindMapView : public QGraphicsView
 public:
     MindMapView(QWidget* parent = nullptr);
 
+    void readFromData(QJsonObject &root);
+    void writeToData(QJsonObject &root);
+    void clearRoots();
+    StringManager* getStringManager() const;
+    void setStringManager(StringManager *stringManager);
+
+    void addNodeAt(QPoint pos);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 public slots:
     void zoomIn();
@@ -49,6 +65,10 @@ protected:
 private:
     int m_counterZoom;
     QPoint m_lastPoint;
+    QList<Node*> m_roots;
+    StringManager* m_stringManager;
+    PreferencesManager* m_preferences;
+    PackageItem* m_currentPackage;
 };
 
 #endif // MINDMAPVIEW_H

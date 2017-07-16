@@ -34,9 +34,6 @@ MindToolBar::MindToolBar(StringManager* stringManager,QWidget *parent) :
     m_group = new QButtonGroup();
     m_edgeModel = new GraphEdgeModel();
     m_commonModel = new GraphCommonModel();
-
-
-
     setupUi();
 }
 

@@ -26,13 +26,14 @@
 
 #define default_w 60
 #define default_h 20
+#include <QUuid>
 /////////////////////////////////////////
 //
 //      Code of ColorTheme
 //
 /////////////////////////////////////////
 ColorTheme::ColorTheme()
-    : m_lineStyle(Qt::SolidLine)
+    : m_lineStyle(Qt::SolidLine),m_id(QUuid::createUuid().toString())
 {
 
 }
@@ -103,14 +104,22 @@ QPixmap ColorTheme::getPixmap()
     return m_pix;
 
 }
+QString ColorTheme::getId() const
+{
+    return m_id;
+}
 
+void ColorTheme::setId(const QString &id)
+{
+    m_id = id;
+}
 /////////////////////////////////////////
 //
 //      Code of GenericMindMapItem
 //
 /////////////////////////////////////////
 GenericMindMapItem::GenericMindMapItem()
-    : m_stringManager(NULL),m_colorTheme(NULL)
+    : m_stringManager(NULL),m_colorTheme(NULL),m_id(QUuid::createUuid().toString())
 {
     setAcceptDrops(true);
     setAcceptHoverEvents(true);
@@ -142,6 +151,16 @@ void GenericMindMapItem::setColorTheme(ColorTheme *colorTheme)
 {
     m_colorTheme = colorTheme;
     update();
+}
+
+QString GenericMindMapItem::getId() const
+{
+    return m_id;
+}
+
+void GenericMindMapItem::setId(const QString &id)
+{
+    m_id = id;
 }
 void  GenericMindMapItem::setGeometry(int w,int h)
 {

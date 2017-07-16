@@ -46,14 +46,17 @@ public:
     void setLineStyle(const Qt::PenStyle &lineStyle);
 
     QPixmap getPixmap();
+    void writeToJson(QJsonObject& obj);
 
+    QString getId() const;
+    void setId(const QString &id);
 private:
     QColor m_textColor;
     QColor m_colorBg0;
     QColor m_colorBg1;
     Qt::PenStyle m_lineStyle;
-
     QPixmap m_pix;
+    QString m_id;
 };
 
 class GenericMindMapItem : public QGraphicsObject,public Serialisable
@@ -77,6 +80,9 @@ public:
     ColorTheme* getColorTheme() const;
     void setColorTheme(ColorTheme* colorTheme);
 
+    QString getId() const;
+    void setId(const QString &id);
+
 public slots:
     virtual void setText(QString) = 0;
     virtual void setName(QString&) = 0;
@@ -84,7 +90,7 @@ public slots:
 protected:
     StringManager* m_stringManager;
     ColorTheme *m_colorTheme;
-
+    QString m_id;
 };
 
 class Edge;
@@ -92,7 +98,6 @@ class EdgableItem : public GenericMindMapItem
 {
 public:
     virtual void addEdge(Edge* ) = 0;
-
     virtual QString getUuid() = 0;
     virtual QPointF middlePoint() = 0;
 };

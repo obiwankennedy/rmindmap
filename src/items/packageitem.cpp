@@ -61,7 +61,9 @@ QString PackageItem::getText() const
 }
 QRectF PackageItem::boundingRect() const
 {
-    QRectF r(m_topLeft.x(), m_topLeft.y(), m_w,m_h);
+    QRectF r(0, 0, m_w,m_h);
+
+  // qDebug() << "rect package" <<r;
     //rect.translate(lastAddedPackage->pos());
 
 
@@ -108,10 +110,6 @@ void PackageItem::setTopLeft(QPointF p )
     updateHW();
 
 
-}
-void  PackageItem::setGrap(GraphWidget* g)
-{
-    m_graph=g;
 }
 
 void PackageItem::setBottomRight(QPointF p)
@@ -199,6 +197,79 @@ void PackageItem::updateEdges()
         edge->adjust();
     }
 }
+void PackageItem::writeToData(QDataStream& out)
+{
+    out << m_title;
+    out << m_id;
+    out << pos();
+    out << m_topLeft;
+    out << m_bottomRight;
+    out << childItems().size();
+    foreach(QGraphicsItem* item,childItems())
+    {
+        if(NULL!=dynamic_cast<Node*>(item))
+        {
+            out << dynamic_cast<Node*>(item)->getUuid();
+
+        }
+    }
+}
+#include <QJsonArray>
+void PackageItem::writeToData(QJsonObject& obj,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done)
+{
+    if(!done->contains(m_id))
+    {
+        obj["type"] = "package";
+    obj["title"] = m_title;
+    obj["id"] = m_id;
+    obj["x"] = pos().x();
+    obj["y"] = pos().y();
+    obj["tlx"] = m_topLeft.x();
+    obj["tly"] = m_topLeft.y();
+    obj["brx"] = m_bottomRight.x();
+    obj["bry"] = m_bottomRight.y();
+
+    QJsonArray children;
+    for(QGraphicsItem* item : childItems())
+    {
+        if(NULL!=dynamic_cast<Node*>(item))
+        {
+            QJsonObject child;
+            child["id"] =  dynamic_cast<Node*>(item)->getId();
+            children.append(child["id"]);
+
+        }
+    }
+     obj["children"] = children;
+
+    QJsonArray edges;
+    for(auto edge : m_edgeList)
+    {
+
+        if(edge->getSource() == this)
+        {
+            QJsonObject edgeJson;
+            edge->writeToData(edgeJson,nullptr,done);
+            edges.append(edgeJson);
+        }
+    }
+    obj["edges"] = edges;
+    }
+/*    out << m_title;
+    out << m_id;
+    out << pos();
+    out << m_topLeft;
+    out << m_bottomRight;
+    out << childItems().size();
+    foreach(QGraphicsItem* item,childItems())
+    {
+        if(NULL!=dynamic_cast<Node*>(item))
+        {
+            out << dynamic_cast<Node*>(item)->getUuid();
+
+        }
+    }*/
+}
 QPixmap PackageItem::getIcon() const
 {
 
@@ -228,8 +299,8 @@ QPointF PackageItem::middlePoint()
 }
 void PackageItem::updateHW()
 {
-    m_w = m_bottomRight.x()-m_topLeft.x();
-    m_h = m_bottomRight.y()-m_topLeft.y();
+    m_w = m_bottomRight.x()-pos().x();
+    m_h = m_bottomRight.y()-pos().y();
 }
 void PackageItem::setGeometry(int w, int h)
 {

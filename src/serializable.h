@@ -30,12 +30,17 @@ public:
     virtual void readSettings(QSettings&) = 0;
     virtual void writeSettings(QSettings&) = 0;
 };
+class EdgableItems;
+class GenericMindMapItem;
+class QGraphicsScene;
 
 class Serialisable
 {
 public:
     virtual void readFromData(QJsonObject&) = 0;
     virtual void writeToData(QJsonObject&) = 0;
+ //  virtual void readFromData(QJsonObject&,EdgableItems* parent,QGraphicsScene* m_scene) = 0;
+ //   virtual void writeToData(QJsonObject&,EdgableItems* parent,QHash<QString,GenericMindMapItem*>* done) = 0;
 };
 
 #endif // SERIALIZABLE_H

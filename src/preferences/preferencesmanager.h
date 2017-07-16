@@ -92,6 +92,8 @@ public:
     ColorTheme* getColorThemeById(int);
 
     int indexOf(ColorTheme* theme);
+    ColorTheme* getNodeColorTheme(QString);
+    ColorTheme* getEdgeColorTheme(QString);
     
 private:
     /**
@@ -110,8 +112,10 @@ private:
     QMap<QString,QVariant>* m_optionDictionary;
 
 
-    QList<ColorTheme*> m_colorThemeNodeModel;
-    QList<ColorTheme*> m_colorThemeEdgeModel;
+    QHash<QString,ColorTheme*> m_colorThemeNodeModel;
+    QHash<QString,ColorTheme*> m_colorThemeEdgeModel;
+
+    QString m_defaultTheme;
 };
 
 #endif // PREFERENCESMANAGER_H

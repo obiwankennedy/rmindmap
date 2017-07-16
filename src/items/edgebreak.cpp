@@ -85,20 +85,53 @@ void EdgeBreak::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 }
 void EdgeBreak::readFromData(QJsonObject& in)
 {
-   /* in >> m_id;
+    m_id = obj["id"].toString();
+    qreal x = obj["x"].toDouble();
+    qreal y = obj["y"].toDouble();
+    setPos(x,y);
+   // scene->addItem(this);
+
+    //scene->addItem(this);
+    QJsonArray array = obj["edges"].toArray();
+    for(auto i : array)
+    {
+        QJsonObject edgeJson = i.toObject();
+        Edge* edge = new Edge();
+        edge->readFromData(edgeJson,nullptr,scene);
+    }
+
+  /*  in >> m_id;
     QPointF center;
     in >> center;
     setPos(center);*/
 }
 
-void EdgeBreak::writeToData(QJsonObject& out)
+
+void EdgeBreak::writeToData(QJsonObject& obj,EdgableItems *destNode,QHash<QString,GenericMindMapItem*>* done)
 {
-  /*  out << m_id;
-    out << pos();*/
+    if(!done->contains(m_id))
+    {
+        done->insert(m_id,this);
+        obj["type"] = "egdebreak";
+        obj["x"] = pos().x();
+        obj["y"] = pos().y();
+        obj["id"] = m_id;
+
+        QJsonArray array;
+        for(auto i : m_edgeList)
+        {
+            QJsonObject item;
+            i->writeToData(item,nullptr,done);
+            array.append(item);
+        }
+        obj["edges"] = array;
+
+    }
 }
 QVariant EdgeBreak::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    switch (change) {
+    switch (change)
+    {
     case ItemScenePositionHasChanged:
     case ItemPositionHasChanged:
          updateEdges();

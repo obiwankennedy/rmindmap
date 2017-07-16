@@ -28,7 +28,9 @@
 
 #include "mainwindow.h"
 #include "detailpanel/detailpanel.h"
-
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -330,9 +332,20 @@ void MainWindow::readFile()
         m_stringManager->readFromData(jsonObj);
         m_scene->readFromData(jsonObj);
         file.close();
-
     }
 }
+
+/*void MainWindow::readFile()
+{
+    QFile file(m_currentMindMapPath);
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QDataStream in(&file);
+        m_stringManager->readFromData(in);
+        //m_widget->readFromData(in);
+        file.close();
+    }
+}*/
 void MainWindow::readFileText()
 {
     QFile file(m_currentMindMapPath);
@@ -384,8 +397,6 @@ void MainWindow::newMindMap()
     m_browser->clear();
 }
 
-
-
 void MainWindow::saveMindMap()
 {
 
@@ -398,8 +409,11 @@ void MainWindow::saveMindMap()
     {
          m_currentMindMapPath += ".rmap";
     }
+    QFile file(m_currentMindMapPath);
 
 
+    QFileInfo fileinfo(file);
+    m_preferences->registerValue("MindMapDirectory",fileinfo.absoluteDir().canonicalPath());
 
     QJsonDocument doc;
     QJsonObject root;

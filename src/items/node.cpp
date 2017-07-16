@@ -94,7 +94,7 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->setPen(Qt::NoPen);
 
     bool showChild = (QStyle::State_Selected & option->state);
-    // qDebug() << showChild << isSelected();
+
 
     //for(auto item : m_children)
     {

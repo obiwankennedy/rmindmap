@@ -513,7 +513,7 @@ void GraphWidget::readFromData(QDataStream& out)
     for(int i=0; i<size;++i)
     {
         pack = new PackageItem();
-        pack->setGrap(this);
+        //pack->setGrap(this);
         emit itemHasBeenAdded(pack);
         //pack->readFromData(out);
         m_scene->addItem(pack);

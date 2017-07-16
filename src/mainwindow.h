@@ -106,7 +106,6 @@ private://attributs
 
     QList<QAction*>* m_recentFileActions;
 
-
    QDockWidget* m_dock;
 
    PreferencesManager* m_preferences;
