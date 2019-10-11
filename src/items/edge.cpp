@@ -137,7 +137,7 @@ void Edge::adjust()
             }
         }
         line.setP1(sourcePoint);
-        if(NULL!=m_dest)
+        if(nullptr!=m_dest)
         {
 
             QPointF middlePoint = mapFromItem(m_dest,m_dest->middlePoint());
@@ -171,7 +171,7 @@ void Edge::adjust()
     else
     {
         sourcePoint = line.p1();
-        if(NULL!=m_dest)
+        if(nullptr!=m_dest)
         {
             destPoint = line.p1();
         }
@@ -200,8 +200,6 @@ QRectF Edge::boundingRect() const
 {
     if (!m_source)
         return QRectF();
-
-
 
     qreal penWidth = 1;
     qreal extra = (penWidth + m_arrowSize) / 2.0;
@@ -287,7 +285,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         m_sourceTanPoint.setY(sourcePoint.y()-disty);
     }
     QPointF destMiddlePoint;
-    if(m_dest==NULL)
+    if(m_dest==nullptr)
     {
         destMiddlePoint = destPoint;
     }
@@ -297,7 +295,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
 
     }
 
-    if((m_dest!=NULL)&&(destMiddlePoint.y()>destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is below of the destination.
+    if((m_dest!=nullptr)&&(destMiddlePoint.y()>destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is below of the destination.
     {
         double disty = (sourcePoint.y()-destPoint.y())/2;
 
@@ -307,7 +305,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         m_destTanPoint.setX(destPoint.x());
         m_destTanPoint.setY(destPoint.y()+disty);
     }
-    else if((m_dest!=NULL)&&(destMiddlePoint.y()<destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is above of the destination.
+    else if((m_dest!=nullptr)&&(destMiddlePoint.y()<destPoint.y())&&(destMiddlePoint.x()==destPoint.x()))//if source is above of the destination.
     {
 
 
@@ -317,7 +315,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         m_destTanPoint.setX(destPoint.x());
         m_destTanPoint.setY(destPoint.y()-disty);
     }
-    else if((m_dest!=NULL)&&(destMiddlePoint.x()>destPoint.x())&&(destMiddlePoint.y()==destPoint.y()))//if source is below of the destination.
+    else if((m_dest!=nullptr)&&(destMiddlePoint.x()>destPoint.x())&&(destMiddlePoint.y()==destPoint.y()))//if source is below of the destination.
     {
 
         double distx = abs(sourcePoint.x()-destPoint.x())/2;
@@ -327,7 +325,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWi
         m_destTanPoint.setX(destPoint.x()-distx);
         m_destTanPoint.setY(destPoint.y());
     }
-    else if((m_dest!=NULL)&&(destMiddlePoint.x()<destPoint.x())&&(destMiddlePoint.y()==destPoint.y()))//if source is above of the destination.
+    else if((m_dest!=nullptr)&&(destMiddlePoint.x()<destPoint.x())&&(destMiddlePoint.y()==destPoint.y()))//if source is above of the destination.
     {
 
         double distx = abs(destPoint.y()-sourcePoint.y())/2;

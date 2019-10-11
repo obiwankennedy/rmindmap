@@ -101,10 +101,6 @@ void EdgeBreak::readFromData(QJsonObject& obj)
         edge->readFromData(edgeJson/*,nullptr,scene*/);
     }
 
-  /*  in >> m_id;
-    QPointF center;
-    in >> center;
-    setPos(center);*/
 }
 
 

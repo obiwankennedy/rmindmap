@@ -37,7 +37,7 @@
 QRect Node::m_minRect = QRect(0,0,60,20);
 Node::Node(QObject *graphWidget)
 {
-    m_proxyw = NULL;
+    m_proxyw = nullptr;
     m_text="test";
     m_textRect = m_minRect;
     setFlags(QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemSendsGeometryChanges|QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsFocusable);
@@ -75,8 +75,6 @@ QList<Edge *> Node::edges() const
 
 QRectF Node::boundingRect() const
 {
-   // qDebug() << "bounding rect" << m_textRect;
-
     return m_textRect;
 }
 
@@ -101,12 +99,14 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         m_selector->setVisibleStatus(showChild);
     }
 
+    if(nullptr == m_colorTheme)
+    {
+        m_colorTheme = PreferencesManager::getInstance()->getDefaultNodeColorTheme();;
+    }
 
     myPainterPath.addRoundedRect(tmp,RADIUS,RADIUS);
     QBrush bgBrush = m_colorTheme->getBrush(0+tmp.width()/2,0,0+tmp.width()/2,tmp.height()*2);
-    //mybrush.
     painter->fillPath(myPainterPath,bgBrush);
-   // painter->drawRoundedRect(tmp,RADIUS,RADIUS);
     painter->restore();
     painter->save();
 
@@ -152,7 +152,7 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event )
 {
     Q_UNUSED(event);
-    if(NULL==m_proxyw)
+    if(nullptr==m_proxyw)
     {
         m_proxyw = scene()->addWidget(m_tempedit);
     }
@@ -193,16 +193,6 @@ void Node::setX(int x)
     m_x = x;
 }
 
-/*GraphWidget *Node::getGraph() const
-{
-    return m_graph;
-}
-
-void Node::setGraph(GraphWidget *graph)
-{
-    m_graph = graph;
-}*/
-
 void Node::setText(QString text)
 {
     m_text=text;
@@ -210,11 +200,9 @@ void Node::setText(QString text)
     QFontMetrics info(font);
 
     m_textRect = info.boundingRect(QString("__%1__").arg(m_text));
- //   qDebug() << "setText"<<m_textRect << m_minRect;
     int y = m_textRect.y();
     m_textRect.adjust(0,-y,0,-y);
 
-    //qDebug() << "setText2" <<m_textRect << m_minRect;
     m_textRect.setHeight(m_textRect.height()*1.5);
 
     if(m_minRect.height()*m_minRect.width()>m_textRect.height()*m_textRect.width())
@@ -222,7 +210,7 @@ void Node::setText(QString text)
         m_textRect = m_minRect;
     }
 
-    if(NULL!=m_stringManager)
+    if(nullptr!=m_stringManager)
     {
         m_stringManager->setValue(tr("%1_%2").arg(m_id).arg("text"),text);
     }
@@ -230,7 +218,7 @@ void Node::setText(QString text)
 
 QString Node::getText() const
 {
-    if(NULL!=m_stringManager)
+    if(nullptr!=m_stringManager)
     {
         return m_stringManager->getValue(tr("%1_%2").arg(m_id).arg("text"));
     }
@@ -289,10 +277,7 @@ void Node::readFromData(QJsonObject& nodeJson)
             QString id = edge->getDestId();
             data.insertMulti(id,edge);
         }
-
-
     }
-
     for(auto item : childItems())
     {
         Node* nodeItem= dynamic_cast<Node*>(item);
@@ -355,14 +340,9 @@ QPointF Node::middlePoint()
 }
 void Node::setUuid(QString uuid)
 {
-   // qDebug() << "uuid" << uuid;
     m_id = uuid;
 }
-/*void Node::setGeometry(int w,int h)
-{
 
-}
-*/
 int Node::getRadius() const
 {
     return RADIUS;
