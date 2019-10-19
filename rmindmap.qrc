@@ -7,4 +7,8 @@
         <file>resources/icons/palette.png</file>
         <file>resources/icons/shape.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>resources/qml/main.qml</file>
+        <file>resources/qml/Node.qml</file>
+    </qresource>
 </RCC>

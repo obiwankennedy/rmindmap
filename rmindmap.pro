@@ -1,55 +1,34 @@
 HEADERS += \
-        src/graphwidget.h \
-    src/mindtoolbar.h \
-    src/graphitemmodel.h \
-    src/mainwindow.h \
-    src/serializable.h \
-    src/graphedgemodel.h \
-    src/graphcommonmodel.h \
-    src/mindmap.h \
-    src/menustyleitem.h \
-    src/mindmapview.h
+    src/controller/mindmapcontroller.h \
+    src/controller/spacingcontroller.h \
+    src/data/link.h \
+    src/data/mindnode.h \
+    src/model/linkmodel.h \
+    src/geometry/linknode.h \
+    src/qmlItems/linkitem.h \
+    src/model/boxmodel.h
+   # src/qmlItems/nodeitem.h \
+   # src/geometry/boxnode.h \
 
+INCLUDEPATH += src
 
 SOURCES += \
-        src/main.cpp \
-        src/graphwidget.cpp \
-    src/mindtoolbar.cpp \
-    src/graphitemmodel.cpp \
-    src/mainwindow.cpp \
-    src/graphedgemodel.cpp \
-    src/graphcommonmodel.cpp \
-    src/mindmap.cpp \
-    src/menustyleitem.cpp \
-    src/mindmapview.cpp
+    src/controller/mindmapcontroller.cpp \
+    src/controller/spacingcontroller.cpp \
+    src/data/link.cpp \
+    src/data/mindnode.cpp \
+    src/model/linkmodel.cpp \
+    main.cpp \
+    src/geometry/linknode.cpp \
+    src/qmlItems/linkitem.cpp \
+    src/model/boxmodel.cpp
+#    src/geometry/boxnode.cpp \
+    #src/qmlItems/nodeitem.cpp \
 
-
-
-
-include(src/preferences/preferences.pri)
-include(src/detailpanel/detailpanel.pri)
-include(src/widgets/widgets.pri)
-include(src/items/items.pri)
-include(src/browser/browser.pri)
-include(src/stringmanager/stringmanager.pri)
-
-
-INCLUDEPATH += src/widgets src
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-QT+= svg
+QT+= svg qml widgets quick
 
 target = bin/rmindmap
 CONFIG += c++11
-# install
-#target.path = $$[QT_INSTALL_EXAMPLES]/graphicsview/elasticnodes
-#sources.files = $$SOURCES $$HEADERS $$RESOURCES $$FORMS elasticnodes.pro
-#sources.path = $$[QT_INSTALL_EXAMPLES]/graphicsview/elasticnodes
-#INSTALLS += target sources
-
-FORMS += \
-    src/menustyleitem.ui
 
 RESOURCES += \
     rmindmap.qrc
@@ -59,3 +38,4 @@ DISTFILES += \
 
 
 
+OTHER_FILES += resources/qml/*.qml
