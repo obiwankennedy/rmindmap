@@ -212,10 +212,23 @@ void MindNode::setImageUri(const QString& uri)
     emit imageUriChanged();
 }
 
+void MindNode::setDragged(bool isdragged)
+{
+    if(m_isDragged == isdragged)
+        return;
+    m_isDragged= isdragged;
+    emit isDraggedChanged();
+}
+
 void MindNode::setId(const QString& id)
 {
     if(id == m_id)
         return;
     m_id= id;
     emit idChanged();
+}
+
+bool MindNode::isDragged() const
+{
+    return m_isDragged;
 }

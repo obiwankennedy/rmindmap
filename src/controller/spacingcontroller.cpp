@@ -67,7 +67,8 @@ void SpacingController::computeInLoop()
         for(auto& node : allNodes)
         {
             node->setVelocity(node->getVelocity() * k_defaultDamping);
-            node->setPosition(node->position() + node->getVelocity().toPointF());
+            if(!node->isDragged())
+                node->setPosition(node->position() + node->getVelocity().toPointF());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -92,7 +93,7 @@ void SpacingController::applyCoulombsLaw(MindNode* node, std::vector<MindNode*> 
 
     node->setVelocity(node->getVelocity() + globalRepulsionForce);
 }
-
+#include <QDebug>
 void SpacingController::applyHookesLaw(Link* link)
 {
     auto node1= link->start();
@@ -101,6 +102,8 @@ void SpacingController::applyHookesLaw(Link* link)
     auto vect= QVector2D(node1->position() - node2->position());
     auto length= vect.length();
     auto force= k_attraction * std::max(length - k_defaultSpringLength, 0.f);
+
+    // qDebug() << node1->getVelocity() << vect;
 
     node1->setVelocity(node1->getVelocity() + vect.normalized() * force * -1);
     node2->setVelocity(node2->getVelocity() + vect.normalized() * force);

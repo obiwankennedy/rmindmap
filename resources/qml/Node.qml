@@ -17,8 +17,14 @@ Pane
     property QtObject object
     onWidthChanged: node.contentWidth = width
     onHeightChanged: node.contentHeight = height
-    onXChanged: node.position=Qt.point(x, y)
-    onYChanged: node.position=Qt.point(x, y)
+    onXChanged: {
+        if(mouse.drag.active)
+            node.position=Qt.point(x, y)
+    }
+    onYChanged: {
+       if(mouse.drag.active)
+            node.position=Qt.point(x, y)
+   }
 
     signal addChild()
 
@@ -52,6 +58,7 @@ Pane
             GradientStop { position: 1.0; color: root.colorTwo }
         }
         MouseArea {
+            id: mouse
             anchors.fill: parent
             drag.target: root
             drag.axis: Drag.XAndYAxis
@@ -59,6 +66,7 @@ Pane
             drag.minimumY: 0
             onPressed: root.selected = true
             onDoubleClicked: root.isEditable = true
+            drag.onActiveChanged: root.object.isDragged = drag.active
 
         }
         AbstractButton {

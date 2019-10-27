@@ -18,6 +18,7 @@ class MindNode : public QObject
     Q_PROPERTY(bool open READ open WRITE setOpen NOTIFY openChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(bool hasLink READ hasLink NOTIFY hasLinkChanged)
+    Q_PROPERTY(bool isDragged READ isDragged WRITE setDragged NOTIFY isDraggedChanged)
 public:
     MindNode(QObject* parent= nullptr);
     virtual ~MindNode();
@@ -61,10 +62,13 @@ public:
     QString imageUri() const;
     void setId(const QString& id);
 
+    bool isDragged() const;
+
 public slots:
     void setText(QString text);
     void setMass(int mass);
     void setImageUri(const QString& uri);
+    void setDragged(bool isdragged);
 
 signals:
     void positionChanged(const QPointF oldPos);
@@ -76,6 +80,7 @@ signals:
     void hasLinkChanged();
     void imageUriChanged();
     void idChanged();
+    void isDraggedChanged();
 
 protected:
     void updatePosition();
@@ -91,6 +96,7 @@ private:
     QString m_text;
     bool m_open= true;
     bool m_visible= true;
+    bool m_isDragged= false;
     QString m_imageUri;
 
     qreal m_width= 100;
