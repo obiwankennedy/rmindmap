@@ -1,4 +1,4 @@
-#include "mindmapcontroller.h"
+﻿#include "mindmapcontroller.h"
 
 #include "controller/spacingcontroller.h"
 #include "model/boxmodel.h"
@@ -10,6 +10,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QThread>
+#include <QUrl>
+#include <random>
 
 MindMapController::MindMapController(QObject* parent)
     : QObject(parent), m_linkModel(new LinkModel()), m_nodeModel(new BoxModel())
@@ -142,6 +144,55 @@ void MindMapController::loadFile()
         auto link= m_linkModel->addLink(nodeMap[idStart], nodeMap[idEnd]);
         link->setVisible(obj["visible"].toBool());
         link->setDirection(static_cast<Link::Direction>(obj["Direction"].toInt()));
+    }
+}
+
+void MindMapController::importFile(const QString& path)
+{
+    QFile file(QUrl(path).path());
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    if(!file.open(QFile::ReadOnly))
+    {
+        qDebug() << QStringLiteral("Error, file %1 can't be read.").arg(path);
+        return;
+    }
+
+    QVector<MindNode*> parent;
+    MindNode* previousNode= nullptr;
+    int depth= 0;
+    while(!file.atEnd())
+    {
+        QByteArray line= file.readLine();
+        auto text= QString::fromUtf8(line);
+        if(text.trimmed().isEmpty())
+            continue;
+
+        auto node= new MindNode();
+        auto newdepth= text.count("  ");
+        node->setText(text.trimmed());
+        std::uniform_real_distribution<> dist(0.0, 1600.0);
+
+        node->setPosition({dist(gen), dist(gen)});
+        m_nodeModel->appendNode(node);
+
+        if(newdepth > depth)
+        {
+            parent.append(previousNode);
+        }
+        if(newdepth < depth)
+        {
+            parent.removeLast();
+        }
+
+        if(newdepth >= depth && !parent.isEmpty())
+        {
+            m_linkModel->addLink(parent.last(), node);
+        }
+
+        previousNode= node;
+        depth= newdepth;
     }
 }
 

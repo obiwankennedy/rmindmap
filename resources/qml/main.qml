@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
+import QtQuick.Dialogs 1.3
 import RMindMap 1.0
 
 ApplicationWindow {
@@ -14,6 +15,20 @@ ApplicationWindow {
   MindMapController {
       id: ctrl
   }
+
+  FileDialog {
+      id: importDialog
+      title: qsTr("Please, select a file to import")
+      folder: shortcuts.home
+      selectMultiple: false
+      nameFilters: ["Text file (*.txt)"]
+      onAccepted: {
+          ctrl.importFile(importDialog.fileUrl)
+          close()
+      }
+      onRejected: close()
+  }
+
 
 
 
@@ -32,8 +47,8 @@ ApplicationWindow {
       id: mapmind
       x: 0
       y: 0
-      width: 800
-      height: 400
+      width: 2000
+      height:2000
       scale: root.viewScale
       transformOrigin: Item.Center
       Repeater {
@@ -43,7 +58,6 @@ ApplicationWindow {
           width: widthLink
           height: heightLink
           start:position
-          onStartChanged: console.log("start changed"+start.x)
           end:last
           visible: link.visible
         }
@@ -83,6 +97,13 @@ ApplicationWindow {
           onTriggered: {
               saveDialog.open()
               ctrl.saveFile();
+          }
+      }
+      MenuSeparator { }
+      MenuItem {
+          text: qsTr("Import File…")
+          onTriggered: {
+              importDialog.open()
           }
       }
       MenuSeparator { }

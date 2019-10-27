@@ -37,6 +37,8 @@ public slots:
     void resetData();
     void setSpacing(bool b);
 
+    void importFile(const QString& path);
+
 private:
     QString m_filename;
     std::unique_ptr<LinkModel> m_linkModel;
