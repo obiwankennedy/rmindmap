@@ -93,17 +93,18 @@ void SpacingController::applyCoulombsLaw(MindNode* node, std::vector<MindNode*> 
 
     node->setVelocity(node->getVelocity() + globalRepulsionForce);
 }
-#include <QDebug>
+
 void SpacingController::applyHookesLaw(Link* link)
 {
     auto node1= link->start();
     auto node2= link->end();
 
+    if(node1 == nullptr || node2 == nullptr)
+        return;
+
     auto vect= QVector2D(node1->position() - node2->position());
     auto length= vect.length();
-    auto force= k_attraction * std::max(length - k_defaultSpringLength, 0.f);
-
-    // qDebug() << node1->getVelocity() << vect;
+    auto force= k_attraction * std::max(length - link->getLength(), 0.f);
 
     node1->setVelocity(node1->getVelocity() + vect.normalized() * force * -1);
     node2->setVelocity(node2->getVelocity() + vect.normalized() * force);

@@ -5,8 +5,8 @@
 LinkItem::LinkItem()
 {
     setFlag(QQuickItem::ItemHasContents, true);
-    setWidth(80);
-    setHeight(80);
+    setWidth(280);
+    setHeight(280);
 }
 
 LinkItem::Direction LinkItem::direction() const

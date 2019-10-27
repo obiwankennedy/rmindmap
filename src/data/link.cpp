@@ -1,6 +1,8 @@
 #include "link.h"
 
 #include "mindnode.h"
+#include <QRectF>
+#include <cmath>
 
 Link::Link(QObject* parent) : QObject(parent) {}
 
@@ -72,7 +74,16 @@ void Link::setStiffness(float stiffness)
 
 float Link::getLength() const
 {
-    return 100.0f; // computeDistance(_first->pos(),_second->pos());
+    auto length= 100.;
+    auto rect1= m_start->boundingRect();
+    auto diag1= std::sqrt(std::pow(rect1.width(), 2) + std::pow(rect1.height(), 2)) / 2;
+
+    auto rect2= m_end->boundingRect();
+    auto diag2= std::sqrt(std::pow(rect2.width(), 2) + std::pow(rect2.height(), 2)) / 2;
+
+    auto realDiag= std::max(diag1, diag2);
+
+    return static_cast<float>(length + 2 * realDiag);
 }
 
 void Link::setVisible(bool vi)

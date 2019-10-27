@@ -166,25 +166,34 @@ void MindMapController::importFile(const QString& path)
     {
         QByteArray line= file.readLine();
         auto text= QString::fromUtf8(line);
+        auto trimmed= text.trimmed();
         if(text.trimmed().isEmpty())
             continue;
 
         auto node= new MindNode();
-        auto newdepth= text.count("  ");
+
+        auto newdepth= std::max(0, (text.indexOf(trimmed[0])) / 2);
+
         node->setText(text.trimmed());
         std::uniform_real_distribution<> dist(0.0, 1600.0);
 
         node->setPosition({dist(gen), dist(gen)});
         m_nodeModel->appendNode(node);
 
-        if(newdepth > depth)
+        if(newdepth == 1)
+            qDebug() << newdepth << parent << text;
+        if(newdepth > depth && previousNode != nullptr)
         {
             parent.append(previousNode);
         }
         if(newdepth < depth)
         {
             parent.removeLast();
+            depth-= 1;
         }
+
+        if(newdepth == 1)
+            qDebug() << newdepth << parent << text;
 
         if(newdepth >= depth && !parent.isEmpty())
         {
