@@ -10,12 +10,18 @@ DragNodeCommand::DragNodeCommand(const QPointF& motion, const std::vector<QPoint
 
 void DragNodeCommand::undo()
 {
-    std::for_each(m_mindNodes.begin(), m_mindNodes.end(), [this](MindNode* node) { node->translate(m_motion * -1); });
+    std::for_each(m_mindNodes.begin(), m_mindNodes.end(), [this](const QPointer<MindNode>& node) {
+        if(node.isNull())
+            return;
+        node->translate(m_motion * -1);
+    });
 }
 
 void DragNodeCommand::redo()
 {
-    std::for_each(m_mindNodes.begin(), m_mindNodes.end(), [this](MindNode* node) {
+    std::for_each(m_mindNodes.begin(), m_mindNodes.end(), [this](const QPointer<MindNode>& node) {
+        if(node.isNull())
+            return;
         if(node->isDragged())
             return;
         node->translate(m_motion);
