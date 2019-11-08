@@ -1,4 +1,5 @@
 HEADERS += \
+    src/command/commandhelper.h \
     src/controller/mindmapcontroller.h \
     src/controller/selectioncontroller.h \
     src/controller/spacingcontroller.h \
@@ -7,7 +8,11 @@ HEADERS += \
     src/model/linkmodel.h \
     src/geometry/linknode.h \
     src/qmlItems/linkitem.h \
-    src/model/boxmodel.h
+    src/command/addnodecommand.h \ 
+    src/command/reparentingnodecommand.h \
+    src/command/dragnodecommand.h  \
+    src/command/removenodecommand.h \ 
+    src/model/boxmodel.h\
    # src/qmlItems/nodeitem.h \
    # src/geometry/boxnode.h \
 
@@ -20,6 +25,10 @@ SOURCES += \
     src/data/link.cpp \
     src/data/mindnode.cpp \
     src/model/linkmodel.cpp \
+    src/command/dragnodecommand.cpp  \
+    src/command/addnodecommand.cpp  \
+    src/command/removenodecommand.cpp \  
+    src/command/reparentingnodecommand.cpp  \
     main.cpp \
     src/geometry/linknode.cpp \
     src/qmlItems/linkitem.cpp \

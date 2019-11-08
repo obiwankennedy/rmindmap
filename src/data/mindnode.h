@@ -20,6 +20,7 @@ class MindNode : public QObject
     Q_PROPERTY(bool hasLink READ hasLink NOTIFY hasLinkChanged)
     Q_PROPERTY(bool isDragged READ isDragged WRITE setDragged NOTIFY isDraggedChanged)
     Q_PROPERTY(bool selected READ selected WRITE setSelected NOTIFY selectedChanged)
+
 public:
     MindNode(QObject* parent= nullptr);
     virtual ~MindNode();
@@ -72,9 +73,11 @@ public slots:
     void setImageUri(const QString& uri);
     void setDragged(bool isdragged);
     void setSelected(bool isSelected);
+    void translate(const QPointF& motion);
 
 signals:
     void positionChanged(const QPointF oldPos);
+    void itemDragged(const QPointF motion);
     void textChanged(QString text);
     void contentWidthChanged();
     void contentHeightChanged();

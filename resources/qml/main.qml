@@ -31,7 +31,6 @@ ApplicationWindow {
 
 
 
-
   // make own item
   Flickable {
     id: flick
@@ -113,6 +112,21 @@ ApplicationWindow {
           onTriggered: {
               saveDialog.open()
               ctrl.saveFile();
+          }
+      }
+      MenuSeparator { }
+      MenuItem {
+          text: qsTr("Undo")
+          enabled: ctrl.canUndo
+          onTriggered: {
+              ctrl.undo()
+          }
+      }
+      MenuItem {
+          text: qsTr("Redo")
+          enabled: ctrl.canRedo
+          onTriggered: {
+              ctrl.redo()
           }
       }
       MenuSeparator { }

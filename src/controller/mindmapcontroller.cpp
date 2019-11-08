@@ -1,5 +1,6 @@
 ﻿#include "mindmapcontroller.h"
 
+#include "controller/selectioncontroller.h"
 #include "controller/spacingcontroller.h"
 #include "model/boxmodel.h"
 #include "model/linkmodel.h"
@@ -14,9 +15,16 @@
 #include <random>
 
 MindMapController::MindMapController(QObject* parent)
-    : QObject(parent), m_linkModel(new LinkModel()), m_nodeModel(new BoxModel())
+    : QObject(parent)
+    , m_linkModel(new LinkModel())
+    , m_nodeModel(new BoxModel())
+    , m_selectionController(new SelectionController())
 {
     m_nodeModel->setLinkModel(m_linkModel.get());
+    m_selectionController->setUndoStack(&m_stack);
+
+    connect(&m_stack, &QUndoStack::canRedoChanged, this, &MindMapController::canRedoChanged);
+    connect(&m_stack, &QUndoStack::canUndoChanged, this, &MindMapController::canUndoChanged);
 
     m_spacing= new QThread();
     m_spacingController.reset(new SpacingController(m_nodeModel->nodes(), m_linkModel.get()));
@@ -180,20 +188,15 @@ void MindMapController::importFile(const QString& path)
         node->setPosition({dist(gen), dist(gen)});
         m_nodeModel->appendNode(node);
 
-        if(newdepth == 1)
-            qDebug() << newdepth << parent << text;
         if(newdepth > depth && previousNode != nullptr)
         {
             parent.append(previousNode);
         }
-        if(newdepth < depth)
+        while(newdepth < depth)
         {
             parent.removeLast();
             depth-= 1;
         }
-
-        if(newdepth == 1)
-            qDebug() << newdepth << parent << text;
 
         if(newdepth >= depth && !parent.isEmpty())
         {
@@ -217,7 +220,33 @@ void MindMapController::setSpacing(bool status)
 {
     m_spacingController->setRunning(status);
 }
+
+void MindMapController::redo()
+{
+    m_stack.redo();
+}
+
+void MindMapController::undo()
+{
+    m_stack.undo();
+}
+
 bool MindMapController::spacing() const
 {
     return m_spacingController->running();
+}
+
+SelectionController* MindMapController::selectionController() const
+{
+    return m_selectionController.get();
+}
+
+bool MindMapController::canRedo() const
+{
+    return m_stack.canRedo();
+}
+
+bool MindMapController::canUndo() const
+{
+    return m_stack.canUndo();
 }

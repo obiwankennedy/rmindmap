@@ -37,8 +37,11 @@ void MindNode::setPosition(const QPointF& pos)
 {
     if(m_position == pos)
         return;
+    auto motion = pos-m_position;
     m_position= pos;
     emit positionChanged(m_position);
+    if(isDragged())
+        emit itemDragged(motion);
 }
 
 QVector2D MindNode::getVelocity() const
@@ -244,5 +247,10 @@ bool MindNode::isDragged() const
 bool MindNode::selected() const
 {
     return m_selected;
+}
+
+void MindNode::translate(const QPointF& motion)
+{
+    setPosition(m_position+motion);
 }
 
