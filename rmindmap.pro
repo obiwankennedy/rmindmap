@@ -1,5 +1,6 @@
 HEADERS += \
     src/controller/mindmapcontroller.h \
+    src/controller/selectioncontroller.h \
     src/controller/spacingcontroller.h \
     src/data/link.h \
     src/data/mindnode.h \
@@ -14,6 +15,7 @@ INCLUDEPATH += src
 
 SOURCES += \
     src/controller/mindmapcontroller.cpp \
+    src/controller/selectioncontroller.cpp \
     src/controller/spacingcontroller.cpp \
     src/data/link.cpp \
     src/data/mindnode.cpp \

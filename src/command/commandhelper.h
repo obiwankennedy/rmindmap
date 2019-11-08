@@ -1,0 +1,4 @@
+#ifndef COMMANDHELPER_H
+#define COMMANDHELPER_H
+
+#endif // COMMANDHELPER_H

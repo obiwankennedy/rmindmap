@@ -12,9 +12,10 @@ Pane
     property color colorTwo: "gray"
     property color colorBorder: "black"
     property bool isEditable: false
-    property bool selected: false | isEditable
+    property bool selected: false
     property alias open: control.open
     property QtObject object
+    signal clicked(var mouse)
     onWidthChanged: node.contentWidth = width
     onHeightChanged: node.contentHeight = height
     onXChanged: {
@@ -64,7 +65,7 @@ Pane
             drag.axis: Drag.XAndYAxis
             drag.minimumX: 0
             drag.minimumY: 0
-            onPressed: root.selected = true
+            onPressed: root.clicked(mouse)
             onDoubleClicked: root.isEditable = true
             drag.onActiveChanged: root.object.isDragged = drag.active
 

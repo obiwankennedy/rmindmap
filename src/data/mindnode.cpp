@@ -220,6 +220,14 @@ void MindNode::setDragged(bool isdragged)
     emit isDraggedChanged();
 }
 
+void MindNode::setSelected(bool isSelected)
+{
+    if(m_selected == isSelected)
+        return;
+    m_selected= isSelected;
+    emit selectedChanged();
+}
+
 void MindNode::setId(const QString& id)
 {
     if(id == m_id)
@@ -232,3 +240,9 @@ bool MindNode::isDragged() const
 {
     return m_isDragged;
 }
+
+bool MindNode::selected() const
+{
+    return m_selected;
+}
+

@@ -51,6 +51,11 @@ ApplicationWindow {
       height:2000
       scale: root.viewScale
       transformOrigin: Item.Center
+      MouseArea {
+        anchors.fill:parent
+        acceptedButtons:Qt.LeftButton
+        onClicked: ctrl.selectionCtrl.clearSelection()
+      }
       Repeater {
         anchors.fill: parent
         model: ctrl.linkModel
@@ -72,10 +77,21 @@ ApplicationWindow {
             focus:true
             text : label
             visible: node.visible
+            selected: node.selected
             onAddChild: ctrl.nodeModel.addBox(node.id)
             onOpenChanged: ctrl.nodeModel.openNode(node.id, open)
+            onClicked: {
+                if(mouse.modifiers & Qt.ControlModifier) {
+                    selected ? ctrl.selectionCtrl.removeFromSelection(node) : ctrl.selectionCtrl.addToSelection(node)
+                }
+                else if(!selected){
+                    ctrl.selectionCtrl.clearSelection()
+                    ctrl.selectionCtrl.addToSelection(node)
+                }
+            }
           }
       }
+
     }
   }
   Menu {
@@ -117,19 +133,20 @@ ApplicationWindow {
     MouseArea {
       anchors.fill:parent
       acceptedButtons:Qt.MiddleButton | Qt.RightButton
-      onPressed:{
-          menu.x = mouse.x
-          menu.y = mouse.y
-          menu.open()
+      propagateComposedEvents: true
+      onClicked:{
+              menu.x = mouse.x
+              menu.y = mouse.y
+              menu.open()
       }
       onWheel: {
         var step = (wheel.modifiers & Qt.ControlModifier) ? 0.1 : 0.01
         if(wheel.angleDelta.y>0)
         {
-          root.viewScale = Math.min(step+root.viewScale,2.0)
+          root.viewScale = Math.min(root.viewScale+step,2.0)
         }
         else
-          root.viewScale = Math.max(step-root.viewScale,0.2)
+          root.viewScale = Math.max(root.viewScale-step,0.2)
       }
     }
 }

@@ -25,6 +25,7 @@
 #include <QSurfaceFormat>
 
 #include "controller/mindmapcontroller.h"
+#include "controller/selectioncontroller.h"
 #include "qmlItems/linkitem.h"
 
 int main(int argc, char** argv)
@@ -45,6 +46,7 @@ int main(int argc, char** argv)
 
     QQmlApplicationEngine qmlEngine;
     qmlRegisterType<MindMapController>("RMindMap", 1, 0, "MindMapController");
+    qmlRegisterType<SelectionController>("RMindMap", 1, 0, "SelectionController");
     qmlRegisterType<LinkItem>("RMindMap", 1, 0, "MindLink");
     qRegisterMetaType<QAbstractItemModel*>();
 
