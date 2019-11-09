@@ -40,6 +40,8 @@ public:
 
     void clear();
 
+    void append(Link* link);
+    void removeLink(Link* link);
 public slots:
     void linkHasChanged();
 

@@ -7,7 +7,7 @@ LinkModel::LinkModel(QObject* parent) : QAbstractItemModel(parent) {}
 QModelIndex LinkModel::index(int row, int column, const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
-    if(row < 0)
+    if(row < 0 || m_data.size() <= static_cast<std::size_t>(row))
         return QModelIndex();
 
     auto const link= m_data.at(static_cast<std::size_t>(row));
@@ -99,6 +99,26 @@ Link* LinkModel::addLink(MindNode* p1, MindNode* p2)
     endInsertRows();
     return link;
 }
+
+void LinkModel::append(Link* link)
+{
+    beginInsertRows(QModelIndex(), static_cast<int>(m_data.size()), static_cast<int>(m_data.size()));
+    connect(link, &Link::linkChanged, this, &LinkModel::linkHasChanged);
+    m_data.push_back(link);
+    endInsertRows();
+}
+
+void LinkModel::removeLink(Link* link)
+{
+    auto id= std::find(m_data.begin(), m_data.end(), link);
+    if(id == m_data.end())
+        return;
+    auto idx= static_cast<int>(std::distance(m_data.begin(), id));
+    beginRemoveRows(QModelIndex(), idx, idx);
+    m_data.erase(id);
+    endRemoveRows();
+}
+
 void LinkModel::linkHasChanged()
 {
     auto link= qobject_cast<Link*>(sender());
