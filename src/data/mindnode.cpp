@@ -1,3 +1,22 @@
+/***************************************************************************
+ *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *   http://www.rolisteam.org/contact                                      *
+ *                                                                         *
+ *   This software is free software; you can redistribute it and/or modify *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 #include "mindnode.h"
 
 #include <QFontMetricsF>
@@ -37,7 +56,7 @@ void MindNode::setPosition(const QPointF& pos)
 {
     if(m_position == pos)
         return;
-    auto motion = pos-m_position;
+    auto motion= pos - m_position;
     m_position= pos;
     emit positionChanged(m_position);
     if(isDragged())
@@ -251,6 +270,5 @@ bool MindNode::selected() const
 
 void MindNode::translate(const QPointF& motion)
 {
-    setPosition(m_position+motion);
+    setPosition(m_position + motion);
 }
-
