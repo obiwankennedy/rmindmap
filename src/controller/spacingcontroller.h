@@ -13,6 +13,7 @@ class SpacingController : public QObject
     Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
 public:
     explicit SpacingController(std::vector<MindNode*>& data, LinkModel* linkModel, QObject* parent= nullptr);
+    ~SpacingController();
 
     bool running() const;
 signals:

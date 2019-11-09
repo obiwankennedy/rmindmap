@@ -37,6 +37,8 @@ SpacingController::SpacingController(std::vector<MindNode*>& data, LinkModel* li
 {
 }
 
+SpacingController::~SpacingController()= default;
+
 void SpacingController::setRunning(bool run)
 {
     if(run == m_running)
