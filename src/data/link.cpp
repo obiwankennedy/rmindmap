@@ -4,7 +4,10 @@
 #include <QRectF>
 #include <cmath>
 
-Link::Link(QObject* parent) : QObject(parent) {}
+Link::Link(QObject* parent) : QObject(parent)
+{
+    setText(tr("is linked"));
+}
 
 void Link::setDirection(const Direction& direction)
 {
@@ -62,6 +65,14 @@ void Link::computePosition()
     m_end->setNextPosition(pos1, this);
 }
 
+void Link::setText(const QString& text)
+{
+    if(m_text == text)
+        return;
+    m_text= text;
+    emit textChanged();
+}
+
 float Link::getStiffness() const
 {
     return m_stiffness;
@@ -100,4 +111,9 @@ void Link::setVisible(bool vi)
 bool Link::isVisible() const
 {
     return m_visible;
+}
+
+QString Link::text() const
+{
+    return m_text;
 }

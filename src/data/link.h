@@ -13,6 +13,7 @@ class Link : public QObject
     Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
     Q_PROPERTY(QPointF startPoint READ startPoint NOTIFY startPointChanged)
     Q_PROPERTY(QPointF endPoint READ endPoint NOTIFY endPointChanged)
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 public:
     enum Direction
     {
@@ -41,21 +42,25 @@ public:
     void setStiffness(float stiffness);
     void setVisible(bool vi);
     bool isVisible() const;
+    QString text() const;
 signals:
     void linkChanged();
     void visibleChanged();
     void directionChanged();
     void startPointChanged();
     void endPointChanged();
+    void textChanged();
 
 public slots:
     void computePosition();
+    void setText(const QString& text);
 
 private:
     Direction m_dir= StartToEnd;
     bool m_visible= true;
     QPointer<MindNode> m_start;
     QPointer<MindNode> m_end;
+    QString m_text;
     float m_stiffness= 400.0f;
 };
 

@@ -58,12 +58,17 @@ ApplicationWindow {
       Repeater {
         anchors.fill: parent
         model: ctrl.linkModel
-        delegate: MindLink{
+        delegate: Link {
+          x: position.x
+          y: position.y
           width: widthLink
           height: heightLink
-          start:position
+          start: position
           end:last
+          startBox: startBoxRole
+          endBox: endBoxRole
           visible: link.visible
+          text: label
         }
       }
       Repeater {

@@ -2,6 +2,8 @@
 
 #include "data/mindnode.h"
 
+#include <QRectF>
+
 LinkModel::LinkModel(QObject* parent) : QAbstractItemModel(parent) {}
 
 QModelIndex LinkModel::index(int row, int column, const QModelIndex& parent) const
@@ -36,7 +38,7 @@ int LinkModel::columnCount(const QModelIndex& parent) const
 
     return 1;
 }
-
+#include <QDebug>
 QVariant LinkModel::data(const QModelIndex& index, int role) const
 {
     if(!index.isValid())
@@ -56,13 +58,23 @@ QVariant LinkModel::data(const QModelIndex& index, int role) const
         result= link->endPoint();
         break;
     case Width:
-        result= link->end()->position().x();
+        result= link->end()->position().x() - link->start()->position().x();
         break;
     case Height:
-        result= link->end()->position().y();
+        result= link->end()->position().y() - link->start()->position().y();
         break;
     case LinkRole:
         result= QVariant::fromValue(link);
+        break;
+    case StartBoxRole:
+        result= QVariant::fromValue(link->start()->boundingRect());
+        break;
+    case EndBoxRole:
+        result= QVariant::fromValue(link->end()->boundingRect());
+        break;
+    case Label:
+        result= link->text();
+        break;
     }
 
     return result;
@@ -82,9 +94,18 @@ bool LinkModel::setData(const QModelIndex& index, const QVariant& value, int rol
 
 QHash<int, QByteArray> LinkModel::roleNames() const
 {
+    // clang-format off
     static QHash<int, QByteArray> roles
-        = {{LinkModel::Direction, "direction"}, {LinkModel::Position, "position"}, {LinkModel::Last, "last"},
-           {LinkModel::Height, "heightLink"},   {LinkModel::Width, "widthLink"},   {LinkModel::LinkRole, "link"}};
+        =  {{LinkModel::Direction, "direction"},
+            {LinkModel::Position, "position"},
+            {LinkModel::Last, "last"},
+            {LinkModel::StartBoxRole,"startBoxRole"},
+            {LinkModel::EndBoxRole,"endBoxRole"},
+            {LinkModel::Height, "heightLink"},
+            {LinkModel::Width, "widthLink"},
+            {LinkModel::LinkRole, "link"},
+            {LinkModel::Label, "label"}};
+    //clang-format on
     return roles;
 }
 

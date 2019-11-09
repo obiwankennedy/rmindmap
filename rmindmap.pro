@@ -46,7 +46,8 @@ RESOURCES += \
     rmindmap.qrc
 
 DISTFILES += \
-    resources/icons/shape.png
+    resources/icons/shape.png \
+    resources/qml/Link.qml
 
 
 

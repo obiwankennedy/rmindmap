@@ -18,7 +18,10 @@ public:
         Last,
         Width,
         Height,
-        LinkRole
+        StartBoxRole,
+        EndBoxRole,
+        LinkRole,
+        Label
     };
     explicit LinkModel(QObject* parent= nullptr);
 

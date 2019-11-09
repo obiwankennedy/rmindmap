@@ -10,5 +10,6 @@
     <qresource prefix="/">
         <file>resources/qml/main.qml</file>
         <file>resources/qml/Node.qml</file>
+        <file>resources/qml/Link.qml</file>
     </qresource>
 </RCC>
