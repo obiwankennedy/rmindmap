@@ -77,7 +77,7 @@ ApplicationWindow {
             text : label
             visible: node.visible
             selected: node.selected
-            onAddChild: ctrl.nodeModel.addBox(node.id)
+            onAddChild: ctrl.addBox(node.id)
             onOpenChanged: ctrl.nodeModel.openNode(node.id, open)
             onClicked: {
                 if(mouse.modifiers & Qt.ControlModifier) {
