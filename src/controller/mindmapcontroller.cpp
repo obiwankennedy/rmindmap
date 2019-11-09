@@ -1,9 +1,11 @@
 ﻿#include "mindmapcontroller.h"
 
+#include "command/addnodecommand.h"
 #include "controller/selectioncontroller.h"
 #include "controller/spacingcontroller.h"
 #include "model/boxmodel.h"
 #include "model/linkmodel.h"
+#include "worker/fileserializer.h"
 
 #include <QDebug>
 #include <QFile>
@@ -16,9 +18,9 @@
 
 MindMapController::MindMapController(QObject* parent)
     : QObject(parent)
+    , m_selectionController(new SelectionController())
     , m_linkModel(new LinkModel())
     , m_nodeModel(new BoxModel())
-    , m_selectionController(new SelectionController())
 {
     m_nodeModel->setLinkModel(m_linkModel.get());
     m_selectionController->setUndoStack(&m_stack);
@@ -41,7 +43,22 @@ MindMapController::MindMapController(QObject* parent)
     resetData();
 }
 
-MindMapController::~MindMapController()= default;
+MindMapController::~MindMapController()
+{
+    if(m_spacing->isRunning())
+    {
+        m_spacingController->setRunning(false);
+        m_spacing->quit();
+        m_spacing->wait();
+        delete m_spacing;
+    }
+
+    auto model= m_nodeModel.release();
+    auto spacingCtrl= m_spacingController.release();
+
+    delete spacingCtrl;
+    delete model;
+}
 
 QAbstractItemModel* MindMapController::nodeModel() const
 {
@@ -53,9 +70,14 @@ QAbstractItemModel* MindMapController::linkModel() const
     return m_linkModel.get();
 }
 
-QString MindMapController::filename() const
+const QString& MindMapController::filename() const
 {
     return m_filename;
+}
+
+const QString& MindMapController::errorMsg() const
+{
+    return m_errorMsg;
 }
 
 void MindMapController::resetData()
@@ -70,142 +92,28 @@ void MindMapController::resetData()
 
 void MindMapController::saveFile()
 {
-    QJsonObject data;
-    QJsonArray nodeArray;
-    auto nodes= m_nodeModel->nodes();
-    for(auto node : nodes)
-    {
-        QJsonObject obj;
-        obj["id"]= node->id();
-        obj["x"]= node->position().x();
-        obj["y"]= node->position().y();
-        obj["text"]= node->text();
-        obj["image"]= node->imageUri();
-        obj["visible"]= node->isVisible();
-        obj["open"]= node->open();
-        nodeArray.append(obj);
-    }
-    data["nodes"]= nodeArray;
+    if(!FileSerializer::writeFile(m_nodeModel.get(), m_linkModel.get(), m_filename))
+        setErrorMsg(tr("Error: File can't be loaded: %1").arg(m_filename));
+}
 
-    QJsonArray linkArray;
-    auto links= m_linkModel->getDataSet();
-    for(auto link : links)
-    {
-        QJsonObject obj;
-        obj["idStart"]= link->start()->id();
-        obj["idEnd"]= link->end()->id();
-        obj["visible"]= link->isVisible();
-        obj["Direction"]= link->direction();
-    }
-
-    data["links"]= linkArray;
-    QJsonDocument doc;
-    doc.setObject(data);
-
-    QFile file(m_filename);
-    if(file.open(QFile::WriteOnly))
-    {
-        file.write(doc.toJson());
-    }
+void MindMapController::setErrorMsg(const QString& msg)
+{
+    if(m_errorMsg == msg)
+        return;
+    m_errorMsg= msg;
+    emit errorMsgChanged();
 }
 
 void MindMapController::loadFile()
 {
-    QFile file(m_filename);
-    if(!file.open(QFile::ReadOnly))
-        qDebug() << "Error: file can't be read";
-
-    auto data= file.readAll();
-    QJsonDocument doc= QJsonDocument::fromJson(data);
-
-    auto json= doc.object();
-
-    auto linkArray= json["links"].toArray();
-    auto nodeArray= json["nodes"].toArray();
-
-    std::map<QString, MindNode*> nodeMap;
-    for(auto nodeRef : nodeArray)
-    {
-        auto obj= nodeRef.toObject();
-        auto node= new MindNode();
-        node->setId(obj["id"].toString());
-        auto x= obj["x"].toDouble();
-        auto y= obj["y"].toDouble();
-        node->setPosition(QPointF(x, y));
-        node->setText(obj["text"].toString());
-        node->setImageUri(obj["image"].toString());
-        node->setVisible(obj["visible"].toBool());
-        node->setOpen(obj["open"].toBool());
-
-        m_nodeModel->appendNode(node);
-        nodeMap.insert({node->id(), node});
-    }
-
-    for(auto linkRef : linkArray)
-    {
-        auto obj= linkRef.toObject();
-        // auto link= new Link();
-
-        auto idStart= obj["idStart"].toString();
-        auto idEnd= obj["idEnd"].toString();
-
-        auto link= m_linkModel->addLink(nodeMap[idStart], nodeMap[idEnd]);
-        link->setVisible(obj["visible"].toBool());
-        link->setDirection(static_cast<Link::Direction>(obj["Direction"].toInt()));
-    }
+    if(!FileSerializer::readFile(m_nodeModel.get(), m_linkModel.get(), m_filename))
+        setErrorMsg(tr("Error: File can't be loaded: %1").arg(m_filename));
 }
 
 void MindMapController::importFile(const QString& path)
 {
-    QFile file(QUrl(path).path());
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    if(!file.open(QFile::ReadOnly))
-    {
-        qDebug() << QStringLiteral("Error, file %1 can't be read.").arg(path);
-        return;
-    }
-
-    QVector<MindNode*> parent;
-    MindNode* previousNode= nullptr;
-    int depth= 0;
-    while(!file.atEnd())
-    {
-        QByteArray line= file.readLine();
-        auto text= QString::fromUtf8(line);
-        auto trimmed= text.trimmed();
-        if(text.trimmed().isEmpty())
-            continue;
-
-        auto node= new MindNode();
-
-        auto newdepth= std::max(0, (text.indexOf(trimmed[0])) / 2);
-
-        node->setText(text.trimmed());
-        std::uniform_real_distribution<> dist(0.0, 1600.0);
-
-        node->setPosition({dist(gen), dist(gen)});
-        m_nodeModel->appendNode(node);
-
-        if(newdepth > depth && previousNode != nullptr)
-        {
-            parent.append(previousNode);
-        }
-        while(newdepth < depth)
-        {
-            parent.removeLast();
-            depth-= 1;
-        }
-
-        if(newdepth >= depth && !parent.isEmpty())
-        {
-            m_linkModel->addLink(parent.last(), node);
-        }
-
-        previousNode= node;
-        depth= newdepth;
-    }
+    if(!FileSerializer::readTextFile(m_nodeModel.get(), m_linkModel.get(), path))
+        setErrorMsg(tr("File can't be loaded: %1").arg(m_filename));
 }
 
 void MindMapController::setFilename(const QString& path)
@@ -244,6 +152,17 @@ SelectionController* MindMapController::selectionController() const
 bool MindMapController::canRedo() const
 {
     return m_stack.canRedo();
+}
+
+void MindMapController::addBox(const QString& idparent)
+{
+    auto cmd= new AddNodeCommand(m_nodeModel.get(), m_linkModel.get(), idparent);
+    m_stack.push(cmd);
+}
+void MindMapController::removeBox(const QString& id)
+{
+    auto cmd= new AddNodeCommand(m_nodeModel.get(), m_linkModel.get(), id);
+    m_stack.push(cmd);
 }
 
 bool MindMapController::canUndo() const
