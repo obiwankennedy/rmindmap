@@ -8,13 +8,14 @@ HEADERS += \
     src/model/linkmodel.h \
     src/geometry/linknode.h \
     src/qmlItems/linkitem.h \
-    src/command/addnodecommand.h \ 
+    src/command/addnodecommand.h \
+    src/worker/fileserializer.h \
     src/command/reparentingnodecommand.h \
     src/command/dragnodecommand.h  \
-    src/command/removenodecommand.h \ 
-    src/model/boxmodel.h\
-   # src/qmlItems/nodeitem.h \
-   # src/geometry/boxnode.h \
+    src/command/removenodecommand.h \
+    src/model/boxmodel.h \
+
+
 
 INCLUDEPATH += src
 
@@ -27,14 +28,14 @@ SOURCES += \
     src/model/linkmodel.cpp \
     src/command/dragnodecommand.cpp  \
     src/command/addnodecommand.cpp  \
-    src/command/removenodecommand.cpp \  
+    src/command/removenodecommand.cpp \
+    src/worker/fileserializer.cpp \
     src/command/reparentingnodecommand.cpp  \
     main.cpp \
     src/geometry/linknode.cpp \
     src/qmlItems/linkitem.cpp \
     src/model/boxmodel.cpp
-#    src/geometry/boxnode.cpp \
-    #src/qmlItems/nodeitem.cpp \
+
 
 QT+= svg qml widgets quick
 

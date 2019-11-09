@@ -6,6 +6,8 @@
 
 BoxModel::BoxModel(QObject* parent) : QAbstractItemModel(parent) {}
 
+BoxModel::~BoxModel() {}
+
 int BoxModel::rowCount(const QModelIndex& parent) const
 {
     if(!parent.isValid())
@@ -142,9 +144,8 @@ void BoxModel::appendNode(MindNode* node)
     endInsertRows();
 }
 
-bool BoxModel::addBox(const QString& idparent)
+std::pair<MindNode*, Link*> BoxModel::addBox(const QString& idparent)
 {
-
     auto row= static_cast<int>(m_data.size());
     beginInsertRows(QModelIndex(), row, row);
     auto root= new MindNode();
@@ -152,28 +153,31 @@ bool BoxModel::addBox(const QString& idparent)
 
     m_data.push_back(root);
     if(idparent.isEmpty())
-        return true;
+        return {};
 
     auto id= std::find_if(m_data.begin(), m_data.end(),
                           [idparent](const MindNode* node) { return idparent == node->id(); });
     if(id == m_data.end())
-        return false;
+        return {};
 
     auto rectParent= (*id)->boundingRect();
     auto pos= rectParent.topLeft() + QPointF(rectParent.width() * 1.5, rectParent.height() * 1.5);
     root->setPosition(pos);
     endInsertRows();
 
-    m_linkModel->addLink(*id, root);
+    auto link= m_linkModel->addLink(*id, root);
 
-    return true;
+    return std::make_pair(root, link);
 }
 
-bool BoxModel::removeBox(const QString& id)
+bool BoxModel::removeBox(const MindNode* node)
 {
-    //  beginRemoveRows(parent, row, row + count - 1);
-    // FIXME: Implement me!
-    //  endRemoveRows();
+    auto it= std::find(m_data.begin(), m_data.end(), node);
+    auto idx= static_cast<int>(std::distance(m_data.begin(), it));
+
+    beginRemoveRows(QModelIndex(), idx, idx);
+    m_data.erase(it);
+    endRemoveRows();
 }
 
 void BoxModel::openNode(const QString& id, bool status)

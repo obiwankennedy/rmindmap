@@ -24,6 +24,7 @@ public:
         Posy
     };
     explicit BoxModel(QObject* parent= nullptr);
+    ~BoxModel() override;
 
     // Basic functionality:
     int rowCount(const QModelIndex& parent= QModelIndex()) const override;
@@ -48,10 +49,10 @@ signals:
     void linkModelChanged();
 public slots:
     // Add data:
-    bool addBox(const QString& idparent);
+    std::pair<MindNode*, Link*> addBox(const QString& idparent);
 
     // Remove data:
-    bool removeBox(const QString& id);
+    bool removeBox(const MindNode* node);
     void openNode(const QString& id, bool status);
 
 private:
