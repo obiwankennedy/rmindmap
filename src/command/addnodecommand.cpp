@@ -20,6 +20,7 @@
 #include "addnodecommand.h"
 
 #include "model/boxmodel.h"
+#include "model/linkmodel.h"
 
 AddNodeCommand::AddNodeCommand(BoxModel* nodeModel, LinkModel* linkModel, const QString& idParent)
     : m_nodeModel(nodeModel), m_linkModel(linkModel), m_idParent(idParent)
