@@ -18,5 +18,31 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "removenodecommand.h"
+#include "data/mindnode.h"
+#include "model/boxmodel.h"
+#include "model/linkmodel.h"
+#include <algorithm>
 
-RemoveNodeCommand::RemoveNodeCommand() {}
+RemoveNodeCommand::RemoveNodeCommand(const std::vector<MindNode*>& selection, BoxModel* nodeModel, LinkModel* linkModel)
+    : m_nodeModel(nodeModel), m_linkModel(linkModel)
+{
+    std::transform(selection.begin(), selection.end(), std::back_inserter(m_selection),
+                   [](MindNode* node) -> QPointer<MindNode> { return QPointer<MindNode>(node); });
+
+    std::for_each(selection.begin(), selection.end(), [this](MindNode* node) {
+        auto sublinks= node->getSubLinks();
+        std::copy(sublinks.begin(), sublinks.end(), std::back_inserter(m_links));
+    });
+}
+
+void RemoveNodeCommand::undo()
+{
+    std::for_each(m_selection.begin(), m_selection.end(), [this](MindNode* node) { m_nodeModel->appendNode(node); });
+    std::for_each(m_links.begin(), m_links.end(), [this](Link* link) { m_linkModel->append(link); });
+}
+
+void RemoveNodeCommand::redo()
+{
+    std::for_each(m_selection.begin(), m_selection.end(), [this](MindNode* node) { m_nodeModel->removeBox(node); });
+    std::for_each(m_links.begin(), m_links.end(), [this](Link* link) { m_linkModel->removeLink(link); });
+}
