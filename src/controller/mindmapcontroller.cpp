@@ -109,10 +109,15 @@ const QString& MindMapController::errorMsg() const
     return m_errorMsg;
 }
 
-void MindMapController::resetData()
+void MindMapController::clearData()
 {
     m_linkModel->clear();
     m_nodeModel->clear();
+}
+
+void MindMapController::resetData()
+{
+    clearData();
 
     auto root= new MindNode();
     root->setText(tr("Root"));
@@ -135,12 +140,14 @@ void MindMapController::setErrorMsg(const QString& msg)
 
 void MindMapController::loadFile()
 {
+    clearData();
     if(!FileSerializer::readFile(m_nodeModel.get(), m_linkModel.get(), m_filename))
         setErrorMsg(tr("Error: File can't be loaded: %1").arg(m_filename));
 }
 
 void MindMapController::importFile(const QString& path)
 {
+    clearData();
     if(!FileSerializer::readTextFile(m_nodeModel.get(), m_linkModel.get(), path))
         setErrorMsg(tr("File can't be loaded: %1").arg(m_filename));
 }
@@ -154,7 +161,9 @@ void MindMapController::setFilename(const QString& path)
 {
     if(path == m_filename)
         return;
-    m_filename= path;
+    m_filename= QUrl(path).toLocalFile();
+    if(!m_filename.endsWith(".rmap"))
+        m_filename+= QStringLiteral(".rmap");
     emit filenameChanged();
 }
 

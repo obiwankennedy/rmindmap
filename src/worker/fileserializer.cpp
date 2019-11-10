@@ -125,8 +125,10 @@ bool FileSerializer::readFile(BoxModel* nodeModel, LinkModel* linkModel, const Q
 
         auto idStart= obj["idStart"].toString();
         auto idEnd= obj["idEnd"].toString();
+        auto text= obj["text"].toString();
 
         auto link= linkModel->addLink(nodeMap[idStart], nodeMap[idEnd]);
+        link->setText(text);
         link->setVisible(obj["visible"].toBool());
         link->setDirection(static_cast<Link::Direction>(obj["Direction"].toInt()));
     }
@@ -147,6 +149,7 @@ bool FileSerializer::writeFile(BoxModel* nodeModel, LinkModel* linkModel, const 
         obj["image"]= node->imageUri();
         obj["visible"]= node->isVisible();
         obj["open"]= node->open();
+        obj["styleIndex"]= node->styleIndex();
         nodeArray.append(obj);
     }
     data["nodes"]= nodeArray;
@@ -160,6 +163,8 @@ bool FileSerializer::writeFile(BoxModel* nodeModel, LinkModel* linkModel, const 
         obj["idEnd"]= link->end()->id();
         obj["visible"]= link->isVisible();
         obj["Direction"]= link->direction();
+        obj["text"]= link->text();
+        linkArray.append(obj);
     }
     data["links"]= linkArray;
     QJsonDocument doc;

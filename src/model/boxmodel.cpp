@@ -149,10 +149,11 @@ QHash<int, QByteArray> BoxModel::roleNames() const
 
 void BoxModel::clear()
 {
+    auto backup= m_data;
     beginResetModel();
-    qDeleteAll(m_data);
     m_data.clear();
     endResetModel();
+    qDeleteAll(backup);
 }
 
 void BoxModel::appendNode(MindNode* node)

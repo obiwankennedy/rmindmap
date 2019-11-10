@@ -44,6 +44,7 @@ ApplicationWindow {
         nameFilters: ["Rolisteam MindMap (*.rmap)"]
         onAccepted: {
             ctrl.setFilename(openDialog.fileUrl)
+            ctrl.loadFile();
             close()
         }
         onRejected: close()
@@ -53,10 +54,13 @@ ApplicationWindow {
         id: saveDialog
         title: qsTr("Save Mindmap into File")
         folder: shortcuts.home
+        selectExisting: false
         selectMultiple: false
+        defaultSuffix: "rmap"
         nameFilters: ["Rolisteam MindMap (*.rmap)"]
         onAccepted: {
             ctrl.setFilename(saveDialog.fileUrl)
+            ctrl.saveFile();
             close()
         }
         onRejected: close()

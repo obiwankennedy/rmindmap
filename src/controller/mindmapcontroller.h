@@ -88,6 +88,9 @@ public slots:
     void removeSelection();
     NodeStyle* getStyle(int index) const;
 
+protected:
+    void clearData();
+
 private:
     QString m_filename;
     QString m_errorMsg;

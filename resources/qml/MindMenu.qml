@@ -14,13 +14,18 @@ Menu {
     }
     MenuItem {
         text: qsTr("Save")
-        onTriggered: ctrl.saveFile();
+
+        onTriggered: {
+            if(ctrl.filename)
+                ctrl.saveFile();
+            else
+                saveDialog.open()
+        }
     }
     MenuItem {
         text: qsTr("Save As…")
         onTriggered: {
             saveDialog.open()
-            ctrl.saveFile();
         }
     }
     MenuItem {

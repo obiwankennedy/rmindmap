@@ -209,8 +209,9 @@ void LinkModel::openLinkAndChildren(const QString& id, bool status)
 
 void LinkModel::clear()
 {
+    auto backup = m_data;
     beginResetModel();
-    qDeleteAll(m_data);
     m_data.clear();
     endResetModel();
+    qDeleteAll(backup);
 }
