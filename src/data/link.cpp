@@ -114,7 +114,16 @@ float Link::getLength() const
 
     auto realDiag= std::max(diag1, diag2);
 
-    return static_cast<float>(length + 2 * realDiag);
+    auto length1= static_cast<float>(length + 2 * realDiag);
+    if(m_end == nullptr || m_start == nullptr)
+        return length1;
+
+    auto nodeCount= static_cast<int>(m_start->getSubLinks().size());
+
+    auto endNodeCount= (m_end->subNodeCount() + nodeCount) / 3;
+    auto length2= static_cast<float>(length * (1 + endNodeCount));
+
+    return std::max(length1, length2);
 }
 
 void Link::setVisible(bool vi)

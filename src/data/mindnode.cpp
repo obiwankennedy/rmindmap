@@ -234,6 +234,21 @@ void MindNode::setStyleIndex(int idx)
     m_styleIndex= idx;
     emit styleIndexChanged();
 }
+
+int MindNode::subNodeCount() const
+{
+    int sum= std::accumulate(m_subNodelinks.begin(), m_subNodelinks.end(), 0, [](int& a, Link* link) {
+        if(nullptr == link)
+            return 0;
+        auto end= link->end();
+        if(nullptr == end)
+            return 0;
+
+        return a + 1 + end->subNodeCount();
+    });
+    return sum;
+}
+
 void MindNode::removeLink(Link* link)
 {
     auto it= std::find(m_subNodelinks.begin(), m_subNodelinks.end(), link);

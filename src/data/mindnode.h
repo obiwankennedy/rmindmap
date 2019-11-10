@@ -89,6 +89,8 @@ public:
 
     const std::vector<QPointer<Link>>& getSubLinks() const;
 
+    int subNodeCount() const;
+
 public slots:
     void setText(QString text);
     void setMass(int mass);
