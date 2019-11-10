@@ -1,173 +1,156 @@
 import QtQuick 2.12
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
+import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Universal 2.12
 import RMindMap 1.0
 
 ApplicationWindow {
-  id: root
-  visible: true
-  width: 800
-  height: 400
-  property real viewScale: 1
-  property int idx: 0
+    id: root
+    visible: true
+    width: 800
+    height: 400
+    property real viewScale: 1
+    property int idx: 0
+    property bool darkMode: false
 
-  MindMapController {
-      id: ctrl
-  }
-
-  FileDialog {
-      id: importDialog
-      title: qsTr("Please, select a file to import")
-      folder: shortcuts.home
-      selectMultiple: false
-      nameFilters: ["Text file (*.txt)"]
-      onAccepted: {
-          ctrl.importFile(importDialog.fileUrl)
-          close()
-      }
-      onRejected: close()
-  }
+    onDarkModeChanged: _engineCtrl.nightMode = root.darkMode
 
     Universal.theme: root.darkMode ? Universal.Dark: Universal.Light
 
+    MindMapController {
+        id: ctrl
+    }
 
-  // make own item
-  Flickable {
-    id: flick
-    anchors.fill: parent
-    contentHeight: mapmind.width
-    contentWidth: mapmind.height
-    contentX: 0
-    contentY: 0
-    interactive: true
-
-
-    Item {
-      id: mapmind
-      x: 0
-      y: 0
-      width: 2000
-      height:2000
-      scale: root.viewScale
-      transformOrigin: Item.Center
-      MouseArea {
-        anchors.fill:parent
-        acceptedButtons:Qt.LeftButton
-        onClicked: ctrl.selectionCtrl.clearSelection()
-      }
-      Repeater {
-        anchors.fill: parent
-        model: ctrl.linkModel
-        delegate: Link {
-          x: position.x
-          y: position.y
-          width: widthLink
-          height: heightLink
-          start: position
-          end:last
-          startBox: startBoxRole
-          endBox: endBoxRole
-          visible: link.visible
-          text: label
+    FileDialog {
+        id: importDialog
+        title: qsTr("Please, select a file to import")
+        folder: shortcuts.home
+        selectMultiple: false
+        nameFilters: ["Text file (*.txt)"]
+        onAccepted: {
+            ctrl.importFile(importDialog.fileUrl)
+            close()
         }
-      }
-      Repeater {
-        anchors.fill: parent
-        model: ctrl.nodeModel
-        delegate: Node {
-            x: position.x
-            y: position.y
-            object: node
-            focus:true
-            text : label
-            visible: node.visible
-            selected: node.selected
-            onAddChild: ctrl.addBox(node.id)
-            onOpenChanged: ctrl.nodeModel.openNode(node.id, open)
-            onClicked: {
-                if(mouse.modifiers & Qt.ControlModifier) {
-                    selected ? ctrl.selectionCtrl.removeFromSelection(node) : ctrl.selectionCtrl.addToSelection(node)
-                }
-                else if(!selected){
-                    ctrl.selectionCtrl.clearSelection()
-                    ctrl.selectionCtrl.addToSelection(node)
+        onRejected: close()
+    }
+
+    FileDialog {
+        id: openDialog
+        title: qsTr("Load Mindmap from File")
+        folder: shortcuts.home
+        selectMultiple: false
+        nameFilters: ["Rolisteam MindMap (*.rmap)"]
+        onAccepted: {
+            ctrl.setFilename(openDialog.fileUrl)
+            close()
+        }
+        onRejected: close()
+    }
+
+    FileDialog {
+        id: saveDialog
+        title: qsTr("Save Mindmap into File")
+        folder: shortcuts.home
+        selectMultiple: false
+        nameFilters: ["Rolisteam MindMap (*.rmap)"]
+        onAccepted: {
+            ctrl.setFilename(saveDialog.fileUrl)
+            close()
+        }
+        onRejected: close()
+    }
+
+    Popup {
+        id: stylePopup
+        GridLayout {
+            columns: 3
+            Repeater {
+                model: ctrl.styleModel
+                delegate: Rectangle {
+                    radius: 8
+                    border.width: 1
+                    border.color: "black"
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: colorOne }
+                        GradientStop { position: 1.0; color: colorTwo }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        color: textColor
+                    }
                 }
             }
-          }
-      }
+        }
 
     }
-  }
-  Menu {
-      id: menu
-      MenuItem {
-          text: qsTr("New")
-          onTriggered: ctrl.resetData()
-      }
-      MenuItem {
-          text: qsTr("Open File…")
-          onTriggered: openDialog.open()
-      }
-      MenuItem {
-          text: qsTr("Save")
-          onTriggered: ctrl.saveFile();
-      }
-      MenuItem {
-          text: qsTr("Save As…")
-          onTriggered: {
-              saveDialog.open()
-              ctrl.saveFile();
-          }
-      }
-      MenuSeparator { }
-      MenuItem {
-          text: qsTr("Undo")
-          enabled: ctrl.canUndo
-          onTriggered: {
-              ctrl.undo()
-          }
-      }
-      MenuItem {
-          text: qsTr("Redo")
-          enabled: ctrl.canRedo
-          onTriggered: {
-              ctrl.redo()
-          }
-      }
-      MenuSeparator { }
-      MenuItem {
-          text: qsTr("Import File…")
-          onTriggered: {
-              importDialog.open()
-          }
-      }
-      MenuSeparator { }
-      MenuItem {
-          text: qsTr("Automatic Spacing")
-          checkable: true
-          checked: ctrl.spacing
-          onTriggered: ctrl.spacing = checked
-      }
-  }
-    MouseArea {
-      anchors.fill:parent
-      acceptedButtons:Qt.MiddleButton | Qt.RightButton
-      propagateComposedEvents: true
-      onClicked:{
-              menu.x = mouse.x
-              menu.y = mouse.y
-              menu.open()
-      }
-      onWheel: {
-        var step = (wheel.modifiers & Qt.ControlModifier) ? 0.1 : 0.01
-        if(wheel.angleDelta.y>0)
-        {
-          root.viewScale = Math.min(root.viewScale+step,2.0)
+
+    MindMap {
+        anchors.fill: parent
+        ctrl: ctrl
+    }
+    MindMenu {
+        id: menu
+        ctrl: ctrl
+    }
+
+
+    RowLayout{
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.rightMargin: 14
+        anchors.topMargin: 14
+        IconButton {//undo
+            source: _engineCtrl.undoIcon
+            enabled: ctrl.canUndo
+            onClicked: ctrl.undo()
         }
-        else
-          root.viewScale = Math.max(root.viewScale-step,0.2)
-      }
+        IconButton {//redo
+            source: _engineCtrl.redoIcon
+            enabled: ctrl.canRedo
+            onClicked: ctrl.redo()
+        }
+        IconButton {
+            source: _engineCtrl.listIcon
+            onClicked: drawer.open()
+        }
+    }
+
+    Drawer {
+        id: drawer
+        edge: Qt.RightEdge
+        width: 0.33 * root.width
+        height: root.height
+        Label {
+            text: "Content goes here!"
+            anchors.centerIn: parent
+        }
+        Switch {
+            text: qsTr("Night Mode")
+            checked: false
+            onCheckedChanged: root.darkMode = checked
+        }
+    }
+
+    MouseArea {
+        anchors.fill:parent
+        acceptedButtons:Qt.MiddleButton | Qt.RightButton
+        propagateComposedEvents: true
+        onClicked:{
+            menu.x = mouse.x
+            menu.y = mouse.y
+            menu.open()
+        }
+        onWheel: {
+            var step = (wheel.modifiers & Qt.ControlModifier) ? 0.1 : 0.01
+            if(wheel.angleDelta.y>0)
+            {
+                root.viewScale = Math.min(root.viewScale+step,2.0)
+            }
+            else
+                root.viewScale = Math.max(root.viewScale-step,0.2)
+        }
     }
 }
