@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Dialogs 1.3
+import QtQuick.Controls.Universal 2.12
 import RMindMap 1.0
 
 ApplicationWindow {
@@ -29,6 +30,7 @@ ApplicationWindow {
       onRejected: close()
   }
 
+    Universal.theme: root.darkMode ? Universal.Dark: Universal.Light
 
 
   // make own item

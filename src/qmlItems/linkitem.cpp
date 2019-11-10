@@ -104,6 +104,20 @@ void LinkItem::setEndBox(QRectF rect)
     emit endBoxChanged();
 }
 
+QColor LinkItem::color() const
+{
+    return m_color;
+}
+
+void LinkItem::setColor(QColor color)
+{
+    if(m_color == color)
+        return;
+    m_color= color;
+    emit colorChanged();
+    m_colorChanged= true;
+}
+
 QSGNode* LinkItem::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*)
 {
     LinkNode* link= static_cast<LinkNode*>(node);
@@ -112,6 +126,12 @@ QSGNode* LinkItem::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeDat
         link= new LinkNode();
         link->setColor(m_color);
     }
+    if(m_colorChanged)
+    {
+        link->setColor(m_color);
+        m_colorChanged= false;
+    }
+
     auto abox= m_startBox;
     abox.moveTo(-m_startBox.width() / 2, -m_startBox.height() / 2);
     auto bbox= m_endBox;

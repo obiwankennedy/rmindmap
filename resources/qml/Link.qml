@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
+import QtQuick.Controls.Universal 2.12
 import RMindMap 1.0
 
 MindLink {
@@ -10,7 +11,7 @@ MindLink {
     property alias opacityLabel: label.opacity
     property color colorBorder: "gray"
     property int borderWidth: 1
-    property color backgroundLabel: "lightgray"
+    property color backgroundLabel: Universal.background
     property int radius: 5
     property real opacityLabel: 0.8
     property QtObject object

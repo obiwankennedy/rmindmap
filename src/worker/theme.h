@@ -21,16 +21,41 @@
 #define QMLENGINECONTROLLER_H
 
 #include <QObject>
+#include <memory>
 
-class QmlEngineController : public QObject
+class QQmlEngine;
+class QQmlFileSelector;
+class Theme : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool nightMode READ nightMode WRITE setNightMode NOTIFY nightModeChanged)
+    Q_PROPERTY(QString undoIcon READ undoIcon NOTIFY undoIconChanged)
+    Q_PROPERTY(QString redoIcon READ redoIcon NOTIFY redoIconChanged)
+    Q_PROPERTY(QString listIcon READ listIcon NOTIFY listIconChanged)
 public:
-    explicit QmlEngineController(QObject *parent = nullptr);
+    explicit Theme(QQmlEngine* m_engine, QObject* parent= nullptr);
+    ~Theme();
+
+    bool nightMode() const;
+
+    QString undoIcon() const;
+    QString redoIcon() const;
+    QString listIcon() const;
 
 signals:
+    void nightModeChanged();
+    void undoIconChanged();
+    void redoIconChanged();
+    void listIconChanged();
 
 public slots:
+    void setNightMode(bool b);
+    QString imagePath(const QString& image) const;
+
+private:
+    QQmlEngine* m_engine;
+    std::unique_ptr<QQmlFileSelector> m_selector;
+    bool m_nightMode= false;
 };
 
 #endif // QMLENGINECONTROLLER_H

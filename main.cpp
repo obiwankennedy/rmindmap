@@ -22,11 +22,14 @@
 #include <QApplication>
 #include <QOpenGLContext>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QQuickStyle>
 #include <QSurfaceFormat>
 
 #include "controller/mindmapcontroller.h"
 #include "controller/selectioncontroller.h"
 #include "qmlItems/linkitem.h"
+#include "worker/theme.h"
 
 int main(int argc, char** argv)
 {
@@ -44,7 +47,11 @@ int main(int argc, char** argv)
     format.setSamples(8);
     QSurfaceFormat::setDefaultFormat(format);
 
+    QQuickStyle::setStyle("Universal");
+
     QQmlApplicationEngine qmlEngine;
+
+    qmlEngine.rootContext()->setContextProperty("_engineCtrl", new Theme(&qmlEngine));
     qmlRegisterType<MindMapController>("RMindMap", 1, 0, "MindMapController");
     qmlRegisterType<SelectionController>("RMindMap", 1, 0, "SelectionController");
     qmlRegisterType<LinkItem>("RMindMap", 1, 0, "MindLink");

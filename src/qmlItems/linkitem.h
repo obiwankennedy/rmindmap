@@ -34,6 +34,7 @@ class LinkItem : public QQuickItem
     Q_PROPERTY(QPointF end READ end WRITE setEnd NOTIFY endChanged)
     Q_PROPERTY(QRectF startBox READ startBox WRITE setStartBox NOTIFY startBoxChanged)
     Q_PROPERTY(QRectF endBox READ endBox WRITE setEndBox NOTIFY endBoxChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     // may not be used
     Q_PROPERTY(PointList points READ points WRITE setPoints NOTIFY pointsChanged)
 
@@ -48,19 +49,21 @@ public:
     LinkItem();
 
     Direction direction() const;
-    void setDirection(const Direction& direction);
     QPointF start() const;
-    void setStart(const QPointF& start);
     QPointF end() const;
-    void setEnd(const QPointF& end);
-
     PointList points() const;
-    void setPoints(const PointList& list);
-
     QRectF startBox() const;
     QRectF endBox() const;
+    QColor color() const;
+
+public slots:
+    void setDirection(const Direction& direction);
+    void setStart(const QPointF& start);
+    void setPoints(const PointList& list);
+    void setEnd(const QPointF& end);
     void setStartBox(QRectF rect);
     void setEndBox(QRectF rect);
+    void setColor(QColor color);
 
 signals:
     void directionChanged();
@@ -69,6 +72,7 @@ signals:
     void pointsChanged();
     void startBoxChanged();
     void endBoxChanged();
+    void colorChanged();
 
 protected:
     QSGNode* updatePaintNode(QSGNode*, UpdatePaintNodeData*) override;
@@ -81,6 +85,7 @@ private:
     QRectF m_startBox;
     QRectF m_endBox;
     PointList m_points;
+    bool m_colorChanged= false;
 };
 
 #endif // LINKITEM_H

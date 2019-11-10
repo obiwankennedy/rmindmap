@@ -17,9 +17,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "qmlenginecontroller.h"
+#include "theme.h"
 
-QmlEngineController::QmlEngineController(QObject *parent) : QObject(parent)
+#include <QQmlEngine>
+#include <QQmlFileSelector>
+
+Theme::Theme(QQmlEngine* engine, QObject* parent) : QObject(parent), m_engine(engine)
 {
+    m_selector.reset(new QQmlFileSelector(m_engine));
+    m_selector->setExtraSelectors(QStringList() << QStringLiteral("+dark"));
+}
 
+Theme::~Theme()= default;
+
+bool Theme::nightMode() const
+{
+    return m_nightMode;
+}
+
+void Theme::setNightMode(bool b)
+{
+    if(m_nightMode == b)
+        return;
+    m_nightMode= b;
+    emit nightModeChanged();
+    emit undoIconChanged();
+    emit redoIconChanged();
+    emit listIconChanged();
+}
+
+QString Theme::imagePath(const QString& image) const
+{
+    return QStringLiteral("qrc:/icons/resources/icons/%1%2")
+        .arg(m_nightMode ? QStringLiteral("+dark/") : QStringLiteral(""))
+        .arg(image);
+}
+
+QString Theme::undoIcon() const
+{
+    return imagePath("undo.svg");
+}
+
+QString Theme::redoIcon() const
+{
+    return imagePath("redo.svg");
+}
+
+QString Theme::listIcon() const
+{
+    return imagePath("list.svg");
 }
