@@ -30,12 +30,15 @@ class LinkModel;
 class MindNode;
 class SpacingController;
 class SelectionController;
+class NodeStyleModel;
+class NodeStyle;
 
 class MindMapController : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* nodeModel READ nodeModel CONSTANT)
     Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel CONSTANT)
+    Q_PROPERTY(QAbstractItemModel* styleModel READ styleModel CONSTANT)
     Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
     Q_PROPERTY(bool spacing READ spacing WRITE setSpacing NOTIFY spacingChanged)
     Q_PROPERTY(SelectionController* selectionCtrl READ selectionController CONSTANT)
@@ -48,6 +51,8 @@ public:
 
     QAbstractItemModel* nodeModel() const;
     QAbstractItemModel* linkModel() const;
+    QAbstractItemModel* styleModel() const;
+
     SelectionController* selectionController() const;
     const QString& filename() const;
     const QString& errorMsg() const;
@@ -77,6 +82,7 @@ public slots:
     void addBox(const QString& idparent);
     void reparenting(MindNode* parent, const QString& id);
     void removeSelection();
+    NodeStyle* getStyle(int index) const;
 
 private:
     QString m_filename;
@@ -85,6 +91,7 @@ private:
     std::unique_ptr<SelectionController> m_selectionController;
     std::unique_ptr<LinkModel> m_linkModel;
     std::unique_ptr<BoxModel> m_nodeModel;
+    std::unique_ptr<NodeStyleModel> m_styleModel;
     QThread* m_spacing= nullptr;
     QUndoStack m_stack;
 };

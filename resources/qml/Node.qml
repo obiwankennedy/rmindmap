@@ -9,15 +9,13 @@ Pane
     //Properties
     property alias source: img.source
     property alias text: text.text
-    property color colorOne: "white"
-    property color colorTwo: "gray"
-    property color colorBorder: "black"
     property bool isEditable: false
     property bool selected: false
     property int radius: 8
     property alias open: control.open
     property int expandButtonSize: 20
     property QtObject object
+    property QtObject nodeStyle
     property string ident: object.id
     property bool dropOver: false
 
@@ -64,6 +62,7 @@ Pane
         TextInput{
             id: text
             enabled: root.isEditable
+            color: root.nodeStyle.textColor
             onEnabledChanged: focus = enabled
             onEditingFinished: root.isEditable = false
         }
@@ -76,8 +75,8 @@ Pane
         border.width: (root.dropOver || root.selected) ? 4 : 1
         border.color: root.dropOver ? "red" : root.selected ? "blue": "black"
         gradient: Gradient {
-            GradientStop { position: 0.0; color: root.colorOne }
-            GradientStop { position: 1.0; color: root.colorTwo }
+            GradientStop { position: 0.0; color: root.nodeStyle.colorOne }
+            GradientStop { position: 1.0; color: root.nodeStyle.colorTwo }
         }
         MouseArea {
             id: mouse

@@ -222,6 +222,18 @@ void MindNode::addLink(Link* link)
         emit hasLinkChanged();
 }
 
+int MindNode::styleIndex() const
+{
+    return m_styleIndex;
+}
+
+void MindNode::setStyleIndex(int idx)
+{
+    if(idx == m_styleIndex)
+        return;
+    m_styleIndex= idx;
+    emit styleIndexChanged();
+}
 void MindNode::removeLink(Link* link)
 {
     auto it= std::find(m_subNodelinks.begin(), m_subNodelinks.end(), link);

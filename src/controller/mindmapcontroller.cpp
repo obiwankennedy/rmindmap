@@ -26,6 +26,7 @@
 #include "controller/spacingcontroller.h"
 #include "model/boxmodel.h"
 #include "model/linkmodel.h"
+#include "model/nodestylemodel.h"
 #include "worker/fileserializer.h"
 
 #include <QDebug>
@@ -42,6 +43,7 @@ MindMapController::MindMapController(QObject* parent)
     , m_selectionController(new SelectionController())
     , m_linkModel(new LinkModel())
     , m_nodeModel(new BoxModel())
+    , m_styleModel(new NodeStyleModel())
 {
     m_nodeModel->setLinkModel(m_linkModel.get());
     m_selectionController->setUndoStack(&m_stack);
@@ -89,6 +91,11 @@ QAbstractItemModel* MindMapController::nodeModel() const
 QAbstractItemModel* MindMapController::linkModel() const
 {
     return m_linkModel.get();
+}
+
+QAbstractItemModel* MindMapController::styleModel() const
+{
+    return m_styleModel.get();
 }
 
 const QString& MindMapController::filename() const
@@ -143,6 +150,11 @@ void MindMapController::setFilename(const QString& path)
         return;
     m_filename= path;
     emit filenameChanged();
+}
+
+NodeStyle* MindMapController::getStyle(int index) const
+{
+    return m_styleModel->getStyle(index);
 }
 
 void MindMapController::setSpacing(bool status)

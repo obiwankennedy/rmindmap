@@ -28,6 +28,7 @@
 
 #include "controller/mindmapcontroller.h"
 #include "controller/selectioncontroller.h"
+#include "data/nodestyle.h"
 #include "qmlItems/linkitem.h"
 #include "worker/theme.h"
 
@@ -55,6 +56,7 @@ int main(int argc, char** argv)
     qmlRegisterType<MindMapController>("RMindMap", 1, 0, "MindMapController");
     qmlRegisterType<SelectionController>("RMindMap", 1, 0, "SelectionController");
     qmlRegisterType<LinkItem>("RMindMap", 1, 0, "MindLink");
+    qmlRegisterType<NodeStyle>("RMindMap", 1, 0, "NodeStyle");
     qRegisterMetaType<QAbstractItemModel*>();
 
     qmlEngine.load(QLatin1String("qrc:/resources/qml/main.qml"));

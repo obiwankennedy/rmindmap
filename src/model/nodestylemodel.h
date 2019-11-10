@@ -43,6 +43,10 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+    NodeStyle* getStyle(int index) const;
+private slots:
+    void initStyles();
+
 private:
     std::vector<NodeStyle*> m_styles;
 };

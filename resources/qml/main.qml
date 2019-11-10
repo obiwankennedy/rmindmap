@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Window 2.2
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Universal 2.12
@@ -62,30 +62,7 @@ ApplicationWindow {
         onRejected: close()
     }
 
-    Popup {
-        id: stylePopup
-        GridLayout {
-            columns: 3
-            Repeater {
-                model: ctrl.styleModel
-                delegate: Rectangle {
-                    radius: 8
-                    border.width: 1
-                    border.color: "black"
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: colorOne }
-                        GradientStop { position: 1.0; color: colorTwo }
-                    }
 
-                    Text {
-                        anchors.centerIn: parent
-                        color: textColor
-                    }
-                }
-            }
-        }
-
-    }
 
     MindMap {
         anchors.fill: parent
