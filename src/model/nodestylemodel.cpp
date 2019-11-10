@@ -19,26 +19,36 @@
  ***************************************************************************/
 #include "nodestylemodel.h"
 
-NodeStyleModel::NodeStyleModel(QObject *parent)
-    : QAbstractListModel(parent)
-{
-}
+#include "data/nodestyle.h"
 
-int NodeStyleModel::rowCount(const QModelIndex &parent) const
+NodeStyleModel::NodeStyleModel(QObject* parent) : QAbstractListModel(parent) {}
+
+int NodeStyleModel::rowCount(const QModelIndex& parent) const
 {
     // For list models only the root node (an invalid parent) should return the list's size. For all
     // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
-    if (parent.isValid())
+    if(parent.isValid())
         return 0;
 
-    // FIXME: Implement me!
+    return static_cast<int>(m_styles.size());
 }
 
-QVariant NodeStyleModel::data(const QModelIndex &index, int role) const
+QVariant NodeStyleModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid())
+    if(!index.isValid())
         return QVariant();
 
     // FIXME: Implement me!
     return QVariant();
+}
+
+QHash<int, QByteArray> NodeStyleModel::roleNames() const
+{
+    // clang-format off
+    static QHash<int, QByteArray> roles
+        =  {{NodeStyleModel::ColorOne, "colorOne"},
+            {NodeStyleModel::ColorTwo, "colorTwo"},
+            {NodeStyleModel::TextColor, "textColor"}};
+    //clang-format on
+    return roles;
 }

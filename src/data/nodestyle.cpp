@@ -19,7 +19,41 @@
  ***************************************************************************/
 #include "nodestyle.h"
 
-NodeStyle::NodeStyle(QObject *parent) : QObject(parent)
-{
+NodeStyle::NodeStyle(QObject* parent) : QObject(parent) {}
 
+QColor NodeStyle::colorOne() const
+{
+    return m_colorOne;
+}
+
+QColor NodeStyle::colorTwo() const
+{
+    return m_colorTwo;
+}
+
+QColor NodeStyle::textColor() const
+{
+    return m_textColor;
+}
+
+void NodeStyle::setColorOne(const QColor& color)
+{
+    if(color == m_colorOne)
+        return;
+    m_colorOne= color;
+    emit colorOneChanged();
+}
+void NodeStyle::setColorTwo(const QColor& color)
+{
+    if(color == m_colorTwo)
+        return;
+    m_colorTwo= color;
+    emit colorTwoChanged();
+}
+void NodeStyle::setTextColor(const QColor& color)
+{
+    if(color == m_textColor)
+        return;
+    m_textColor= color;
+    emit textColorChanged();
 }

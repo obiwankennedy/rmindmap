@@ -21,20 +21,30 @@
 #define NODESTYLEMODEL_H
 
 #include <QAbstractListModel>
+class NodeStyle;
 
 class NodeStyleModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    explicit NodeStyleModel(QObject *parent = nullptr);
+    enum Roles
+    {
+        ColorOne= Qt::UserRole + 1,
+        ColorTwo,
+        TextColor
+    };
+    explicit NodeStyleModel(QObject* parent= nullptr);
 
     // Basic functionality:
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent= QModelIndex()) const override;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index, int role= Qt::DisplayRole) const override;
+
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
+    std::vector<NodeStyle*> m_styles;
 };
 
 #endif // NODESTYLEMODEL_H

@@ -20,17 +20,35 @@
 #ifndef NODESTYLE_H
 #define NODESTYLE_H
 
+#include <QColor>
 #include <QObject>
 
 class NodeStyle : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QColor colorOne READ colorOne WRITE setColorOne NOTIFY colorOneChanged)
+    Q_PROPERTY(QColor colorTwo READ colorTwo WRITE setColorTwo NOTIFY colorTwoChanged)
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
 public:
-    explicit NodeStyle(QObject *parent = nullptr);
+    explicit NodeStyle(QObject* parent= nullptr);
 
+    QColor colorOne() const;
+    QColor colorTwo() const;
+    QColor textColor() const;
 signals:
+    void colorOneChanged();
+    void colorTwoChanged();
+    void textColorChanged();
 
 public slots:
+    void setColorOne(const QColor& color);
+    void setColorTwo(const QColor& color);
+    void setTextColor(const QColor& color);
+
+private:
+    QColor m_colorOne;
+    QColor m_colorTwo;
+    QColor m_textColor;
 };
 
 #endif // NODESTYLE_H
