@@ -23,16 +23,25 @@
 #include <QPointer>
 #include <QUndoCommand>
 class MindNode;
+class BoxModel;
+class LinkModel;
+class Link;
 
 class ReparentingNodeCommand : public QUndoCommand
 {
 public:
-    ReparentingNodeCommand() : void undo() override;
+    ReparentingNodeCommand(BoxModel* nodeModel, LinkModel* linkModel, MindNode* newParent, const QString& id);
+    void undo() override;
     void redo() override;
 
 private:
     QPointer<MindNode> m_mindNode;
     QPointer<MindNode> m_oldParent;
+    QPointer<Link> m_oldLink;
+    QPointer<Link> m_newLink;
+
+    BoxModel* m_nodeModel= nullptr;
+    LinkModel* m_linkModel= nullptr;
     QPointer<MindNode> m_newParent;
 };
 

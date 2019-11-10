@@ -77,6 +77,7 @@ public:
     void setVisible(bool op);
 
     void addLink(Link* link);
+    void removeLink(Link* link);
     bool hasLink() const;
 
     QString imageUri() const;
@@ -84,6 +85,8 @@ public:
 
     bool isDragged() const;
     bool selected() const;
+
+    const std::vector<QPointer<Link>>& getSubLinks() const;
 
 public slots:
     void setText(QString text);
@@ -130,8 +133,8 @@ private:
 
     int m_mass= 1;
     std::map<Link*, QPointF> m_nextPositions;
-    QVector2D _velocity;
-    QVector2D _acceleration;
+    QVector2D m_velocity;
+    QVector2D m_acceleration;
 };
 
 #endif // MINDNODE_H

@@ -64,6 +64,7 @@ public:
 
     void clear();
     void appendNode(MindNode* node);
+    MindNode* node(const QString& id) const;
 signals:
     void linkModelChanged();
 public slots:

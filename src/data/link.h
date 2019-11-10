@@ -62,6 +62,8 @@ public:
     void setVisible(bool vi);
     bool isVisible() const;
     QString text() const;
+
+    void cleanUpLink();
 signals:
     void linkChanged();
     void visibleChanged();

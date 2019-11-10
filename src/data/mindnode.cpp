@@ -65,27 +65,27 @@ void MindNode::setPosition(const QPointF& pos)
 
 QVector2D MindNode::getVelocity() const
 {
-    return _velocity;
+    return m_velocity;
 }
 
 void MindNode::setVelocity(const QVector2D& velocity)
 {
-    _velocity= velocity;
+    m_velocity= velocity;
 }
 
 QVector2D MindNode::getAcceleration() const
 {
-    return _acceleration;
+    return m_acceleration;
 }
 
 void MindNode::setAcceleration(const QVector2D& acceleration)
 {
-    _acceleration= acceleration;
+    m_acceleration= acceleration;
 }
 
 void MindNode::applyForce(const QVector2D& force)
 {
-    _acceleration+= force / m_mass;
+    m_acceleration+= force / m_mass;
 }
 
 int MindNode::getMass() const
@@ -110,6 +110,11 @@ void MindNode::setText(QString text)
 
     m_text= text;
     emit textChanged(m_text);
+}
+
+const std::vector<QPointer<Link>>& MindNode::getSubLinks() const
+{
+    return m_subNodelinks;
 }
 
 qreal MindNode::contentWidth() const
@@ -216,6 +221,17 @@ void MindNode::addLink(Link* link)
     if(h != hasLink())
         emit hasLinkChanged();
 }
+
+void MindNode::removeLink(Link* link)
+{
+    auto it= std::find(m_subNodelinks.begin(), m_subNodelinks.end(), link);
+
+    if(it == m_subNodelinks.end())
+        return;
+
+    m_subNodelinks.erase(it);
+}
+
 bool MindNode::hasLink() const
 {
     return !m_subNodelinks.empty();

@@ -46,10 +46,6 @@ MindNode* Link::start() const
 void Link::setStart(MindNode* start)
 {
     m_start= start;
-    if(m_start)
-    {
-        m_start->addLink(this);
-    }
     connect(m_start, &MindNode::positionChanged, this, &Link::linkChanged);
 }
 
@@ -100,6 +96,11 @@ float Link::getStiffness() const
 void Link::setStiffness(float stiffness)
 {
     m_stiffness= stiffness;
+}
+
+void Link::cleanUpLink()
+{
+    m_start->removeLink(this);
 }
 
 float Link::getLength() const

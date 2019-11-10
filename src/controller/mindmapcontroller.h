@@ -27,6 +27,7 @@
 class QAbstractItemModel;
 class BoxModel;
 class LinkModel;
+class MindNode;
 class SpacingController;
 class SelectionController;
 
@@ -74,7 +75,8 @@ public slots:
     void importFile(const QString& path);
 
     void addBox(const QString& idparent);
-    void removeBox(const QString& id);
+    void reparenting(MindNode* parent, const QString& id);
+    void removeSelection();
 
 private:
     QString m_filename;

@@ -20,6 +20,8 @@
 #include "mindmapcontroller.h"
 
 #include "command/addnodecommand.h"
+#include "command/removenodecommand.h"
+#include "command/reparentingnodecommand.h"
 #include "controller/selectioncontroller.h"
 #include "controller/spacingcontroller.h"
 #include "model/boxmodel.h"
@@ -178,9 +180,16 @@ void MindMapController::addBox(const QString& idparent)
     auto cmd= new AddNodeCommand(m_nodeModel.get(), m_linkModel.get(), idparent);
     m_stack.push(cmd);
 }
-void MindMapController::removeBox(const QString& id)
+
+void MindMapController::reparenting(MindNode* parent, const QString& id)
 {
-    auto cmd= new AddNodeCommand(m_nodeModel.get(), m_linkModel.get(), id);
+    auto cmd= new ReparentingNodeCommand(m_nodeModel.get(), m_linkModel.get(), parent, id);
+    m_stack.push(cmd);
+}
+void MindMapController::removeSelection()
+{
+    auto nodes= m_selectionController->selectedNodes();
+    auto cmd= new RemoveNodeCommand(nodes, m_nodeModel.get(), m_linkModel.get());
     m_stack.push(cmd);
 }
 

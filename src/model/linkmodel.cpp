@@ -130,10 +130,15 @@ QHash<int, QByteArray> LinkModel::roleNames() const
 
 Link* LinkModel::addLink(MindNode* p1, MindNode* p2)
 {
+    if(nullptr == p1 || nullptr == p2)
+        return nullptr;
+
     beginInsertRows(QModelIndex(), static_cast<int>(m_data.size()), static_cast<int>(m_data.size()));
     auto link= new Link();
+    p2->setParentNode(p1);
     connect(link, &Link::linkChanged, this, &LinkModel::linkHasChanged);
     link->setStart(p1);
+    p1->addLink(link);
     link->setEnd(p2);
     m_data.push_back(link);
     endInsertRows();
@@ -142,20 +147,33 @@ Link* LinkModel::addLink(MindNode* p1, MindNode* p2)
 
 void LinkModel::append(Link* link)
 {
+    if(link == nullptr)
+        return;
+    auto p1 = link->start();
+    if(p1==nullptr)
+        return;
     beginInsertRows(QModelIndex(), static_cast<int>(m_data.size()), static_cast<int>(m_data.size()));
     connect(link, &Link::linkChanged, this, &LinkModel::linkHasChanged);
     m_data.push_back(link);
+    p1->addLink(link);
     endInsertRows();
 }
 
 void LinkModel::removeLink(Link* link)
 {
+    if(link == nullptr)
+        return;
+    auto p1 = link->start();
+    if(p1==nullptr)
+        return;
+
     auto id= std::find(m_data.begin(), m_data.end(), link);
     if(id == m_data.end())
         return;
     auto idx= static_cast<int>(std::distance(m_data.begin(), id));
     beginRemoveRows(QModelIndex(), idx, idx);
     m_data.erase(id);
+    p1->removeLink(link);
     endRemoveRows();
 }
 

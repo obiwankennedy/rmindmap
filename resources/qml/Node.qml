@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.12
 Pane
 {
     id: root
+    //Properties
     property alias source: img.source
     property alias text: text.text
     property color colorOne: "white"
@@ -13,27 +14,45 @@ Pane
     property color colorBorder: "black"
     property bool isEditable: false
     property bool selected: false
+    property int radius: 8
     property alias open: control.open
+    property int expandButtonSize: 20
     property QtObject object
+    property string ident: object.id
+    property bool dropOver: false
+
+    //Signals
     signal clicked(var mouse)
-    onWidthChanged: node.contentWidth = width
-    onHeightChanged: node.contentHeight = height
+    signal selectStyle()
+    signal reparenting(var id)
+    signal addChild()
+
+
+    onWidthChanged: object.contentWidth = width
+    onHeightChanged: object.contentHeight = height
     onXChanged: {
         if(mouse.drag.active)
-            node.position=Qt.point(x, y)
+            object.position=Qt.point(x, y)
     }
     onYChanged: {
        if(mouse.drag.active)
-            node.position=Qt.point(x, y)
+            object.position=Qt.point(x, y)
    }
 
-    signal addChild()
+    //Drag
+    Drag.active: mouse.drag.active
+    Drag.keys: [ "rmindmap/reparenting","text/plain" ]
+    Drag.supportedActions: Qt.MoveAction
+    Drag.mimeData: {
+        "text/plain": node.id
+    }
+
 
     Connections {
-        target: node
+        target: object
         onPositionChanged: {
-            x=node.position.x
-            y=node.position.y
+            x=object.position.x
+            y=object.position.y
         }
     }
 
@@ -50,10 +69,12 @@ Pane
         }
     }
 
+
+
     background: Rectangle {
-        radius: 8
-        border.width: root.selected ? 4 : 1
-        border.color: root.selected ? "blue": "black"
+        radius: root.radius
+        border.width: (root.dropOver || root.selected) ? 4 : 1
+        border.color: root.dropOver ? "red" : root.selected ? "blue": "black"
         gradient: Gradient {
             GradientStop { position: 0.0; color: root.colorOne }
             GradientStop { position: 1.0; color: root.colorTwo }
@@ -65,18 +86,34 @@ Pane
             drag.axis: Drag.XAndYAxis
             drag.minimumX: 0
             drag.minimumY: 0
-            onPressed: root.clicked(mouse)
+            onPressed:{
+                root.clicked(mouse)
+                root.grabToImage(function(result) {
+                                if(mouse.modifiers & Qt.ControlModifier)
+                                {
+                                    root.Drag.dragType = Drag.Automatic
+                                    root.Drag.keys = [ "rmindmap/reparenting","text/plain" ]
+                                }
+                                else
+                                {
+                                    root.Drag.dragType = Drag.Internal
+                                    root.Drag.keys = []
+                                }
+                                root.Drag.imageSource = result.url
+                            })
+            }
+
             onDoubleClicked: root.isEditable = true
             drag.onActiveChanged: root.object.isDragged = drag.active
-
         }
+
         AbstractButton {
             id: control
             property bool open: !checked
             checkable: true
             visible: object.hasLink
-            width: 20
-            height: 20
+            width: root.expandButtonSize
+            height: root.expandButtonSize
             anchors.top: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             topPadding: 0
@@ -107,6 +144,51 @@ Pane
                 anchors.fill: parent
                 onClicked: root.addChild()
             }
+        }
+
+        Rectangle {
+            id: style
+            visible: root.selected
+            width: root.expandButtonSize
+            height: root.expandButtonSize
+            radius: root.expandButtonSize/2
+            color: "blue"
+            anchors.verticalCenter: parent.top
+            anchors.horizontalCenter: parent.right
+            Text {
+                topPadding: 0
+                padding: 0
+                width: 2
+                height: 2
+                anchors.centerIn: parent
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                fontSizeMode: Text.Fit
+                minimumPixelSize: 2
+                color: "white"
+                text: "▼"
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: selectStyle()
+            }
+        }
+
+        DropArea {
+            anchors.fill: parent
+            keys: [ "rmindmap/reparenting","text/plain" ]
+            onDropped: {
+                reparenting(drop.text)
+                root.dropOver = false
+            }
+            onEntered: {
+                if(drag.source === root)
+                    drag.accepted = false
+
+                if(drag.source !== root)
+                    root.dropOver = true
+            }
+            onExited:root.dropOver = false
         }
     }
 }
