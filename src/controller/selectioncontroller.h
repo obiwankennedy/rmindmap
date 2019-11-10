@@ -36,6 +36,7 @@ public:
 
     void setEnabled(bool enable);
     bool enabled() const;
+    const std::vector<MindNode*>& selectedNodes() const;
 signals:
     void enabledChanged();
 

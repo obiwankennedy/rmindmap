@@ -42,6 +42,11 @@ bool SelectionController::enabled() const
     return m_enabled;
 }
 
+const std::vector<MindNode*>& SelectionController::selectedNodes() const
+{
+    return m_selection;
+}
+
 void SelectionController::addToSelection(MindNode* node)
 {
     if(node == nullptr)
