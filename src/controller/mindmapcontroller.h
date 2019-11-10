@@ -39,6 +39,7 @@ class MindMapController : public QObject
     Q_PROPERTY(QAbstractItemModel* nodeModel READ nodeModel CONSTANT)
     Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel CONSTANT)
     Q_PROPERTY(QAbstractItemModel* styleModel READ styleModel CONSTANT)
+    Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
     Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
     Q_PROPERTY(bool spacing READ spacing WRITE setSpacing NOTIFY spacingChanged)
     Q_PROPERTY(SelectionController* selectionCtrl READ selectionController CONSTANT)
@@ -60,6 +61,7 @@ public:
     bool spacing() const;
     bool canRedo() const;
     bool canUndo() const;
+    int defaultStyleIndex() const;
 
 signals:
     void filenameChanged();
@@ -67,6 +69,7 @@ signals:
     void canRedoChanged();
     void canUndoChanged();
     void errorMsgChanged();
+    void defaultStyleIndexChanged();
 
 public slots:
     void saveFile();
@@ -78,6 +81,7 @@ public slots:
     void undo();
     void setErrorMsg(const QString& msg);
     void importFile(const QString& path);
+    void setDefaultStyleIndex(int indx);
 
     void addBox(const QString& idparent);
     void reparenting(MindNode* parent, const QString& id);

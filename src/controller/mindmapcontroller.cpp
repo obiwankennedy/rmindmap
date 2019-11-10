@@ -50,6 +50,7 @@ MindMapController::MindMapController(QObject* parent)
 
     connect(&m_stack, &QUndoStack::canRedoChanged, this, &MindMapController::canRedoChanged);
     connect(&m_stack, &QUndoStack::canUndoChanged, this, &MindMapController::canUndoChanged);
+    connect(m_nodeModel.get(), &BoxModel::defaultStyleIndexChanged, this, &MindMapController::defaultStyleIndexChanged);
 
     m_spacing= new QThread();
     m_spacingController.reset(new SpacingController(m_nodeModel->nodes(), m_linkModel.get()));
@@ -144,6 +145,11 @@ void MindMapController::importFile(const QString& path)
         setErrorMsg(tr("File can't be loaded: %1").arg(m_filename));
 }
 
+void MindMapController::setDefaultStyleIndex(int indx)
+{
+    m_nodeModel->setDefaultStyleIndex(indx);
+}
+
 void MindMapController::setFilename(const QString& path)
 {
     if(path == m_filename)
@@ -208,4 +214,9 @@ void MindMapController::removeSelection()
 bool MindMapController::canUndo() const
 {
     return m_stack.canUndo();
+}
+
+int MindMapController::defaultStyleIndex() const
+{
+    return m_nodeModel->defaultStyleIndex();
 }

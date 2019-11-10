@@ -100,14 +100,74 @@ ApplicationWindow {
         edge: Qt.RightEdge
         width: 0.33 * root.width
         height: root.height
-        Label {
-            text: "Content goes here!"
-            anchors.centerIn: parent
-        }
-        Switch {
-            text: qsTr("Night Mode")
-            checked: false
-            onCheckedChanged: root.darkMode = checked
+        ColumnLayout {
+            anchors.fill: parent
+
+            Switch {
+                text: qsTr("Night Mode")
+                checked: false
+                onCheckedChanged: root.darkMode = checked
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Label {
+                    text: qsTr("Default Style")
+                }
+                ComboBox {
+                    id: combo
+                    model: ctrl.styleModel
+                    currentIndex: 0
+                    onCurrentIndexChanged: ctrl.defaultStyleIndex = currentIndex
+
+                   contentItem: Rectangle {
+                        radius: 8
+                        width: 80
+                        height: 15
+                        border.width: 1
+                        border.color: "black"
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: ctrl.getStyle(combo.currentIndex).colorOne }
+                            GradientStop { position: 1.0; color: ctrl.getStyle(combo.currentIndex).colorTwo }
+                        }
+                        Text {
+                            anchors.centerIn: parent
+                            color: ctrl.getStyle(combo.currentIndex).textColor
+                            text: qsTr("Text")
+                        }
+                    }
+
+
+                    delegate: ItemDelegate {
+                        width: combo.width
+                        height: 20
+
+                        Rectangle {
+                            radius: 8
+                            width: 80
+                            height: 15
+                            anchors.centerIn: parent
+                            border.width: 1
+                            border.color: "black"
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: colorOne }
+                                GradientStop { position: 1.0; color: colorTwo }
+                            }
+                            Label {
+                                anchors.centerIn: parent
+                                color: model.textColor
+                                text: qsTr("Text")
+                            }
+                        }
+                    }
+                }
+            }
+
+            Label {
+               property string logs
+               text: qsTr("Errors:\n%1").arg(logs)
+               Layout.fillHeight: true
+               Layout.fillWidth: true
+            }
         }
     }
 

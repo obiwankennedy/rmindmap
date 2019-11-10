@@ -29,6 +29,7 @@ class BoxModel : public QAbstractItemModel
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel WRITE setLinkModel NOTIFY linkModelChanged)
+    Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
 public:
     enum Roles : int
     {
@@ -65,8 +66,12 @@ public:
     void clear();
     void appendNode(MindNode* node);
     MindNode* node(const QString& id) const;
+    int defaultStyleIndex() const;
+
 signals:
     void linkModelChanged();
+    void defaultStyleIndexChanged();
+
 public slots:
     // Add data:
     std::pair<MindNode*, Link*> addBox(const QString& idparent);
@@ -74,10 +79,12 @@ public slots:
     // Remove data:
     bool removeBox(const MindNode* node);
     void openNode(const QString& id, bool status);
+    void setDefaultStyleIndex(int indx);
 
 private:
     std::vector<MindNode*> m_data;
     LinkModel* m_linkModel= nullptr;
+    int m_defaultStyleIndex= 0;
 };
 
 #endif // BOXMODEL_H

@@ -171,6 +171,7 @@ std::pair<MindNode*, Link*> BoxModel::addBox(const QString& idparent)
     beginInsertRows(QModelIndex(), row, row);
     auto root= new MindNode();
     root->setText(tr("New Node"));
+    root->setStyleIndex(m_defaultStyleIndex);
 
     m_data.push_back(root);
     if(idparent.isEmpty())
@@ -230,4 +231,17 @@ MindNode* BoxModel::node(const QString& id) const
 std::vector<MindNode*>& BoxModel::nodes()
 {
     return m_data;
+}
+
+void BoxModel::setDefaultStyleIndex(int indx)
+{
+    if(indx == m_defaultStyleIndex)
+        return;
+    m_defaultStyleIndex= indx;
+    emit defaultStyleIndexChanged();
+}
+
+int BoxModel::defaultStyleIndex() const
+{
+    return m_defaultStyleIndex;
 }
