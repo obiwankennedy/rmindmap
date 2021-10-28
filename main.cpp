@@ -37,6 +37,7 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setOrganizationName(QStringLiteral("Rolisteam"));
     app.setOrganizationDomain(QStringLiteral("org.rolisteam"));
+    Q_INIT_RESOURCE(rmindmap);
     auto format= QSurfaceFormat::defaultFormat();
     if(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
     {

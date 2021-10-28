@@ -51,6 +51,8 @@ MindMapController::MindMapController(QObject* parent)
     connect(&m_stack, &QUndoStack::canRedoChanged, this, &MindMapController::canRedoChanged);
     connect(&m_stack, &QUndoStack::canUndoChanged, this, &MindMapController::canUndoChanged);
     connect(m_nodeModel.get(), &BoxModel::defaultStyleIndexChanged, this, &MindMapController::defaultStyleIndexChanged);
+    connect(m_nodeModel.get(), &BoxModel::nodeHeightChanged, this, &MindMapController::contentRectChanged);
+    connect(m_nodeModel.get(), &BoxModel::nodeWidthChanged, this, &MindMapController::contentRectChanged);
 
     m_spacing= new QThread();
     m_spacingController.reset(new SpacingController(m_nodeModel->nodes(), m_linkModel.get()));
@@ -107,6 +109,11 @@ const QString& MindMapController::filename() const
 const QString& MindMapController::errorMsg() const
 {
     return m_errorMsg;
+}
+
+QRectF MindMapController::contentRect() const
+{
+    return {0, 0, m_nodeModel->nodeWidth(), m_nodeModel->nodeHeight()};
 }
 
 void MindMapController::clearData()

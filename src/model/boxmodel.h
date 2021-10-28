@@ -30,6 +30,8 @@ class BoxModel : public QAbstractItemModel
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel WRITE setLinkModel NOTIFY linkModelChanged)
     Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
+    Q_PROPERTY(qreal nodeWidth READ nodeWidth NOTIFY nodeWidthChanged)
+    Q_PROPERTY(qreal nodeHeight READ nodeHeight NOTIFY nodeHeightChanged)
 public:
     enum Roles : int
     {
@@ -68,9 +70,14 @@ public:
     MindNode* node(const QString& id) const;
     int defaultStyleIndex() const;
 
+    qreal nodeWidth() const;
+    qreal nodeHeight() const;
+
 signals:
     void linkModelChanged();
     void defaultStyleIndexChanged();
+    void nodeHeightChanged();
+    void nodeWidthChanged();
 
 public slots:
     // Add data:
@@ -82,9 +89,16 @@ public slots:
     void setDefaultStyleIndex(int indx);
 
 private:
+    void setNodeWidth(qreal w);
+    void setNodeHeight(qreal h);
+    void computeContentSize(const MindNode* newNode);
+
+private:
     std::vector<MindNode*> m_data;
     LinkModel* m_linkModel= nullptr;
     int m_defaultStyleIndex= 0;
+    qreal m_nodeWidth= 0.;
+    qreal m_nodeHeight= 0.;
 };
 
 #endif // BOXMODEL_H

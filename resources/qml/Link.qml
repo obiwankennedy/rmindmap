@@ -16,30 +16,38 @@ MindLink {
     property real opacityLabel: 0.8
     property QtObject object
 
-
-    TextField {
-        id: label
+    FocusScope {
+        id: focusScope
         anchors.centerIn: parent
-        text: label
-        readOnly: !root.editable
-        onReadOnlyChanged: focus = root.editable
-        onEditingFinished: root.editable = false
+        TextField {
+            id: label
+            text: label
+            anchors.centerIn: parent
+            readOnly: !root.editable
+            focusReason: Qt.MouseFocusReason
+            onReadOnlyChanged: focus = root.editable
+            onEditingFinished: root.editable = false
+            color: root.color
 
-        background: Rectangle {
-            border.width: root.borderWidth
-            border.color: root.colorBorder
-            color: root.backgroundLabel
-            radius: root.radius
-            opacity: root.opacityLabel
+            background: Rectangle {
+                border.width: root.borderWidth
+                border.color: root.colorBorder
+                color: label.readOnly ? Qt.darker(root.backgroundLabel) : root.backgroundLabel
+                radius: root.radius
+                opacity: root.opacityLabel
 
-        }
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            onDoubleClicked: {
-                console.log("double click")
-
-                root.editable = true
+            }
+            MouseArea {
+                id: mouse
+                anchors.fill: parent
+                acceptedButtons: label.readOnly ? Qt.LeftButton : Qt.NoButton
+                enabled: label.readOnly
+                propagateComposedEvents: true
+                onDoubleClicked: {
+                    root.editable = true
+                    focusScope.focus = true
+                    label.focus = true
+                }
             }
         }
     }

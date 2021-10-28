@@ -154,6 +154,9 @@ void BoxModel::clear()
     m_data.clear();
     endResetModel();
     qDeleteAll(backup);
+
+    m_nodeHeight= 0.;
+    m_nodeWidth= 0.;
 }
 
 void BoxModel::appendNode(MindNode* node)
@@ -164,6 +167,7 @@ void BoxModel::appendNode(MindNode* node)
     beginInsertRows(QModelIndex(), row, row);
     m_data.push_back(node);
     endInsertRows();
+    computeContentSize(node);
 }
 
 std::pair<MindNode*, Link*> BoxModel::addBox(const QString& idparent)
@@ -187,6 +191,8 @@ std::pair<MindNode*, Link*> BoxModel::addBox(const QString& idparent)
     auto pos= rectParent.topLeft() + QPointF(rectParent.width() * 1.5, rectParent.height() * 1.5);
     root->setPosition(pos);
     endInsertRows();
+
+    computeContentSize(root);
 
     auto link= m_linkModel->addLink(*id, root);
 
@@ -242,7 +248,39 @@ void BoxModel::setDefaultStyleIndex(int indx)
     emit defaultStyleIndexChanged();
 }
 
+void BoxModel::setNodeWidth(qreal w)
+{
+    if(qFuzzyCompare(w, m_nodeWidth))
+        return;
+    m_nodeWidth= w;
+    emit nodeWidthChanged();
+}
+
+void BoxModel::setNodeHeight(qreal h)
+{
+    if(qFuzzyCompare(h, m_nodeHeight))
+        return;
+    m_nodeHeight= h;
+    emit nodeHeightChanged();
+}
+
+void BoxModel::computeContentSize(const MindNode* newNode)
+{
+    setNodeWidth(std::max(newNode->position().x() + newNode->contentWidth(), m_nodeWidth));
+    setNodeHeight(std::max(newNode->position().y() + newNode->contentHeight(), m_nodeHeight));
+}
+
 int BoxModel::defaultStyleIndex() const
 {
     return m_defaultStyleIndex;
+}
+
+qreal BoxModel::nodeWidth() const
+{
+    return m_nodeWidth;
+}
+
+qreal BoxModel::nodeHeight() const
+{
+    return m_nodeHeight;
 }

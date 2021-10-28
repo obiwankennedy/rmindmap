@@ -21,6 +21,7 @@
 #define MINDMAPCONTROLLER_H
 
 #include <QObject>
+#include <QRectF>
 #include <QUndoStack>
 #include <memory>
 
@@ -46,6 +47,7 @@ class MindMapController : public QObject
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY canRedoChanged)
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
     Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged)
+    Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY contentRectChanged)
 public:
     explicit MindMapController(QObject* parent= nullptr);
     ~MindMapController();
@@ -57,6 +59,7 @@ public:
     SelectionController* selectionController() const;
     const QString& filename() const;
     const QString& errorMsg() const;
+    QRectF contentRect() const;
 
     bool spacing() const;
     bool canRedo() const;
@@ -70,6 +73,7 @@ signals:
     void canUndoChanged();
     void errorMsgChanged();
     void defaultStyleIndexChanged();
+    void contentRectChanged();
 
 public slots:
     void saveFile();

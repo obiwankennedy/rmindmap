@@ -7,11 +7,15 @@ Flickable {
     id: flick
     property QtObject ctrl
 
-    contentHeight: mapmind.width
-    contentWidth: mapmind.height
+    contentHeight: mapmind.height
+    contentWidth: mapmind.width
     contentX: 0
     contentY: 0
     interactive: true
+    boundsBehavior: Flickable.StopAtBounds
+
+    ScrollBar.vertical: ScrollBar { }
+    ScrollBar.horizontal: ScrollBar { }
 
     Shortcut {
         sequence: StandardKey.Undo
@@ -83,8 +87,9 @@ Flickable {
         id: mapmind
         x: 0
         y: 0
-        width: 2000
-        height:2000
+        width: Math.max(2000, ctrl.contentRect.width)
+        height: Math.max(1000, ctrl.contentRect.height)
+
         scale: root.viewScale
         transformOrigin: Item.Center
         MouseArea {
@@ -122,6 +127,7 @@ Flickable {
                 text : label
                 visible: node.visible
                 selected: node.selected
+                buttonColor: Universal.foreground
                 onAddChild: ctrl.addBox(node.id)
                 onOpenChanged: ctrl.nodeModel.openNode(node.id, open)
                 onReparenting: ctrl.reparenting(node,id)
