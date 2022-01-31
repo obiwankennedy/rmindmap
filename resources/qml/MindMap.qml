@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Universal 2.12
+import RMindMap 1.0
 
 Flickable {
     id: flick
@@ -24,6 +25,98 @@ Flickable {
     Shortcut {
         sequence: StandardKey.Redo
         onActivated: ctrl.redo();
+    }
+
+    Component {
+        id: linkComp
+        Link {
+            x: item.startPoint.x
+            y: item.startPoint.y
+            width: item.width
+            height: item.height
+            color: Universal.foreground
+            start: item.startPoint
+            end: item.endPoint
+            startBox: item.startBox
+            endBox: item.endBox
+            visible: item.visible
+            text: item.text
+
+            /*Timer {
+                running: true
+                repeat: true
+                onTriggered: console.log("link: ")
+            }*/
+        }
+    }
+
+    Component {
+        id: packComp
+        Item {
+            x: position.x
+            y: position.y
+            width: widthLink
+            height: heightLink
+            Rectangle {
+                id: titleBox
+                anchors.top: parent.top
+                anchors.left: parent.left
+                width: 40
+                height: 20
+/*
+                Label {
+                    anchors.centerIn:  parent
+                    text: label
+                }*/
+            }
+            Rectangle {
+                anchors.top: titleBox.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+            }
+            Timer {
+                running: true
+                repeat: true
+                onTriggered: console.log("packComp: ")
+            }
+        }
+    }
+
+
+    Component {
+        id: nodeComp
+        Node {
+            id: nodeItem
+            x: item.position.x
+            y: item.position.y
+            object: item
+            nodeStyle: ctrl.style(item.styleIndex)
+            focus: true
+            text : item.text
+            visible: item.visible
+            selected: item.selected
+            buttonColor: Universal.foreground
+            onAddChild: ctrl.addBox(item.id)
+            onOpenChanged: ctrl.itemModel.openItem(item.id, open)
+            onReparenting: ctrl.reparenting(node,id)
+            onSelectStyle: {
+                stylePopup.parent = nodeItem
+                stylePopup.open()
+            }
+            onTextChanged: item.text = nodeItem.text
+
+            onClicked: {
+                if(mouse.modifiers & Qt.ControlModifier) {
+                    selected ? ctrl.selectionCtrl.removeFromSelection(item) : ctrl.selectionCtrl.addToSelection(item)
+                }
+                else if(!selected){
+                    ctrl.selectionCtrl.clearSelection()
+                    ctrl.selectionCtrl.addToSelection(item)
+                }
+            }
+
+        }
     }
 
     Popup {
@@ -92,59 +185,36 @@ Flickable {
 
         scale: root.viewScale
         transformOrigin: Item.Center
+       /*Rectangle {
+            anchors.fill: parent
+            color: "red"
+            opacity: 0.4
+        }*/
+
+
         MouseArea {
             anchors.fill:parent
             acceptedButtons:Qt.LeftButton
             onClicked: ctrl.selectionCtrl.clearSelection()
         }
         Repeater {
+            id: repeater
             anchors.fill: parent
-            model: ctrl.linkModel
-            delegate: Link {
-                x: position.x
-                y: position.y
-                color: Universal.foreground
-                width: widthLink
-                height: heightLink
-                start: position
-                end:last
-                startBox: startBoxRole
-                endBox: endBoxRole
-                visible: link.visible
-                text: label
-            }
-        }
-        Repeater {
-            anchors.fill: parent
-            model: ctrl.nodeModel
-            delegate: Node {
-                id: nodeItem
-                x: position.x
-                y: position.y
-                object: node
-                nodeStyle: ctrl.getStyle(node.styleIndex)
-                focus: true
-                text : label
-                visible: node.visible
-                selected: node.selected
-                buttonColor: Universal.foreground
-                onAddChild: ctrl.addBox(node.id)
-                onOpenChanged: ctrl.nodeModel.openNode(node.id, open)
-                onReparenting: ctrl.reparenting(node,id)
-                onSelectStyle: {
-                    stylePopup.parent = nodeItem
-                    stylePopup.open()
-                }
-                onClicked: {
-                    if(mouse.modifiers & Qt.ControlModifier) {
-                        selected ? ctrl.selectionCtrl.removeFromSelection(node) : ctrl.selectionCtrl.addToSelection(node)
-                    }
-                    else if(!selected){
-                        ctrl.selectionCtrl.clearSelection()
-                        ctrl.selectionCtrl.addToSelection(node)
-                    }
-                }
+            model: ctrl.itemModel
 
+
+            delegate: Loader {
+                property string text: label
+                property QtObject item:  object
+                property bool isSelected: selected
+                property bool isVisible: visible
+                /*Timer {
+                    running: true
+                    repeat: true
+                    onTriggered: console.log("repeater: "+type+" value:"+MindItem.LinkType)
+                }*/
+
+                sourceComponent: type == MindItem.PackageType ? packComp : type == MindItem.LinkType ? linkComp : nodeComp
             }
         }
 

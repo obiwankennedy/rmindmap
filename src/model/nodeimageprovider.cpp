@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2021 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#include "nodeimageprovider.h"
 
-#include <QFontMetricsF>
+#include "core/model/imagemodel.h"
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+namespace mindmap
 {
-    return m_styleIndex;
+NodeImageProvider::NodeImageProvider(ImageModel* model)
+    : QQuickImageProvider(QQuickImageProvider::Pixmap), m_dataModel(model)
+{
 }
 
-void MindNode::setStyleIndex(int idx)
+QPixmap NodeImageProvider::requestPixmap(const QString& id, QSize* size, const QSize& requestedSize)
 {
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+    Q_UNUSED(size)
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
+    QPixmap map= m_dataModel->pixmapFromId(id);
 
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
+    if(requestedSize.isValid())
+        map= map.scaled(requestedSize, Qt::KeepAspectRatio);
+
+    *size= map.size();
+
+    return map;
 }
+} // namespace mindmap

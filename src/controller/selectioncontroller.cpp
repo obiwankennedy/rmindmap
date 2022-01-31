@@ -42,12 +42,12 @@ bool SelectionController::enabled() const
     return m_enabled;
 }
 
-const std::vector<MindNode*>& SelectionController::selectedNodes() const
+const std::vector<PositionedItem*>& SelectionController::selectedNodes() const
 {
     return m_selection;
 }
 
-void SelectionController::addToSelection(MindNode* node)
+void SelectionController::addToSelection(PositionedItem* node)
 {
     if(node == nullptr)
         return;
@@ -56,7 +56,7 @@ void SelectionController::addToSelection(MindNode* node)
     connect(node, &MindNode::itemDragged, this, &SelectionController::movingNode);
 }
 
-void SelectionController::removeFromSelection(MindNode* node)
+void SelectionController::removeFromSelection(PositionedItem* node)
 {
     node->setSelected(false);
     disconnect(node, &MindNode::itemDragged, this, &SelectionController::movingNode);
@@ -65,7 +65,7 @@ void SelectionController::removeFromSelection(MindNode* node)
 
 void SelectionController::clearSelection()
 {
-    std::for_each(m_selection.begin(), m_selection.end(), [this](MindNode* node) {
+    std::for_each(m_selection.begin(), m_selection.end(), [this](PositionedItem* node) {
         node->setSelected(false);
         disconnect(node, &MindNode::itemDragged, this, &SelectionController::movingNode);
     });
@@ -74,9 +74,9 @@ void SelectionController::clearSelection()
 
 void SelectionController::movingNode(const QPointF& motion)
 {
-    std::vector<QPointer<MindNode>> vec;
+    std::vector<QPointer<PositionedItem>> vec;
     std::transform(m_selection.begin(), m_selection.end(), std::back_inserter(vec),
-                   [](MindNode* node) { return QPointer<MindNode>(node); });
+                   [](PositionedItem* node) { return QPointer<PositionedItem>(node); });
     auto cmd= new DragNodeCommand(motion, vec);
 
     m_undoStack->push(cmd);

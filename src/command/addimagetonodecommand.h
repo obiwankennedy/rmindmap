@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2021 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#ifndef ADDIMAGETONODECOMMAND_H
+#define ADDIMAGETONODECOMMAND_H
 
-#include <QFontMetricsF>
+#include <QPixmap>
+#include <QPointer>
+#include <QUndoCommand>
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+class ImageModel;
+namespace mindmap
 {
-    return m_styleIndex;
-}
+class BoxModel;
 
-void MindNode::setStyleIndex(int idx)
+class AddImageToNodeCommand : public QUndoCommand
 {
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+public:
+    AddImageToNodeCommand(BoxModel* nodeModel, ImageModel* imgModel, const QString& id, const QUrl& url);
+    AddImageToNodeCommand(BoxModel* nodeModel, ImageModel* imgModel, const QString& id, const QPixmap& pix);
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
+    void undo() override;
+    void redo() override;
 
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+private:
+    QPointer<BoxModel> m_nodeModel;
+    QString m_id;
+    QPointer<ImageModel> m_imgModel;
+    QPixmap m_pixmap;
+};
+} // namespace mindmap
+#endif // ADDIMAGETONODECOMMAND_H

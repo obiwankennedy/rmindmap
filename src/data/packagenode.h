@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2022 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,18 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#ifndef PACKAGENODE_H
+#define PACKAGENODE_H
 
-#include <QFontMetricsF>
+#include "data/positioneditem.h"
+#include "minditem.h"
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+class PackageNode : public PositionedItem
 {
-    return m_styleIndex;
-}
+    Q_OBJECT
 
-void MindNode::setStyleIndex(int idx)
-{
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+public:
+    explicit PackageNode(QObject* parent= nullptr);
+};
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
-
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+#endif // PACKAGENODE_H

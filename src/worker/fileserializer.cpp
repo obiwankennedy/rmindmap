@@ -19,8 +19,10 @@
  ***************************************************************************/
 #include "fileserializer.h"
 
-#include "model/boxmodel.h"
-#include "model/linkmodel.h"
+#include "data/link.h"
+#include "data/mindnode.h"
+#include "data/packagenode.h"
+#include "model/minditemmodel.h"
 
 #include <QByteArray>
 #include <QFile>
@@ -32,7 +34,7 @@
 
 FileSerializer::FileSerializer() {}
 
-bool FileSerializer::readTextFile(BoxModel* nodeModel, LinkModel* linkModel, const QString& filepath)
+bool FileSerializer::readTextFile(MindItemModel* nodeModel, const QString& filepath)
 {
     QFile file(QUrl(filepath).path());
     std::random_device rd;
@@ -61,7 +63,7 @@ bool FileSerializer::readTextFile(BoxModel* nodeModel, LinkModel* linkModel, con
         node->setText(text.trimmed());
         std::uniform_real_distribution<> dist(0.0, 1600.0);
         node->setPosition({dist(gen), dist(gen)});
-        nodeModel->appendNode(node);
+        nodeModel->appendItem(node);
 
         if(newdepth > depth && previousNode != nullptr)
         {
@@ -75,7 +77,11 @@ bool FileSerializer::readTextFile(BoxModel* nodeModel, LinkModel* linkModel, con
 
         if(newdepth >= depth && !parent.isEmpty())
         {
-            linkModel->addLink(parent.last(), node);
+            // parent.last(), node;
+            auto link= new Link();
+            link->setStart(parent.last());
+            link->setEnd(node);
+            nodeModel->appendItem(link);
         }
 
         previousNode= node;
@@ -84,7 +90,8 @@ bool FileSerializer::readTextFile(BoxModel* nodeModel, LinkModel* linkModel, con
 
     return true;
 }
-bool FileSerializer::readFile(BoxModel* nodeModel, LinkModel* linkModel, const QString& filepath)
+
+bool FileSerializer::readFile(MindItemModel* nodeModel, const QString& filepath)
 {
     QFile file(filepath);
     if(!file.open(QFile::ReadOnly))
@@ -99,8 +106,9 @@ bool FileSerializer::readFile(BoxModel* nodeModel, LinkModel* linkModel, const Q
 
     auto linkArray= json["links"].toArray();
     auto nodeArray= json["nodes"].toArray();
+    auto packagesArray= json["packages"].toArray();
 
-    std::map<QString, MindNode*> nodeMap;
+    std::map<QString, PositionedItem*> nodeMap;
     for(auto nodeRef : nodeArray)
     {
         auto obj= nodeRef.toObject();
@@ -114,7 +122,22 @@ bool FileSerializer::readFile(BoxModel* nodeModel, LinkModel* linkModel, const Q
         node->setVisible(obj["visible"].toBool());
         node->setOpen(obj["open"].toBool());
 
-        nodeModel->appendNode(node);
+        nodeModel->appendItem(node);
+        nodeMap.insert({node->id(), node});
+    }
+
+    for(auto packRef : packagesArray)
+    {
+        auto obj= packRef.toObject();
+        auto node= new PackageNode();
+        node->setId(obj["id"].toString());
+        auto x= obj["x"].toDouble();
+        auto y= obj["y"].toDouble();
+        node->setPosition(QPointF(x, y));
+        node->setText(obj["text"].toString());
+        node->setVisible(obj["visible"].toBool());
+
+        nodeModel->appendItem(node);
         nodeMap.insert({node->id(), node});
     }
 
@@ -127,20 +150,30 @@ bool FileSerializer::readFile(BoxModel* nodeModel, LinkModel* linkModel, const Q
         auto idEnd= obj["idEnd"].toString();
         auto text= obj["text"].toString();
 
-        auto link= linkModel->addLink(nodeMap[idStart], nodeMap[idEnd]);
+        auto link= new Link();
+        link->setStart(nodeMap[idStart]);
+        link->setEnd(nodeMap[idEnd]);
+
         link->setText(text);
         link->setVisible(obj["visible"].toBool());
         link->setDirection(static_cast<Link::Direction>(obj["Direction"].toInt()));
+        nodeModel->appendItem(link);
     }
     return true;
 }
-bool FileSerializer::writeFile(BoxModel* nodeModel, LinkModel* linkModel, const QString& filepath)
+
+bool FileSerializer::writeFile(MindItemModel* nodeModel, const QString& filepath)
 {
     QJsonObject data;
+
+    // NODES
     QJsonArray nodeArray;
-    auto nodes= nodeModel->nodes();
-    for(auto node : nodes)
+    auto const& nodes= nodeModel->items(MindItem::NodeType);
+    for(auto item : nodes)
     {
+        auto node= dynamic_cast<MindNode*>(item);
+        if(!node)
+            continue;
         QJsonObject obj;
         obj["id"]= node->id();
         obj["x"]= node->position().x();
@@ -154,10 +187,35 @@ bool FileSerializer::writeFile(BoxModel* nodeModel, LinkModel* linkModel, const 
     }
     data["nodes"]= nodeArray;
 
-    QJsonArray linkArray;
-    auto links= linkModel->getDataSet();
-    for(auto link : links)
+    // PACKAGES
+    QJsonArray packageArray;
+    auto const& packages= nodeModel->items(MindItem::PackageType);
+    for(auto item : packages)
     {
+        auto pack= dynamic_cast<PackageNode*>(item);
+        if(!pack)
+            continue;
+        QJsonObject obj;
+        obj["id"]= pack->id();
+        obj["x"]= pack->position().x();
+        obj["y"]= pack->position().y();
+        obj["text"]= pack->text();
+
+        obj["width"]= pack->width();
+        obj["height"]= pack->height();
+        obj["visible"]= pack->isVisible();
+        packageArray.append(obj);
+    }
+    data["packages"]= packageArray;
+
+    // LINKS
+    QJsonArray linkArray;
+    auto const& links= nodeModel->items(MindItem::LinkType);
+    for(auto item : links)
+    {
+        auto link= dynamic_cast<Link*>(item);
+        if(!link)
+            continue;
         QJsonObject obj;
         obj["idStart"]= link->start()->id();
         obj["idEnd"]= link->end()->id();

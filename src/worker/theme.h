@@ -32,6 +32,7 @@ class Theme : public QObject
     Q_PROPERTY(QString undoIcon READ undoIcon NOTIFY undoIconChanged)
     Q_PROPERTY(QString redoIcon READ redoIcon NOTIFY redoIconChanged)
     Q_PROPERTY(QString listIcon READ listIcon NOTIFY listIconChanged)
+    Q_PROPERTY(QString editIcon READ editIcon NOTIFY editIconChanged)
 public:
     explicit Theme(QQmlEngine* m_engine, QObject* parent= nullptr);
     ~Theme();
@@ -41,16 +42,18 @@ public:
     QString undoIcon() const;
     QString redoIcon() const;
     QString listIcon() const;
+    QString editIcon() const;
 
+    QString imagePath(const QString& image) const;
 signals:
     void nightModeChanged();
     void undoIconChanged();
     void redoIconChanged();
     void listIconChanged();
+    void editIconChanged();
 
 public slots:
     void setNightMode(bool b);
-    QString imagePath(const QString& image) const;
 
 private:
     QQmlEngine* m_engine;

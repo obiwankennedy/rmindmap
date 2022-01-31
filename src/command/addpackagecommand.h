@@ -17,35 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#ifndef ADDPACKAGECOMMAND_H
+#define ADDPACKAGECOMMAND_H
 
-#include <QFontMetricsF>
+#include <QPointer>
+#include <QUndoCommand>
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+class MindNode;
+class Link;
+class BoxModel;
+class LinkModel;
+class AddPackageCommand : public QUndoCommand
 {
-    return m_styleIndex;
-}
+public:
+    AddPackageCommand(const QPointF& pos, BoxModel* nodeModel, LinkModel* linkModel, const QString& idParent);
+    void undo() override;
+    void redo() override;
 
-void MindNode::setStyleIndex(int idx)
-{
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+private:
+    QPointer<MindNode> m_mindNode;
+    QPointer<Link> m_link;
+    BoxModel* m_nodeModel= nullptr;
+    LinkModel* m_linkModel= nullptr;
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
+    QString m_idParent;
+};
 
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+#endif // ADDPACKAGECOMMAND_H

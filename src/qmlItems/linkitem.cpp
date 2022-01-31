@@ -66,6 +66,7 @@ void LinkItem::setEnd(const QPointF& end)
         return;
     m_end= end;
     emit endChanged();
+    update();
 }
 
 PointList LinkItem::points() const
@@ -98,6 +99,7 @@ void LinkItem::setStartBox(QRectF rect)
 }
 void LinkItem::setEndBox(QRectF rect)
 {
+    qDebug() << "set endbox" << rect;
     if(rect == m_endBox)
         return;
     m_endBox= rect;

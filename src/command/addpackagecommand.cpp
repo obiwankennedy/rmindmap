@@ -17,30 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ADDNODECOMMAND_H
-#define ADDNODECOMMAND_H
+#include "addpackagecommand.h"
 
-#include <QPointer>
-#include <QUndoCommand>
+#include "model/minditemmodel.h"
+#include "model/linkmodel.h"
 
-class MindNode;
-class Link;
-class BoxModel;
-class LinkModel;
-class AddNodeCommand : public QUndoCommand
+AddPackageCommand::AddPackageCommand(const QPointF& pos, BoxModel* nodeModel, LinkModel* linkModel,
+                                     const QString& idParent)
+    : m_nodeModel(nodeModel), m_linkModel(linkModel), m_idParent(idParent)
 {
-public:
-    AddNodeCommand(BoxModel* nodeModel, LinkModel* linkModel, const QString& idParent);
-    void undo() override;
-    void redo() override;
+}
 
-private:
-    QPointer<MindNode> m_mindNode;
-    QPointer<Link> m_link;
-    BoxModel* m_nodeModel= nullptr;
-    LinkModel* m_linkModel= nullptr;
+void AddPackageCommand::undo()
+{
+    m_nodeModel->removeBox(m_mindNode);
+    m_linkModel->removeLink(m_link);
+}
 
-    QString m_idParent;
-};
-
-#endif // ADDNODECOMMAND_H
+void AddPackageCommand::redo()
+{
+    if(m_mindNode.isNull())
+    {
+        auto pair= m_nodeModel->addBox(m_idParent);
+        m_mindNode= pair.first;
+        m_link= pair.second;
+    }
+    else
+    {
+        m_nodeModel->appendNode(m_mindNode.data());
+        m_linkModel->append(m_link);
+    }
+}

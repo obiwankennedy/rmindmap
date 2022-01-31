@@ -19,13 +19,13 @@
  ***************************************************************************/
 #include "mindmapcontroller.h"
 
-#include "command/addnodecommand.h"
+#include "command/additemcommand.h"
 #include "command/removenodecommand.h"
 #include "command/reparentingnodecommand.h"
 #include "controller/selectioncontroller.h"
 #include "controller/spacingcontroller.h"
-#include "model/boxmodel.h"
-#include "model/linkmodel.h"
+#include "data/packagenode.h"
+#include "model/minditemmodel.h"
 #include "model/nodestylemodel.h"
 #include "worker/fileserializer.h"
 
@@ -41,21 +41,21 @@
 MindMapController::MindMapController(QObject* parent)
     : QObject(parent)
     , m_selectionController(new SelectionController())
-    , m_linkModel(new LinkModel())
-    , m_nodeModel(new BoxModel())
+    , m_itemModel(new MindItemModel())
     , m_styleModel(new NodeStyleModel())
 {
-    m_nodeModel->setLinkModel(m_linkModel.get());
+    // m_itemModel->setLinkModel(m_linkModel.get());
     m_selectionController->setUndoStack(&m_stack);
 
     connect(&m_stack, &QUndoStack::canRedoChanged, this, &MindMapController::canRedoChanged);
     connect(&m_stack, &QUndoStack::canUndoChanged, this, &MindMapController::canUndoChanged);
-    connect(m_nodeModel.get(), &BoxModel::defaultStyleIndexChanged, this, &MindMapController::defaultStyleIndexChanged);
-    connect(m_nodeModel.get(), &BoxModel::nodeHeightChanged, this, &MindMapController::contentRectChanged);
-    connect(m_nodeModel.get(), &BoxModel::nodeWidthChanged, this, &MindMapController::contentRectChanged);
+    // connect(m_itemModel.get(), &MindItemModel::defaultStyleIndexChanged, this,
+    // &MindMapController::defaultStyleIndexChanged); connect(m_itemModel.get(), &MindItemModel::nodeHeightChanged,
+    // this, &MindMapController::contentRectChanged); connect(m_itemModel.get(), &MindItemModel::nodeWidthChanged, this,
+    // &MindMapController::contentRectChanged);
 
     m_spacing= new QThread();
-    m_spacingController.reset(new SpacingController(m_nodeModel->nodes(), m_linkModel.get()));
+    m_spacingController.reset(new SpacingController(m_itemModel.get()));
     m_spacingController->moveToThread(m_spacing);
     connect(m_spacing, &QThread::started, m_spacingController.get(), &SpacingController::computeInLoop);
     connect(m_spacingController.get(), &SpacingController::runningChanged, this, &MindMapController::spacingChanged);
@@ -79,21 +79,16 @@ MindMapController::~MindMapController()
         delete m_spacing;
     }
 
-    auto model= m_nodeModel.release();
+    auto model= m_itemModel.release();
     auto spacingCtrl= m_spacingController.release();
 
     delete spacingCtrl;
     delete model;
 }
 
-QAbstractItemModel* MindMapController::nodeModel() const
+QAbstractItemModel* MindMapController::itemModel() const
 {
-    return m_nodeModel.get();
-}
-
-QAbstractItemModel* MindMapController::linkModel() const
-{
-    return m_linkModel.get();
+    return m_itemModel.get();
 }
 
 QAbstractItemModel* MindMapController::styleModel() const
@@ -113,13 +108,13 @@ const QString& MindMapController::errorMsg() const
 
 QRectF MindMapController::contentRect() const
 {
-    return {0, 0, m_nodeModel->nodeWidth(), m_nodeModel->nodeHeight()};
+    return m_itemModel->contentRect();
 }
 
 void MindMapController::clearData()
 {
-    m_linkModel->clear();
-    m_nodeModel->clear();
+    // m_linkModel->clear();
+    m_itemModel->clear();
 }
 
 void MindMapController::resetData()
@@ -128,12 +123,12 @@ void MindMapController::resetData()
 
     auto root= new MindNode();
     root->setText(tr("Root"));
-    m_nodeModel->appendNode(root);
+    m_itemModel->appendItem(root);
 }
 
 void MindMapController::saveFile()
 {
-    if(!FileSerializer::writeFile(m_nodeModel.get(), m_linkModel.get(), m_filename))
+    if(!FileSerializer::writeFile(m_itemModel.get(), m_filename))
         setErrorMsg(tr("Error: File can't be loaded: %1").arg(m_filename));
 }
 
@@ -148,20 +143,24 @@ void MindMapController::setErrorMsg(const QString& msg)
 void MindMapController::loadFile()
 {
     clearData();
-    if(!FileSerializer::readFile(m_nodeModel.get(), m_linkModel.get(), m_filename))
+    if(!FileSerializer::readFile(m_itemModel.get(), m_filename))
         setErrorMsg(tr("Error: File can't be loaded: %1").arg(m_filename));
 }
 
 void MindMapController::importFile(const QString& path)
 {
     clearData();
-    if(!FileSerializer::readTextFile(m_nodeModel.get(), m_linkModel.get(), path))
+    if(!FileSerializer::readTextFile(m_itemModel.get(), path))
         setErrorMsg(tr("File can't be loaded: %1").arg(m_filename));
 }
 
 void MindMapController::setDefaultStyleIndex(int indx)
 {
-    m_nodeModel->setDefaultStyleIndex(indx);
+    if(indx == m_defaultStyleIndex)
+        return;
+
+    m_defaultStyleIndex= indx;
+    emit defaultStyleIndexChanged();
 }
 
 void MindMapController::setFilename(const QString& path)
@@ -174,7 +173,7 @@ void MindMapController::setFilename(const QString& path)
     emit filenameChanged();
 }
 
-NodeStyle* MindMapController::getStyle(int index) const
+NodeStyle* MindMapController::style(int index) const
 {
     return m_styleModel->getStyle(index);
 }
@@ -211,20 +210,41 @@ bool MindMapController::canRedo() const
 
 void MindMapController::addBox(const QString& idparent)
 {
-    auto cmd= new AddNodeCommand(m_nodeModel.get(), m_linkModel.get(), idparent);
+    auto cmd= new AddItemCommand(m_itemModel.get(), MindItem::NodeType, this, idparent);
     m_stack.push(cmd);
+}
+
+void MindMapController::addPackage(const QPointF& pos)
+{
+    auto cmd= new AddItemCommand(m_itemModel.get(), MindItem::PackageType, this, {}, pos);
+    m_stack.push(cmd);
+}
+
+void MindMapController::updatePackage(const QPointF& pos)
+{
+    if(!m_package)
+        return;
+
+    auto offset= pos - m_package->position();
+    m_package->setWidth(offset.x());
+    m_package->setHeight(offset.y());
 }
 
 void MindMapController::reparenting(MindNode* parent, const QString& id)
 {
-    auto cmd= new ReparentingNodeCommand(m_nodeModel.get(), m_linkModel.get(), parent, id);
+    auto cmd= new ReparentingNodeCommand(m_itemModel.get(), parent, id);
     m_stack.push(cmd);
 }
 void MindMapController::removeSelection()
 {
     auto nodes= m_selectionController->selectedNodes();
-    auto cmd= new RemoveNodeCommand(nodes, m_nodeModel.get(), m_linkModel.get());
+    auto cmd= new RemoveNodeCommand(nodes, m_itemModel.get());
     m_stack.push(cmd);
+}
+
+void MindMapController::setCurrentPackage(PositionedItem* item)
+{
+    m_package= item;
 }
 
 bool MindMapController::canUndo() const
@@ -234,5 +254,5 @@ bool MindMapController::canUndo() const
 
 int MindMapController::defaultStyleIndex() const
 {
-    return m_nodeModel->defaultStyleIndex();
+    return m_defaultStyleIndex;
 }

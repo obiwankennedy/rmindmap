@@ -21,24 +21,25 @@
 #define MINDMAPCONTROLLER_H
 
 #include <QObject>
+#include <QPointer>
 #include <QRectF>
 #include <QUndoStack>
 #include <memory>
 
 class QAbstractItemModel;
-class BoxModel;
-class LinkModel;
+class MindItemModel;
 class MindNode;
 class SpacingController;
 class SelectionController;
 class NodeStyleModel;
 class NodeStyle;
+class PositionedItem;
 
 class MindMapController : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel* nodeModel READ nodeModel CONSTANT)
-    Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel CONSTANT)
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel CONSTANT)
+    // Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel CONSTANT)
     Q_PROPERTY(QAbstractItemModel* styleModel READ styleModel CONSTANT)
     Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
     Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
@@ -48,12 +49,12 @@ class MindMapController : public QObject
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
     Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged)
     Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY contentRectChanged)
+    Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
 public:
     explicit MindMapController(QObject* parent= nullptr);
     ~MindMapController();
 
-    QAbstractItemModel* nodeModel() const;
-    QAbstractItemModel* linkModel() const;
+    QAbstractItemModel* itemModel() const;
     QAbstractItemModel* styleModel() const;
 
     SelectionController* selectionController() const;
@@ -65,6 +66,7 @@ public:
     bool canRedo() const;
     bool canUndo() const;
     int defaultStyleIndex() const;
+    Q_INVOKABLE NodeStyle* style(int index) const;
 
 signals:
     void filenameChanged();
@@ -88,9 +90,12 @@ public slots:
     void setDefaultStyleIndex(int indx);
 
     void addBox(const QString& idparent);
+    void addPackage(const QPointF& pos);
+    void updatePackage(const QPointF& pos);
+
     void reparenting(MindNode* parent, const QString& id);
     void removeSelection();
-    NodeStyle* getStyle(int index) const;
+    void setCurrentPackage(PositionedItem* item);
 
 protected:
     void clearData();
@@ -100,11 +105,12 @@ private:
     QString m_errorMsg;
     std::unique_ptr<SpacingController> m_spacingController;
     std::unique_ptr<SelectionController> m_selectionController;
-    std::unique_ptr<LinkModel> m_linkModel;
-    std::unique_ptr<BoxModel> m_nodeModel;
+    std::unique_ptr<MindItemModel> m_itemModel;
     std::unique_ptr<NodeStyleModel> m_styleModel;
     QThread* m_spacing= nullptr;
     QUndoStack m_stack;
+    int m_defaultStyleIndex= 0;
+    QPointer<PositionedItem> m_package;
 };
 
 #endif // MINDMAPCONTROLLER_H

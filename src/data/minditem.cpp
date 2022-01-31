@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2022 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,33 +17,68 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "addnodecommand.h"
+#include "minditem.h"
 
-#include "model/boxmodel.h"
-#include "model/linkmodel.h"
+#include <QRectF>
+#include <QUuid>
 
-AddNodeCommand::AddNodeCommand(BoxModel* nodeModel, LinkModel* linkModel, const QString& idParent)
-    : m_nodeModel(nodeModel), m_linkModel(linkModel), m_idParent(idParent)
+#include "data/link.h"
+
+MindItem::MindItem(Type type, QObject* parent)
+    : QObject{parent}, m_type(type), m_id(QUuid::createUuid().toString(QUuid::WithoutBraces))
 {
 }
-
-void AddNodeCommand::undo()
+bool MindItem::isVisible() const
 {
-    m_nodeModel->removeBox(m_mindNode);
-    m_linkModel->removeLink(m_link);
+    return m_visible;
+}
+void MindItem::setVisible(bool op)
+{
+    if(op == m_visible)
+        return;
+    m_visible= op;
+    emit visibleChanged();
 }
 
-void AddNodeCommand::redo()
+QString MindItem::text() const
 {
-    if(m_mindNode.isNull())
-    {
-        auto pair= m_nodeModel->addBox(m_idParent);
-        m_mindNode= pair.first;
-        m_link= pair.second;
-    }
-    else
-    {
-        m_nodeModel->appendNode(m_mindNode.data());
-        m_linkModel->append(m_link);
-    }
+    return m_text;
+}
+
+void MindItem::setText(QString text)
+{
+    if(m_text == text)
+        return;
+
+    m_text= text;
+    emit textChanged(m_text);
+}
+
+QString MindItem::id() const
+{
+    return m_id;
+}
+void MindItem::setSelected(bool isSelected)
+{
+    if(m_selected == isSelected)
+        return;
+    m_selected= isSelected;
+    emit selectedChanged();
+}
+
+void MindItem::setId(const QString& id)
+{
+    if(id == m_id)
+        return;
+    m_id= id;
+    emit idChanged();
+}
+bool MindItem::selected() const
+{
+    return m_selected;
+}
+
+MindItem::Type MindItem::type() const
+{
+    return m_type;
 }

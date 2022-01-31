@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2021 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#ifndef NODEIMAGEPROVIDER_H
+#define NODEIMAGEPROVIDER_H
 
-#include <QFontMetricsF>
+#include <QQuickImageProvider>
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
+class ImageModel;
 
-int MindNode::styleIndex() const
+namespace mindmap
 {
-    return m_styleIndex;
-}
-
-void MindNode::setStyleIndex(int idx)
+class NodeImageProvider : public QQuickImageProvider
 {
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+public:
+    NodeImageProvider(ImageModel* model);
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
+    QPixmap requestPixmap(const QString& id, QSize* size, const QSize& requestedSize) override;
 
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+private:
+    QPointer<ImageModel> m_dataModel;
+};
+} // namespace mindmap
+#endif // NODEIMAGEPROVIDER_H

@@ -20,12 +20,18 @@
 #include "link.h"
 
 #include "mindnode.h"
+#include <QDebug>
 #include <QRectF>
 #include <cmath>
 
-Link::Link(QObject* parent) : QObject(parent)
+Link::Link(QObject* parent) : MindItem(MindItem::LinkType, parent)
 {
     setText(tr("is linked"));
+    connect(this, &Link::visibleChanged, this, [this]() {
+        if(!m_end)
+            return;
+        m_end->setVisible(isVisible());
+    });
 }
 
 void Link::setDirection(const Direction& direction)
@@ -38,18 +44,75 @@ Link::Direction Link::direction() const
     return m_dir;
 }
 
-MindNode* Link::start() const
+PositionedItem* Link::start() const
 {
     return m_start;
 }
 
-void Link::setStart(MindNode* start)
+void Link::setStart(PositionedItem* start)
 {
+    if(start == m_start)
+        return;
+
+    if(m_start)
+    {
+        m_start->removeLink(this);
+        disconnect(m_start, 0, this, 0);
+    }
+
     m_start= start;
-    connect(m_start, &MindNode::positionChanged, this, &Link::linkChanged);
+
+    if(nullptr != m_start)
+    {
+        m_start->addLink(this);
+        connect(m_start, &MindNode::positionChanged, this, &Link::startPointChanged);
+        connect(m_start, &MindNode::positionChanged, this, &Link::sizeChanged);
+        connect(m_start, &MindNode::textChanged, this, [this]() {
+            emit startBoxChanged();
+            emit startPointChanged();
+        });
+    }
+    emit startChanged();
 }
 
-MindNode* Link::end() const
+void Link::setEnd(PositionedItem* end)
+{
+    if(end == m_end)
+        return;
+
+    if(m_end)
+    {
+        disconnect(m_end, 0, this, 0);
+    }
+    m_end= end;
+    if(nullptr != m_end)
+    {
+        connect(m_end, &MindNode::positionChanged, this, &Link::endPointChanged);
+        connect(m_end, &MindNode::positionChanged, this, &Link::sizeChanged);
+        connect(m_end, &MindNode::textChanged, this, [this]() {
+            qDebug() << m_end->boundingRect() << "text changed";
+            emit endBoxChanged();
+            emit endPointChanged();
+        });
+    }
+    emit endChanged();
+}
+
+qreal Link::width() const
+{
+    if(!end() || !start())
+        return 0.0;
+    return end()->position().x() - start()->position().x();
+}
+
+qreal Link::height() const
+{
+    if(!end() || !start())
+        return 0.0;
+    return end()->position().y() - start()->position().y();
+}
+
+PositionedItem* Link::end() const
 {
     return m_end;
 }
@@ -68,24 +131,11 @@ QPointF Link::startPoint() const
     return m_start->centerPoint();
 }
 
-void Link::setEnd(MindNode* end)
-{
-    m_end= end;
-    connect(m_end, &MindNode::positionChanged, this, &Link::linkChanged);
-}
 void Link::computePosition()
 {
     auto pos1= m_start->position();
     pos1.setY(pos1.y() + 50);
     m_end->setNextPosition(pos1, this);
-}
-
-void Link::setText(const QString& text)
-{
-    if(m_text == text)
-        return;
-    m_text= text;
-    emit textChanged();
 }
 
 float Link::getStiffness() const
@@ -118,7 +168,7 @@ float Link::getLength() const
     if(m_end == nullptr || m_start == nullptr)
         return length1;
 
-    auto nodeCount= static_cast<int>(m_start->getSubLinks().size());
+    auto nodeCount= static_cast<int>(m_start->subLinks().size());
 
     auto endNodeCount= (m_end->subNodeCount() + nodeCount) / 3;
     auto length2= static_cast<float>(length * (1 + endNodeCount));
@@ -126,23 +176,12 @@ float Link::getLength() const
     return std::max(length1, length2);
 }
 
-void Link::setVisible(bool vi)
+const QRectF Link::endBox() const
 {
-    if(m_visible == vi)
-        return;
-    m_visible= vi;
-    emit visibleChanged();
-
-    if(nullptr != m_end)
-        m_end->setVisible(vi);
+    return m_end ? m_end->boundingRect() : QRectF{};
 }
 
-bool Link::isVisible() const
+const QRectF Link::startBox() const
 {
-    return m_visible;
-}
-
-QString Link::text() const
-{
-    return m_text;
+    return m_start ? m_start->boundingRect() : QRectF{};
 }

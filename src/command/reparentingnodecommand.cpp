@@ -19,25 +19,23 @@
  ***************************************************************************/
 #include "reparentingnodecommand.h"
 
-#include "model/boxmodel.h"
-#include "model/linkmodel.h"
+//#include "model/linkmodel.h"
+#include "model/minditemmodel.h"
 
-ReparentingNodeCommand::ReparentingNodeCommand(BoxModel* nodeModel, LinkModel* linkModel, MindNode* newParent,
-                                               const QString& id)
-    : m_nodeModel(nodeModel), m_linkModel(linkModel), m_newParent(newParent)
+ReparentingNodeCommand::ReparentingNodeCommand(MindItemModel* nodeModel, MindItem* newParent, const QString& id)
+    : m_nodeModel(nodeModel), m_newParent(newParent)
 {
-    m_mindNode= m_nodeModel->node(id);
-    if(m_mindNode)
-        m_oldParent= m_mindNode->parentNode();
+    m_mindNode= dynamic_cast<MindNode*>(m_nodeModel->item(id));
+    /* if(m_mindNode)
+         m_oldParent= m_mindNode->parentNode();
 
-    if(m_oldParent)
-    {
-        auto links= m_oldParent->getSubLinks();
-        auto idxLink
-            = std::find_if(links.begin(), links.end(), [this](Link* link) { return link->end() == m_mindNode.data(); });
-        if(idxLink != links.end())
-            m_oldLink= (*idxLink);
-    }
+     if(m_oldParent)
+     {
+         auto links= m_oldParent->getSubLinks();
+         auto idxLink
+             = std::find_if(links.begin(), links.end(), [this](Link* link) { return link->end() == m_mindNode.data();
+     }); if(idxLink != links.end()) m_oldLink= (*idxLink);
+     }*/
 }
 
 void ReparentingNodeCommand::undo()
@@ -45,8 +43,8 @@ void ReparentingNodeCommand::undo()
     if(m_mindNode.isNull() || m_oldLink.isNull() || m_newLink.isNull())
         return;
 
-    m_linkModel->removeLink(m_newLink);
-    m_linkModel->append(m_oldLink);
+    //  m_linkModel->removeLink(m_newLink);
+    // m_linkModel->append(m_oldLink);
 }
 
 void ReparentingNodeCommand::redo()
@@ -54,9 +52,9 @@ void ReparentingNodeCommand::redo()
     if(m_mindNode.isNull() || m_oldLink.isNull())
         return;
 
-    m_linkModel->removeLink(m_oldLink);
-    if(m_newLink.isNull())
-        m_newLink= m_linkModel->addLink(m_newParent, m_mindNode);
-    else
-        m_linkModel->append(m_newLink);
+    /*  m_linkModel->removeLink(m_oldLink);
+      if(m_newLink.isNull())
+          m_newLink= m_linkModel->addLink(m_newParent, m_mindNode);
+      else
+          m_linkModel->append(m_newLink);*/
 }

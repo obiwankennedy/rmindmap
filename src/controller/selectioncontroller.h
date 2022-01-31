@@ -24,7 +24,7 @@
 #include <QPointF>
 #include <QUndoStack>
 
-class MindNode;
+class PositionedItem;
 class SelectionController : public QObject
 {
     Q_OBJECT
@@ -36,18 +36,18 @@ public:
 
     void setEnabled(bool enable);
     bool enabled() const;
-    const std::vector<MindNode*>& selectedNodes() const;
+    const std::vector<PositionedItem*>& selectedNodes() const;
 signals:
     void enabledChanged();
 
 public slots:
-    void addToSelection(MindNode* node);
-    void removeFromSelection(MindNode* node);
+    void addToSelection(PositionedItem* node);
+    void removeFromSelection(PositionedItem* node);
     void movingNode(const QPointF& motion);
     void clearSelection();
 
 private:
-    std::vector<MindNode*> m_selection;
+    std::vector<PositionedItem*> m_selection;
     bool m_enabled= false;
     QUndoStack* m_undoStack;
 };

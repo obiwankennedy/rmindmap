@@ -17,35 +17,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#include "additemcommand.h"
 
-#include <QFontMetricsF>
+//#include "model/linkmodel.h"
+#include "controller/mindmapcontroller.h"
+#include "model/minditemmodel.h"
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+AddItemCommand::AddItemCommand(MindItemModel* nodeModel, MindItem::Type type, MindMapController* ctrl,
+                               const QString& idParent, QPointF pos)
+    : m_ctrl(ctrl), m_nodeModel(nodeModel), m_idParent(idParent), m_type(type), m_pos(pos)
 {
-    return m_styleIndex;
 }
 
-void MindNode::setStyleIndex(int idx)
+void AddItemCommand::undo()
 {
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
+    m_nodeModel->removeItem(m_mindItem);
+    m_nodeModel->removeItem(m_link);
 }
 
-QString MindNode::imageUri() const
+void AddItemCommand::redo()
 {
-    return m_imageUri;
-}
+    if(m_mindItem.isNull())
+    {
+        auto pair= m_nodeModel->addItem(m_idParent, m_type);
+        if(!m_pos.isNull())
+        {
+            auto p= dynamic_cast<PositionedItem*>(pair.first);
+            if(p)
+                p->setPosition(m_pos);
 
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
+            if(m_type == MindItem::PackageType)
+                m_ctrl->setCurrentPackage(p);
+        }
+        m_mindItem= pair.first;
+        m_link= pair.second;
+    }
+    else
+    {
+        m_nodeModel->appendItem(m_mindItem.data());
+        m_nodeModel->appendItem(m_link);
+    }
 }

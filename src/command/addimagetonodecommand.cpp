@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2021 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#include "addimagetonodecommand.h"
 
-#include <QFontMetricsF>
+#include "core/model/imagemodel.h"
+#include "core/worker/iohelper.h"
+#include "model/boxmodel.h"
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+namespace mindmap
 {
-    return m_styleIndex;
+AddImageToNodeCommand::AddImageToNodeCommand(BoxModel* nodeModel, ImageModel* imgModel, const QString& id,
+                                             const QPixmap& pix)
+    : m_nodeModel(nodeModel), m_id(id), m_imgModel(imgModel), m_pixmap(pix)
+{
+}
+AddImageToNodeCommand::AddImageToNodeCommand(BoxModel* nodeModel, ImageModel* imgModel, const QString& id,
+                                             const QUrl& url)
+    : m_nodeModel(nodeModel), m_id(id), m_imgModel(imgModel)
+{
+    m_pixmap= IOHelper::readPixmapFromURL(url);
+    setText(QObject::tr("Add %1 image").arg(url.fileName()));
 }
 
-void MindNode::setStyleIndex(int idx)
+void mindmap::AddImageToNodeCommand::undo()
 {
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
+    m_imgModel->removePixmap(m_id);
+    m_nodeModel->setImageUriToNode(m_id, {});
 }
 
-QString MindNode::imageUri() const
+void mindmap::AddImageToNodeCommand::redo()
 {
-    return m_imageUri;
+    m_imgModel->insertPixmap(m_id, m_pixmap);
+    m_nodeModel->setImageUriToNode(m_id, m_id);
 }
-
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+} // namespace mindmap

@@ -67,3 +67,8 @@ QString Theme::listIcon() const
 {
     return imagePath("list.svg");
 }
+
+QString Theme::editIcon() const
+{
+    return imagePath("edit.svg");
+}

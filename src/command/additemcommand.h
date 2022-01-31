@@ -17,35 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#ifndef ADDITEMCOMMAND_H
+#define ADDITEMCOMMAND_H
 
-#include <QFontMetricsF>
+#include <QPointer>
+#include <QUndoCommand>
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
+#include "data/minditem.h"
 
-int MindNode::styleIndex() const
+class Link;
+class MindItemModel;
+class MindMapController;
+class AddItemCommand : public QUndoCommand
 {
-    return m_styleIndex;
-}
+public:
+    AddItemCommand(MindItemModel* nodeModel, MindItem::Type type, MindMapController* ctrl, const QString& idParent= {},
+                   QPointF pos= {});
+    void undo() override;
+    void redo() override;
 
-void MindNode::setStyleIndex(int idx)
-{
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+private:
+    QPointer<MindItem> m_mindItem;
+    QPointer<Link> m_link;
+    QPointer<MindMapController> m_ctrl;
+    QPointer<MindItemModel> m_nodeModel;
+    QString m_idParent;
+    MindItem::Type m_type;
+    QPointF m_pos;
+};
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
-
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+#endif // ADDITEMCOMMAND_H

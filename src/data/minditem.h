@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2022 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#ifndef MINDITEM_H
+#define MINDITEM_H
 
-#include <QFontMetricsF>
+#include <QObject>
+#include <QPointF>
+#include <QVector2D>
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
+class Link;
 
-int MindNode::styleIndex() const
+class MindItem : public QObject
 {
-    return m_styleIndex;
-}
+    Q_OBJECT
+    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
+    Q_PROPERTY(bool selected READ selected WRITE setSelected NOTIFY selectedChanged)
+    Q_PROPERTY(Type type READ type CONSTANT)
+public:
+    enum Type
+    {
+        NodeType,
+        LinkType,
+        PackageType
+    };
+    Q_ENUM(Type);
+    explicit MindItem(Type type, QObject* parent= nullptr);
 
-void MindNode::setStyleIndex(int idx)
-{
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
-}
+    QString text() const;
+    QString id() const;
+    bool isVisible() const;
+    bool selected() const;
+    Type type() const;
 
-QString MindNode::imageUri() const
-{
-    return m_imageUri;
-}
+public slots:
+    void setText(QString text);
+    void setVisible(bool op);
+    void setSelected(bool isSelected);
+    void setId(const QString& id);
 
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+signals:
+    void idChanged();
+    void visibleChanged();
+    void textChanged(QString text);
+    void selectedChanged();
+
+protected:
+    Type m_type;
+    QString m_id;
+    QString m_text;
+    bool m_visible= true;
+    bool m_selected= false;
+};
+
+#endif // MINDITEM_H

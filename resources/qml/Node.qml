@@ -27,8 +27,8 @@ Pane
     signal addChild()
 
 
-    onWidthChanged: object.contentWidth = width
-    onHeightChanged: object.contentHeight = height
+    onWidthChanged: object.width = width
+    onHeightChanged: object.height = height
     onXChanged: {
         if(mouse.drag.active)
             object.position=Qt.point(x, y)
@@ -43,7 +43,7 @@ Pane
     Drag.keys: [ "rmindmap/reparenting","text/plain" ]
     Drag.supportedActions: Qt.MoveAction
     Drag.mimeData: {
-        "text/plain": node.id
+        "text/plain": root.object.id
     }
 
 
@@ -59,7 +59,7 @@ Pane
         Image {
             id: img
             visible: source
-            source: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTEzkD2vu5XtWwvH_LjybftQPmxVjdCrIMbjQ&usqp=CAU"
+            //source: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTEzkD2vu5XtWwvH_LjybftQPmxVjdCrIMbjQ&usqp=CAU"
             fillMode: Image.PreserveAspectFit
             sourceSize.height: 200
             sourceSize.width: 200

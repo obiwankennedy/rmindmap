@@ -20,9 +20,10 @@
 #include "spacingcontroller.h"
 
 #include "data/link.h"
-#include "data/mindnode.h"
-#include "model/linkmodel.h"
+#include "data/positioneditem.h"
+#include "model/minditemmodel.h"
 
+#include <QDebug>
 #include <QLineF>
 #include <chrono>
 #include <cmath>
@@ -40,7 +41,7 @@ bool isInside(QPointF pos1, QPointF pos2, float distance)
     return (std::sqrt(d.x() * d.x() + d.y() * d.y()) < distance);
 }
 
-QPointF computeCenter(const MindNode* first, const std::vector<MindNode*>& data)
+QPointF computeCenter(const PositionedItem* first, const std::vector<PositionedItem*>& data)
 {
     QPointF pos= first->position();
     for(auto it= data.begin(); it != data.end(); ++it)
@@ -51,10 +52,7 @@ QPointF computeCenter(const MindNode* first, const std::vector<MindNode*>& data)
     return pos;
 }
 
-SpacingController::SpacingController(std::vector<MindNode*>& data, LinkModel* linkModel, QObject* parent)
-    : QObject(parent), m_data(data), m_linkModel(linkModel)
-{
-}
+SpacingController::SpacingController(MindItemModel* data, QObject* parent) : QObject(parent), m_model(data) {}
 
 SpacingController::~SpacingController()= default;
 
@@ -75,17 +73,32 @@ void SpacingController::computeInLoop()
 {
     while(m_running)
     {
-        auto const allNodes= m_data;
-        for(auto& node : allNodes)
+        qDebug() << "running";
+        auto const& allNodes= m_model->items(MindItem::NodeType);
+        auto const& allPackage= m_model->items(MindItem::PackageType);
+
+        std::vector<PositionedItem*> vec;
+        vec.reserve(allNodes.size() + allPackage.size());
+        std::transform(std::begin(allPackage), std::end(allPackage), std::back_inserter(vec),
+                       [](MindItem* item) { return dynamic_cast<PositionedItem*>(item); });
+
+        vec.erase(std::remove_if(std::begin(vec), std::end(vec), [](PositionedItem* item) { return nullptr == item; }),
+                  std::end(vec));
+
+        for(auto& node : vec)
         {
-            applyCoulombsLaw(node, allNodes);
+            applyCoulombsLaw(node, vec);
         }
-        auto const allLinks= m_linkModel->getDataSet();
-        for(auto& link : allLinks)
+        auto const allLinks= m_model->items(MindItem::LinkType);
+        for(auto& item : allLinks)
         {
+            auto link= dynamic_cast<Link*>(item);
+            if(!link)
+                continue;
+
             applyHookesLaw(link);
         }
-        for(auto& node : allNodes)
+        for(auto& node : vec)
         {
             node->setVelocity(node->getVelocity() * k_defaultDamping);
             if(!node->isDragged())
@@ -97,7 +110,7 @@ void SpacingController::computeInLoop()
     Q_EMIT finished();
 }
 
-void SpacingController::applyCoulombsLaw(MindNode* node, std::vector<MindNode*> nodeList)
+void SpacingController::applyCoulombsLaw(PositionedItem* node, std::vector<PositionedItem*> nodeList)
 {
     auto globalRepulsionForce= QVector2D();
     for(auto const& otherNode : nodeList)

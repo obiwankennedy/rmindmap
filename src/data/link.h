@@ -23,16 +23,28 @@
 #include <QObject>
 #include <QPointF>
 #include <QPointer>
+#include <QRectF>
 
-class MindNode;
-class Link : public QObject
+#include "data/minditem.h"
+//#include "data/positioneditem.h"
+
+class PositionedItem;
+class Link : public MindItem
 {
     Q_OBJECT
-    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+
+    Q_PROPERTY(PositionedItem* start READ start WRITE setStart NOTIFY startChanged)
+    Q_PROPERTY(PositionedItem* end READ end WRITE setEnd NOTIFY endChanged)
+
     Q_PROPERTY(QPointF startPoint READ startPoint NOTIFY startPointChanged)
     Q_PROPERTY(QPointF endPoint READ endPoint NOTIFY endPointChanged)
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+
+    Q_PROPERTY(QRectF startBox READ startBox NOTIFY startBoxChanged)
+    Q_PROPERTY(QRectF endBox READ endBox NOTIFY endBoxChanged)
+
+    Q_PROPERTY(qreal width READ width NOTIFY sizeChanged)
+    Q_PROPERTY(qreal height READ height NOTIFY sizeChanged)
 public:
     enum Direction
     {
@@ -44,44 +56,42 @@ public:
     explicit Link(QObject* parent= nullptr);
 
     Direction direction() const;
-    void setDirection(const Direction& direction);
-
-    MindNode* start() const;
-    void setStart(MindNode* start);
-
-    MindNode* end() const;
-    void setEnd(MindNode* end);
-
+    PositionedItem* start() const;
+    PositionedItem* end() const;
     QPointF endPoint() const;
     QPointF startPoint() const;
 
     float getLength() const;
-
     float getStiffness() const;
-    void setStiffness(float stiffness);
-    void setVisible(bool vi);
-    bool isVisible() const;
-    QString text() const;
-
     void cleanUpLink();
-signals:
-    void linkChanged();
-    void visibleChanged();
-    void directionChanged();
-    void startPointChanged();
-    void endPointChanged();
-    void textChanged();
+
+    const QRectF endBox() const;
+    const QRectF startBox() const;
+
+    qreal width() const;
+    qreal height() const;
 
 public slots:
+    void setStiffness(float stiffness);
+    void setDirection(const Direction& direction);
+    void setEnd(PositionedItem* end);
+    void setStart(PositionedItem* start);
     void computePosition();
-    void setText(const QString& text);
+
+signals:
+    void sizeChanged();
+    void directionChanged();
+    void startChanged();
+    void endChanged();
+    void startPointChanged();
+    void endPointChanged();
+    void startBoxChanged();
+    void endBoxChanged();
 
 private:
     Direction m_dir= StartToEnd;
-    bool m_visible= true;
-    QPointer<MindNode> m_start;
-    QPointer<MindNode> m_end;
-    QString m_text;
+    QPointer<PositionedItem> m_start;
+    QPointer<PositionedItem> m_end;
     float m_stiffness= 400.0f;
 };
 

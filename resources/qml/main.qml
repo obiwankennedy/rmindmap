@@ -14,8 +14,9 @@ ApplicationWindow {
     property real viewScale: 1
     property int idx: 0
     property bool darkMode: false
+    property bool addPackage: false
 
-    onDarkModeChanged: _engineCtrl.nightMode = root.darkMode
+    onDarkModeChanged: Theme.nightMode = root.darkMode
 
     Universal.theme: root.darkMode ? Universal.Dark: Universal.Light
 
@@ -66,6 +67,10 @@ ApplicationWindow {
         onRejected: close()
     }
 
+    Component.onCompleted: {
+        ctrl.setFilename("file:///home/renaud/documents/03_jdr/01_Scenariotheque/16_l5r/15_riz/riz.rmap")
+        ctrl.loadFile();
+    }
 
 
     MindMap {
@@ -78,23 +83,30 @@ ApplicationWindow {
     }
 
 
-    RowLayout{
+    GridLayout{
+        columns: 4
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.rightMargin: 14
         anchors.topMargin: 14
         IconButton {//undo
-            source: _engineCtrl.undoIcon
+            source: Theme.undoIcon
             enabled: ctrl.canUndo
             onClicked: ctrl.undo()
         }
         IconButton {//redo
-            source: _engineCtrl.redoIcon
+            source: Theme.redoIcon
             enabled: ctrl.canRedo
             onClicked: ctrl.redo()
         }
+        IconButton {//add package
+            source: Theme.editIcon
+            checkable: true
+            checked: root.addPackage
+            onClicked: root.addPackage = !root.addPackage
+        }
         IconButton {
-            source: _engineCtrl.listIcon
+            source: Theme.listIcon
             onClicked: drawer.open()
         }
     }
@@ -130,12 +142,12 @@ ApplicationWindow {
                         border.width: 1
                         border.color: "black"
                         gradient: Gradient {
-                            GradientStop { position: 0.0; color: ctrl.getStyle(combo.currentIndex).colorOne }
-                            GradientStop { position: 1.0; color: ctrl.getStyle(combo.currentIndex).colorTwo }
+                            GradientStop { position: 0.0; color: ctrl.style(combo.currentIndex).colorOne }
+                            GradientStop { position: 1.0; color: ctrl.style(combo.currentIndex).colorTwo }
                         }
                         Text {
                             anchors.centerIn: parent
-                            color: ctrl.getStyle(combo.currentIndex).textColor
+                            color: ctrl.style(combo.currentIndex).textColor
                             text: qsTr("Text")
                         }
                     }
@@ -179,6 +191,20 @@ ApplicationWindow {
         anchors.fill:parent
         acceptedButtons:Qt.MiddleButton | Qt.RightButton
         propagateComposedEvents: true
+        onPressed: {
+            if(root.addPackage)
+                ctrl.addPackage(Qt.point(mouse.x, mouse.y))
+        }
+
+        onPositionChanged: {
+            if(root.addPackage)
+                ctrl.updatePackage(Qt.point(mouse.x, mouse.y))
+        }
+        onReleased: {
+            if(root.addPackage)
+                root.addPackage = false
+        }
+
         onClicked:{
             menu.x = mouse.x
             menu.y = mouse.y

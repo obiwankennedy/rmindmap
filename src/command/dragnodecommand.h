@@ -24,12 +24,12 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-class MindNode;
+class PositionedItem;
 
 class DragNodeCommand : public QUndoCommand
 {
 public:
-    DragNodeCommand(const QPointF& motion, const std::vector<QPointer<MindNode>>& selection);
+    DragNodeCommand(const QPointF& motion, const std::vector<QPointer<PositionedItem>>& selection);
     void undo() override;
     void redo() override;
     int id() const override;
@@ -37,11 +37,11 @@ public:
     bool mergeWith(const QUndoCommand* other) override;
 
     const QPointF& getMotion() const;
-    const std::vector<QPointer<MindNode>> getSelection() const;
+    const std::vector<QPointer<PositionedItem>> getSelection() const;
 
 private:
     QPointF m_motion;
-    std::vector<QPointer<MindNode>> m_mindNodes;
+    std::vector<QPointer<PositionedItem>> m_mindNodes;
 };
 
 #endif // DRAGNODECOMMAND_H

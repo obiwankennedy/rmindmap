@@ -30,12 +30,12 @@ class LinkItem : public QQuickItem
     Q_OBJECT
 
     Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+
     Q_PROPERTY(QPointF start READ start WRITE setStart NOTIFY startChanged)
     Q_PROPERTY(QPointF end READ end WRITE setEnd NOTIFY endChanged)
     Q_PROPERTY(QRectF startBox READ startBox WRITE setStartBox NOTIFY startBoxChanged)
     Q_PROPERTY(QRectF endBox READ endBox WRITE setEndBox NOTIFY endBoxChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-    // may not be used
     Q_PROPERTY(PointList points READ points WRITE setPoints NOTIFY pointsChanged)
 
 public:

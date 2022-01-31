@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2021 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,35 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mindnode.h"
+#include "removeimagefromnodecommand.h"
 
-#include <QFontMetricsF>
+#include "core/model/imagemodel.h"
+#include "mindmap/src/model/boxmodel.h"
 
-MindNode::MindNode(QObject* parent) : PositionedItem(MindItem::NodeType, parent) {}
-MindNode::~MindNode()= default;
-
-int MindNode::styleIndex() const
+namespace mindmap
 {
-    return m_styleIndex;
+RemoveImageFromNodeCommand::RemoveImageFromNodeCommand(BoxModel* nodeModel, ImageModel* imgModel, const QString& id)
+    : m_nodeModel(nodeModel), m_id(id), m_imgModel(imgModel)
+{
+    m_pixmap= imgModel->pixmapFromId(m_id);
+    Q_ASSERT(!m_pixmap.isNull());
+    setText(QObject::tr("Removing image from node"));
 }
 
-void MindNode::setStyleIndex(int idx)
+void RemoveImageFromNodeCommand::undo()
 {
-    if(idx == m_styleIndex)
-        return;
-    m_styleIndex= idx;
-    emit styleIndexChanged();
+    m_imgModel->insertPixmap(m_id, m_pixmap);
+    m_nodeModel->setImageUriToNode(m_id, m_id);
 }
 
-QString MindNode::imageUri() const
+void RemoveImageFromNodeCommand::redo()
 {
-    return m_imageUri;
+    m_imgModel->removePixmap(m_id);
+    m_nodeModel->setImageUriToNode(m_id, {});
 }
-
-void MindNode::setImageUri(const QString& uri)
-{
-    if(uri == m_imageUri)
-        return;
-    m_imageUri= uri;
-    emit imageUriChanged();
-}
+} // namespace mindmap
