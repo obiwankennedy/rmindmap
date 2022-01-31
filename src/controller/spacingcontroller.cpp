@@ -73,21 +73,12 @@ void SpacingController::computeInLoop()
 {
     while(m_running)
     {
-        qDebug() << "running";
-        auto const& allNodes= m_model->items(MindItem::NodeType);
-        auto const& allPackage= m_model->items(MindItem::PackageType);
 
-        std::vector<PositionedItem*> vec;
-        vec.reserve(allNodes.size() + allPackage.size());
-        std::transform(std::begin(allPackage), std::end(allPackage), std::back_inserter(vec),
-                       [](MindItem* item) { return dynamic_cast<PositionedItem*>(item); });
+        auto const& allNodes= m_model->positionnedItems();
 
-        vec.erase(std::remove_if(std::begin(vec), std::end(vec), [](PositionedItem* item) { return nullptr == item; }),
-                  std::end(vec));
-
-        for(auto& node : vec)
+        for(auto& node : allNodes)
         {
-            applyCoulombsLaw(node, vec);
+            applyCoulombsLaw(node, allNodes);
         }
         auto const allLinks= m_model->items(MindItem::LinkType);
         for(auto& item : allLinks)
@@ -98,9 +89,10 @@ void SpacingController::computeInLoop()
 
             applyHookesLaw(link);
         }
-        for(auto& node : vec)
+        for(auto& node : allNodes)
         {
             node->setVelocity(node->getVelocity() * k_defaultDamping);
+
             if(!node->isDragged())
                 node->setPosition(node->position() + node->getVelocity().toPointF());
         }

@@ -27,6 +27,13 @@ Flickable {
         onActivated: ctrl.redo();
     }
 
+    Rectangle {
+        anchors.centerIn: flick.contentItem
+        width: 10
+        height: 10
+        color: "red"
+    }
+
     Component {
         id: linkComp
         Link {
@@ -93,13 +100,13 @@ Flickable {
             object: item
             nodeStyle: ctrl.style(item.styleIndex)
             focus: true
-            text : item.text
+            text : item.text ? item.text : "new node"
             visible: item.visible
             selected: item.selected
             buttonColor: Universal.foreground
             onAddChild: ctrl.addBox(item.id)
             onOpenChanged: ctrl.itemModel.openItem(item.id, open)
-            onReparenting: ctrl.reparenting(node,id)
+            onReparenting: ctrl.reparenting(item,id)
             onSelectStyle: {
                 stylePopup.parent = nodeItem
                 stylePopup.open()

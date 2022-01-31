@@ -34,6 +34,7 @@ class SelectionController;
 class NodeStyleModel;
 class NodeStyle;
 class PositionedItem;
+class MindItem;
 
 class MindMapController : public QObject
 {
@@ -93,7 +94,7 @@ public slots:
     void addPackage(const QPointF& pos);
     void updatePackage(const QPointF& pos);
 
-    void reparenting(MindNode* parent, const QString& id);
+    void reparenting(MindItem* parent, const QString& id);
     void removeSelection();
     void setCurrentPackage(PositionedItem* item);
 

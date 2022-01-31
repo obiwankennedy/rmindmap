@@ -230,9 +230,9 @@ void MindMapController::updatePackage(const QPointF& pos)
     m_package->setHeight(offset.y());
 }
 
-void MindMapController::reparenting(MindNode* parent, const QString& id)
+void MindMapController::reparenting(MindItem* parent, const QString& id)
 {
-    auto cmd= new ReparentingNodeCommand(m_itemModel.get(), parent, id);
+    auto cmd= new ReparentingNodeCommand(m_itemModel.get(), dynamic_cast<PositionedItem*>(parent), id);
     m_stack.push(cmd);
 }
 void MindMapController::removeSelection()
