@@ -26,30 +26,46 @@
 #include "data/positioneditem.h"
 #include "minditem.h"
 
-class Link;
+class LinkController;
 class MindNode : public PositionedItem
 {
     Q_OBJECT
     Q_PROPERTY(QString imageUri READ imageUri WRITE setImageUri NOTIFY imageUriChanged)
     Q_PROPERTY(int styleIndex READ styleIndex WRITE setStyleIndex NOTIFY styleIndexChanged)
+    Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    Q_PROPERTY(QString tagsText READ tagsText WRITE setTagsText NOTIFY tagsChanged)
 public:
     MindNode(QObject* parent= nullptr);
     virtual ~MindNode();
 
     QString imageUri() const;
     int styleIndex() const;
+    QString description() const;
+
+    const QStringList& tags() const;
+
+    const QString tagsText() const;
 
 public slots:
+    void setTagsText(const QString& newTagsText);
     void setImageUri(const QString& uri);
     void setStyleIndex(int idx);
+    void setDescription(const QString& newDescription);
+    void setTags(const QStringList& newTags);
 
 signals:
     void imageUriChanged();
     void styleIndexChanged();
+    void descriptionChanged();
+
+    void tagsChanged();
 
 private:
     QString m_imageUri;
     int m_styleIndex= 0; // default
+    QString m_description;
+    QStringList m_tags;
 };
 
 #endif // MINDNODE_H

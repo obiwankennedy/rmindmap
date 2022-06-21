@@ -146,13 +146,13 @@ void PositionedItem::applyForce(const QVector2D& force)
     m_acceleration+= force / m_mass;
 }
 
-void PositionedItem::setNextPosition(const QPointF& pos, Link* emiter)
+void PositionedItem::setNextPosition(const QPointF& pos, LinkController* emiter)
 {
     m_nextPositions.erase(emiter);
-    m_nextPositions.insert(std::pair<Link*, QPointF>(emiter, pos));
+    m_nextPositions.insert(std::pair<LinkController*, QPointF>(emiter, pos));
     updatePosition();
 }
-void PositionedItem::addLink(Link* link)
+void PositionedItem::addLink(LinkController* link)
 {
     auto h= hasLink();
     m_subNodelinks.push_back(link);
@@ -199,14 +199,14 @@ bool PositionedItem::open() const
 {
     return m_open;
 }
-const std::vector<QPointer<Link>>& PositionedItem::subLinks() const
+const std::vector<QPointer<LinkController>>& PositionedItem::subLinks() const
 {
     return m_subNodelinks;
 }
 
 int PositionedItem::subNodeCount() const
 {
-    int sum= std::accumulate(m_subNodelinks.begin(), m_subNodelinks.end(), 0, [](int& a, Link* link) {
+    int sum= std::accumulate(m_subNodelinks.begin(), m_subNodelinks.end(), 0, [](int& a, LinkController* link) {
         if(nullptr == link)
             return 0;
         auto end= link->end();
@@ -218,7 +218,7 @@ int PositionedItem::subNodeCount() const
     return sum;
 }
 
-void PositionedItem::removeLink(Link* link)
+void PositionedItem::removeLink(LinkController* link)
 {
     auto it= std::find(m_subNodelinks.begin(), m_subNodelinks.end(), link);
 
@@ -231,7 +231,7 @@ void PositionedItem::removeLink(Link* link)
 void PositionedItem::setLinkVisibility()
 {
     bool visiblility= isVisible() & m_open;
-    std::for_each(m_subNodelinks.begin(), m_subNodelinks.end(), [visiblility](Link* link) {
+    std::for_each(m_subNodelinks.begin(), m_subNodelinks.end(), [visiblility](LinkController* link) {
         if(nullptr == link)
             return;
         link->setVisible(visiblility);
@@ -241,4 +241,17 @@ void PositionedItem::setLinkVisibility()
 void PositionedItem::translate(const QPointF& motion)
 {
     setPosition(m_position + motion);
+}
+
+bool PositionedItem::isLocked() const
+{
+    return m_locked;
+}
+
+void PositionedItem::setLocked(bool newLocked)
+{
+    if (m_locked == newLocked)
+        return;
+    m_locked = newLocked;
+    emit lockedChanged();
 }

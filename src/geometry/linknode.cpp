@@ -36,13 +36,55 @@ void LinkNode::setColor(const QColor& color)
     m_material.setColor(color);
     markDirty(QSGNode::DirtyMaterial);
 }
-void LinkNode::update(const QPointF& p1, const QRectF& rect1, const QPointF& p2, const QRectF& rect2)
+void LinkNode::update(const QRectF& rect, LinkController::Orientation orient, const QRectF& startBox,
+                      const QRectF& endBox)
 {
     qreal arrowLenght= 10.0;
     qreal arrowWidth= 8.0;
     qreal radius= 0.;
     qreal diameter= 0.;
     m_geometry.setLineWidth(PenWidth);
+
+    QPointF p1, p2;
+    QRectF rect1= startBox;
+    rect1.moveTo(-startBox.width() / 2, -startBox.height() / 2);
+    QRectF rect2= endBox;
+    rect2.moveTo(-endBox.width() / 2, -endBox.height() / 2);
+
+    switch(orient)
+    {
+    case LinkController::RightBottom:
+    {
+        p1= rect.topLeft();
+        p2= rect.bottomRight();
+        rect2= rect2.translated(p2.x(), p2.y());
+    }
+    break;
+    case LinkController::LeftBottom:
+    {
+        p1= rect.topRight();
+        p2= rect.bottomLeft();
+        rect2= rect2.translated(p2.x(), p2.y());
+        rect1= rect1.translated(p1.x(), p1.y());
+    }
+    break;
+    case LinkController::RightTop:
+    {
+        p1= rect.bottomLeft();
+        p2= rect.topRight();
+        rect2= rect2.translated(p2.x(), p2.y());
+        rect1= rect1.translated(p1.x(), p1.y());
+    }
+    break;
+    case LinkController::LeftTop:
+    {
+        p1= rect.bottomRight();
+        p2= rect.topLeft();
+        rect1= rect1.translated(p1.x(), p1.y());
+    }
+    break;
+    }
+
     QLineF line(p1, p2);
 
     QLineF rect1Bottom(rect1.bottomLeft(), rect1.bottomRight());
@@ -53,10 +95,10 @@ void LinkNode::update(const QPointF& p1, const QRectF& rect1, const QPointF& p2,
     QVector<QLineF> lines({rect1Bottom, rect1Top, rect1Left, rect1Right});
 
     QPointF intersection1;
-    for(auto rectSide : lines)
+    for(auto const& rectSide : qAsConst(lines))
     {
         QPointF point;
-        if(line.intersect(rectSide, &point) == QLineF::BoundedIntersection)
+        if(line.intersects(rectSide, &point) == QLineF::BoundedIntersection)
             intersection1= point;
     }
 
@@ -68,10 +110,10 @@ void LinkNode::update(const QPointF& p1, const QRectF& rect1, const QPointF& p2,
     QVector<QLineF> lines2({rect2Bottom, rect2Top, rect2Left, rect2Right});
 
     QPointF intersection2;
-    for(auto rectSide : lines2)
+    for(auto const& rectSide : qAsConst(lines2))
     {
         QPointF point;
-        if(line.intersect(rectSide, &point) == QLineF::BoundedIntersection)
+        if(line.intersects(rectSide, &point) == QLineF::BoundedIntersection)
             intersection2= point;
     }
 

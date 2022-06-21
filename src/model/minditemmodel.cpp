@@ -23,6 +23,8 @@
 #include <QDebug>
 #include <QRectF>
 
+#include "model/nodeimageprovider.h"
+
 std::vector<MindItem*>& getVector(std::vector<MindItem*>& links, std::vector<MindItem*>& package,
                                   std::vector<MindItem*>& node, MindItem::Type type)
 {
@@ -34,7 +36,9 @@ std::vector<MindItem*>& getVector(std::vector<MindItem*>& links, std::vector<Min
         return node;
 }
 
-MindItemModel::MindItemModel(QObject* parent) : QAbstractListModel(parent) {}
+MindItemModel::MindItemModel(ImageModel* imgModel, QObject* parent) : QAbstractListModel(parent), m_imgModel(imgModel)
+{
+}
 
 MindItemModel::~MindItemModel() {}
 
@@ -102,6 +106,9 @@ QVariant MindItemModel::data(const QModelIndex& index, int role) const
     case Object:
         result= QVariant::fromValue(mindNode);
         break;
+    case HasPicture:
+        result= mindNode->type() == MindItem::NodeType ? m_imgModel->hasPixmap(mindNode->id()) : false;
+        break;
     }
     return result;
 }
@@ -114,6 +121,37 @@ bool MindItemModel::setData(const QModelIndex& index, const QVariant& value, int
         return true;
     }
     return false;
+}
+
+void MindItemModel::update(const QString& id, int role)
+{
+    auto current= item(id);
+
+    if(!current)
+        return;
+
+    int row= 0;
+    if(current->type() == MindItem::LinkType)
+    {
+        auto it= std::find(std::begin(m_links), std::end(m_links), current);
+        if(it != std::end(m_links))
+            row= std::distance(std::begin(m_links), it);
+    }
+    else if(current->type() == MindItem::PackageType)
+    {
+        auto it= std::find(std::begin(m_packages), std::end(m_packages), current);
+        if(it != std::end(m_packages))
+            row= std::distance(std::begin(m_packages), it) + m_links.size();
+    }
+    else if(current->type() == MindItem::NodeType)
+    {
+        auto it= std::find(std::begin(m_nodes), std::end(m_nodes), current);
+        if(it != std::end(m_nodes))
+            row= std::distance(std::begin(m_nodes), it) + m_links.size() + m_packages.size();
+    }
+
+    qDebug() << row << role << "update";
+    emit dataChanged(index(row, 0), index(row, 0), {role});
 }
 
 void MindItemModel::setImageUriToNode(const QString& id, const QString& url)
@@ -142,9 +180,13 @@ Qt::ItemFlags MindItemModel::flags(const QModelIndex& index) const
 
 QHash<int, QByteArray> MindItemModel::roleNames() const
 {
-    static QHash<int, QByteArray> roles
-        = {{MindItemModel::Label, "label"}, {MindItemModel::Visible, "visible"}, {MindItemModel::Selected, "selected"},
-           {MindItemModel::Type, "type"},   {MindItemModel::Uuid, "id"},         {MindItemModel::Object, "object"}};
+    static QHash<int, QByteArray> roles= {{MindItemModel::Label, "label"},
+                                          {MindItemModel::Visible, "visible"},
+                                          {MindItemModel::Selected, "selected"},
+                                          {MindItemModel::Type, "type"},
+                                          {MindItemModel::Uuid, "id"},
+                                          {MindItemModel::Object, "object"},
+                                          {MindItemModel::HasPicture, "hasPicture"}};
     return roles;
 }
 
@@ -182,9 +224,9 @@ void MindItemModel::appendItem(MindItem* node)
     {
     case MindItem::LinkType:
     {
-        auto link= dynamic_cast<Link*>(node);
+        auto link= dynamic_cast<LinkController*>(node);
         if(link)
-            connect(link, &Link::startPointChanged, this, [this, link]() {
+            connect(link, &LinkController::startPointChanged, this, [this, link]() {
                 QModelIndex parent;
                 auto it= std::find(m_links.begin(), m_links.end(), link);
                 if(it == m_links.end())
@@ -203,7 +245,6 @@ void MindItemModel::appendItem(MindItem* node)
         row+= m_packages.size();
         break;
     }
-    qDebug() << "appendItem" << row << (vec == m_links);
 
     beginInsertRows(QModelIndex(), row, row);
     vec.push_back(node);
@@ -237,7 +278,7 @@ std::vector<PositionedItem*> MindItemModel::positionnedItems() const
     return vec;
 }
 
-std::pair<MindItem*, Link*> MindItemModel::addItem(const QString& idparent, MindItem::Type type)
+std::pair<MindItem*, LinkController*> MindItemModel::addItem(const QString& idparent, MindItem::Type type)
 {
 
     auto& vec= getVector(m_links, m_packages, m_nodes, type);
@@ -256,7 +297,7 @@ std::pair<MindItem*, Link*> MindItemModel::addItem(const QString& idparent, Mind
         break;
     }
 
-    std::pair<MindItem*, Link*> result;
+    std::pair<MindItem*, LinkController*> result;
 
     if(type == MindItem::NodeType)
     {
@@ -283,9 +324,10 @@ std::pair<MindItem*, Link*> MindItemModel::addItem(const QString& idparent, Mind
 
         emit contentRectChanged();
 
-        auto link= new Link();
+        auto link= new LinkController();
         link->setStart((*id));
         link->setEnd(root);
+        root->setParentNode(*id);
 
         appendItem(link);
 
@@ -327,7 +369,6 @@ bool MindItemModel::removeItem(const MindItem* node)
 
 void MindItemModel::openItem(const QString& id, bool status)
 {
-    qDebug() << "openItem" << id << status;
     auto it= item(id);
 
     if(nullptr == it)
@@ -395,13 +436,13 @@ std::vector<MindItem*>& MindItemModel::items(MindItem::Type type)
     return getVector(m_links, m_packages, m_nodes, type);
 }
 
-std::vector<Link*> MindItemModel::sublink(const QString& id)
+std::vector<LinkController*> MindItemModel::sublink(const QString& id)
 {
-    std::vector<Link*> vec;
+    std::vector<LinkController*> vec;
 
     for(auto item : m_links)
     {
-        auto link= dynamic_cast<Link*>(item);
+        auto link= dynamic_cast<LinkController*>(item);
         if(!link)
             continue;
 

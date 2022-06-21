@@ -44,6 +44,11 @@ void Theme::setNightMode(bool b)
     emit undoIconChanged();
     emit redoIconChanged();
     emit listIconChanged();
+    emit saveIconChanged();
+    emit trashIconChanged();
+    emit grayArrowChanged();
+    emit editIconChanged();
+    emit refreshIconChanged();
 }
 
 QString Theme::imagePath(const QString& image) const
@@ -71,4 +76,24 @@ QString Theme::listIcon() const
 QString Theme::editIcon() const
 {
     return imagePath("edit.svg");
+}
+
+QString Theme::addGrayArrow() const
+{
+    return imagePath("addGrayArrow.svg");
+}
+
+QString Theme::saveIcon() const
+{
+    return imagePath("save.svg");
+}
+
+QString Theme::trashIcon() const
+{
+    return imagePath("trash.svg");
+}
+
+QString Theme::refreshIcon() const
+{
+    return imagePath("refresh.svg");
 }

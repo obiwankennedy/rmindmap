@@ -10,7 +10,7 @@ MindLink {
     property alias visibleLabel: label.visible
     property alias opacityLabel: label.opacity
     property color colorBorder: "gray"
-    property int borderWidth: 1
+    property int borderWidth: 2
     property color backgroundLabel: Universal.background
     property int radius: 5
     property real opacityLabel: 0.8
@@ -26,7 +26,12 @@ MindLink {
             readOnly: !root.editable
             focusReason: Qt.MouseFocusReason
             onReadOnlyChanged: focus = root.editable
-            onEditingFinished: root.editable = false
+            onEditingFinished: {
+
+                root.editable = false
+                root.object.text = label.text
+
+            }
             color: root.color
 
             background: Rectangle {

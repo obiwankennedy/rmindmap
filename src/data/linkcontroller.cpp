@@ -17,39 +17,61 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "link.h"
+#include "linkcontroller.h"
 
-#include "mindnode.h"
 #include <QDebug>
 #include <QRectF>
 #include <cmath>
 
-Link::Link(QObject* parent) : MindItem(MindItem::LinkType, parent)
+#include "mindnode.h"
+
+LinkController::LinkController(QObject* parent) : MindItem(MindItem::LinkType, parent)
 {
-    setText(tr("is linked"));
-    connect(this, &Link::visibleChanged, this, [this]() {
-        if(!m_end)
+    connect(this, &LinkController::visibleChanged, this, [this]() {
+        if(!m_end || !m_constraint)
             return;
         m_end->setVisible(isVisible());
     });
+    connect(this, &LinkController::geometryChanged, this, &LinkController::computeNormalizedRect);
+    connect(this, &LinkController::endChanged, this, &LinkController::computeNormalizedRect);
+    connect(this, &LinkController::startChanged, this, &LinkController::computeNormalizedRect);
 }
 
-void Link::setDirection(const Direction& direction)
+void LinkController::setDirection(const Direction& direction)
 {
     m_dir= direction;
 }
 
-Link::Direction Link::direction() const
+LinkController::Direction LinkController::direction() const
 {
     return m_dir;
 }
 
-PositionedItem* Link::start() const
+PositionedItem* LinkController::start() const
 {
     return m_start;
 }
 
-void Link::setStart(PositionedItem* start)
+void LinkController::computeNormalizedRect()
+{
+    QRectF rect{m_start->centerPoint().x(), m_start->centerPoint().y(), width(), height()};
+
+    auto o= m_orient;
+    if(rect.height() < 0 && rect.width() < 0)
+        m_orient= LeftTop;
+    else if(rect.height() < 0)
+        m_orient= RightTop;
+    else if(rect.width() < 0)
+        m_orient= LeftBottom;
+    else
+        m_orient= RightBottom;
+
+    if(o != m_orient)
+        emit orientationChanged();
+    setNormalizedRect(rect.normalized());
+}
+
+void LinkController::setStart(PositionedItem* start)
 {
     if(start == m_start)
         return;
@@ -65,8 +87,9 @@ void Link::setStart(PositionedItem* start)
     if(nullptr != m_start)
     {
         m_start->addLink(this);
-        connect(m_start, &MindNode::positionChanged, this, &Link::startPointChanged);
-        connect(m_start, &MindNode::positionChanged, this, &Link::sizeChanged);
+        connect(m_start, &MindNode::positionChanged, this, &LinkController::startPointChanged);
+        connect(m_start, &MindNode::positionChanged, this, &LinkController::geometryChanged);
+        connect(m_start, &MindNode::visibleChanged, this, &LinkController::setVisible);
         connect(m_start, &MindNode::textChanged, this, [this]() {
             emit startBoxChanged();
             emit startPointChanged();
@@ -75,7 +98,7 @@ void Link::setStart(PositionedItem* start)
     emit startChanged();
 }
 
-void Link::setEnd(PositionedItem* end)
+void LinkController::setEnd(PositionedItem* end)
 {
     if(end == m_end)
         return;
@@ -87,73 +110,102 @@ void Link::setEnd(PositionedItem* end)
     m_end= end;
     if(nullptr != m_end)
     {
-        connect(m_end, &MindNode::positionChanged, this, &Link::endPointChanged);
-        connect(m_end, &MindNode::positionChanged, this, &Link::sizeChanged);
+        connect(m_end, &MindNode::positionChanged, this, &LinkController::endPointChanged);
+        connect(m_end, &MindNode::positionChanged, this, &LinkController::geometryChanged);
+        connect(m_end, &MindNode::visibleChanged, this, &LinkController::setVisible);
         connect(m_end, &MindNode::textChanged, this, [this]() {
-            qDebug() << m_end->boundingRect() << "text changed";
             emit endBoxChanged();
             emit endPointChanged();
         });
     }
+
     emit endChanged();
 }
 
-qreal Link::width() const
+qreal LinkController::width() const
 {
     if(!end() || !start())
         return 0.0;
-    return end()->position().x() - start()->position().x();
+    return end()->centerPoint().x() - start()->centerPoint().x();
 }
 
-qreal Link::height() const
+qreal LinkController::height() const
 {
     if(!end() || !start())
         return 0.0;
-    return end()->position().y() - start()->position().y();
+    return end()->centerPoint().y() - start()->centerPoint().y();
 }
 
-PositionedItem* Link::end() const
+PositionedItem* LinkController::end() const
 {
     return m_end;
 }
 
-QPointF Link::endPoint() const
+QPointF LinkController::endPoint() const
 {
     if(nullptr == m_end)
         return {};
     return m_end->centerPoint();
 }
 
-QPointF Link::startPoint() const
+QPointF LinkController::startPoint() const
 {
     if(nullptr == m_start)
         return {};
     return m_start->centerPoint();
 }
 
-void Link::computePosition()
+QPointF LinkController::topLeftCorner() const
+{
+    return m_normalizedRect.topLeft();
+}
+
+qreal LinkController::normalizedWidth() const
+{
+    return m_normalizedRect.width();
+}
+
+qreal LinkController::normalizedHeight() const
+{
+    return m_normalizedRect.height();
+}
+
+LinkController::Orientation LinkController::orientation() const
+{
+    return m_orient;
+}
+
+void LinkController::computePosition()
 {
     auto pos1= m_start->position();
     pos1.setY(pos1.y() + 50);
     m_end->setNextPosition(pos1, this);
 }
 
-float Link::getStiffness() const
+void LinkController::setNormalizedRect(QRectF rect)
+{
+    if(m_normalizedRect == rect)
+        return;
+    m_normalizedRect= rect;
+    emit normalizedRectChanged();
+}
+
+float LinkController::getStiffness() const
 {
     return m_stiffness;
 }
 
-void Link::setStiffness(float stiffness)
+void LinkController::setStiffness(float stiffness)
 {
     m_stiffness= stiffness;
 }
 
-void Link::cleanUpLink()
+void LinkController::cleanUpLink()
 {
     m_start->removeLink(this);
 }
 
-float Link::getLength() const
+float LinkController::getLength() const
 {
     auto length= 100.;
     auto rect1= m_start->boundingRect();
@@ -176,12 +228,51 @@ float Link::getLength() const
     return std::max(length1, length2);
 }
 
-const QRectF Link::endBox() const
+const QRectF LinkController::endBox() const
 {
     return m_end ? m_end->boundingRect() : QRectF{};
 }
 
-const QRectF Link::startBox() const
+const QRectF LinkController::startBox() const
 {
     return m_start ? m_start->boundingRect() : QRectF{};
+}
+
+bool LinkController::color() const
+{
+    return m_color;
+}
+
+void LinkController::setColor(const bool& newColor)
+{
+    if(m_color == newColor)
+        return;
+    m_color= newColor;
+    emit colorChanged();
+}
+
+const Qt::PenStyle& LinkController::lineStyle() const
+{
+    return m_lineStyle;
+}
+
+void LinkController::setLineStyle(const Qt::PenStyle& newLineStyle)
+{
+    if(m_lineStyle == newLineStyle)
+        return;
+    m_lineStyle= newLineStyle;
+    emit lineStyleChanged();
+}
+
+bool LinkController::constraint() const
+{
+    return m_constraint;
+}
+
+void LinkController::setConstraint(bool newConstraint)
+{
+    if(m_constraint == newConstraint)
+        return;
+    m_constraint= newConstraint;
+    emit constraintChanged();
 }

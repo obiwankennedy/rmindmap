@@ -24,11 +24,12 @@
 #include <QPointF>
 #include <QUndoStack>
 
-class PositionedItem;
+class MindItem;
 class SelectionController : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(bool hasSelection READ hasSelection NOTIFY hasSelectionChanged)
 public:
     explicit SelectionController(QObject* parent= nullptr);
 
@@ -36,18 +37,22 @@ public:
 
     void setEnabled(bool enable);
     bool enabled() const;
-    const std::vector<PositionedItem*>& selectedNodes() const;
+    const std::vector<MindItem*>& selectedNodes() const;
+    bool hasSelection() const;
+
 signals:
     void enabledChanged();
 
+    void hasSelectionChanged();
+
 public slots:
-    void addToSelection(PositionedItem* node);
-    void removeFromSelection(PositionedItem* node);
+    void addToSelection(MindItem* node);
+    void removeFromSelection(MindItem* node);
     void movingNode(const QPointF& motion);
     void clearSelection();
 
 private:
-    std::vector<PositionedItem*> m_selection;
+    std::vector<MindItem*> m_selection;
     bool m_enabled= false;
     QUndoStack* m_undoStack;
 };

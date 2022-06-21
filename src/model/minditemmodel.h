@@ -21,10 +21,13 @@
 #define MINDITEMMODEL_H
 
 #include <QAbstractListModel>
+#include <QPointer>
 
 #include "data/minditem.h"
 #include "data/mindnode.h"
 #include "data/packagenode.h"
+
+class ImageModel;
 
 class MindItemModel : public QAbstractListModel
 {
@@ -39,10 +42,11 @@ public:
         Selected,
         Type,
         Uuid,
-        Object
+        Object,
+        HasPicture
     };
     Q_ENUM(Roles)
-    explicit MindItemModel(QObject* parent= nullptr);
+    explicit MindItemModel(ImageModel* imgModel, QObject* parent= nullptr);
     ~MindItemModel() override;
 
     // Basic functionality:
@@ -63,18 +67,19 @@ public:
 
     QRectF contentRect() const;
 
-    std::vector<Link*> sublink(const QString& id);
+    std::vector<LinkController*> sublink(const QString& id);
 
     std::vector<PositionedItem*> positionnedItems() const;
 
 public slots:
     // Add data:
-    std::pair<MindItem*, Link*> addItem(const QString& idparent, MindItem::Type type);
+    std::pair<MindItem*, LinkController*> addItem(const QString& idparent, MindItem::Type type);
 
     // Remove data:
     bool removeItem(const MindItem* node);
     void openItem(const QString& id, bool status);
     void setImageUriToNode(const QString& id, const QString& url);
+    void update(const QString& id, int role);
 
 signals:
     void contentRectChanged();
@@ -83,6 +88,8 @@ private:
     std::vector<MindItem*> m_links;
     std::vector<MindItem*> m_packages;
     std::vector<MindItem*> m_nodes;
+
+    QPointer<ImageModel> m_imgModel;
 };
 
 #endif // MINDITEMMODEL_H

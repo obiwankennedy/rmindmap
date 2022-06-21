@@ -35,12 +35,11 @@ class NodeStyleModel;
 class NodeStyle;
 class PositionedItem;
 class MindItem;
-
+class ImageModel;
 class MindMapController : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel CONSTANT)
-    // Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel CONSTANT)
     Q_PROPERTY(QAbstractItemModel* styleModel READ styleModel CONSTANT)
     Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
     Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
@@ -51,12 +50,17 @@ class MindMapController : public QObject
     Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged)
     Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY contentRectChanged)
     Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
+    Q_PROPERTY(bool linkLabelVisibility READ linkLabelVisibility WRITE setLinkLabelVisibility NOTIFY
+                   linkLabelVisibilityChanged)
+    Q_PROPERTY(bool hasSelection READ hasSelection NOTIFY hasSelectionChanged)
+    Q_PROPERTY(ImageModel* imgModel READ imgModel CONSTANT)
 public:
     explicit MindMapController(QObject* parent= nullptr);
     ~MindMapController();
 
     QAbstractItemModel* itemModel() const;
     QAbstractItemModel* styleModel() const;
+    ImageModel* imgModel() const;
 
     SelectionController* selectionController() const;
     const QString& filename() const;
@@ -69,6 +73,11 @@ public:
     int defaultStyleIndex() const;
     Q_INVOKABLE NodeStyle* style(int index) const;
 
+    bool linkLabelVisibility() const;
+    void setLinkLabelVisibility(bool newLinkLabelVisibility);
+
+    bool hasSelection() const;
+
 signals:
     void filenameChanged();
     void spacingChanged();
@@ -77,6 +86,9 @@ signals:
     void errorMsgChanged();
     void defaultStyleIndexChanged();
     void contentRectChanged();
+    void linkLabelVisibilityChanged();
+
+    void hasSelectionChanged();
 
 public slots:
     void saveFile();
@@ -93,10 +105,16 @@ public slots:
     void addBox(const QString& idparent);
     void addPackage(const QPointF& pos);
     void updatePackage(const QPointF& pos);
+    void addLink(const QString& start, const QString& id);
 
     void reparenting(MindItem* parent, const QString& id);
     void removeSelection();
     void setCurrentPackage(PositionedItem* item);
+
+    void centerItems(qreal w, qreal h);
+    void addImageFor(const QString& idNode, const QString& path);
+    void addItemIntoPackage(const QString& idNode, const QString& idPack);
+    void refresh();
 
 protected:
     void clearData();
@@ -106,12 +124,14 @@ private:
     QString m_errorMsg;
     std::unique_ptr<SpacingController> m_spacingController;
     std::unique_ptr<SelectionController> m_selectionController;
+    std::unique_ptr<ImageModel> m_imgModel;
     std::unique_ptr<MindItemModel> m_itemModel;
     std::unique_ptr<NodeStyleModel> m_styleModel;
     QThread* m_spacing= nullptr;
     QUndoStack m_stack;
     int m_defaultStyleIndex= 0;
     QPointer<PositionedItem> m_package;
+    bool m_linkLabelVisibility;
 };
 
 #endif // MINDMAPCONTROLLER_H

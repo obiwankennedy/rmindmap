@@ -24,20 +24,20 @@
 #include <QUndoCommand>
 class MindItem;
 class MindItemModel;
-class Link;
+class LinkController;
 class PositionedItem;
 class ReparentingNodeCommand : public QUndoCommand
 {
 public:
-    ReparentingNodeCommand(MindItemModel* nodeModel, PositionedItem *newParent, const QString& id);
+    ReparentingNodeCommand(MindItemModel* nodeModel, PositionedItem* newParent, const QString& id);
     void undo() override;
     void redo() override;
 
 private:
     QPointer<PositionedItem> m_mindNode;
     QPointer<PositionedItem> m_oldParent;
-    QPointer<Link> m_oldLink;
-    QPointer<Link> m_newLink;
+    QPointer<LinkController> m_oldLink;
+    QPointer<LinkController> m_newLink;
 
     QPointer<MindItemModel> m_nodeModel= nullptr;
     QPointer<PositionedItem> m_newParent;

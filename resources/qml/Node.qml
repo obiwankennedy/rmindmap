@@ -24,6 +24,7 @@ Pane
     signal clicked(var mouse)
     signal selectStyle()
     signal reparenting(var id)
+    signal dropImage(var paths)
     signal addChild()
 
 
@@ -71,7 +72,9 @@ Pane
             color: root.nodeStyle.textColor
             Layout.alignment: Qt.AlignHCenter
             onEnabledChanged: focus = enabled
-            onEditingFinished: root.isEditable = false
+            onEditingFinished:{ root.isEditable = false
+                root.object.text = text.text
+            }
         }
     }
 
@@ -190,7 +193,15 @@ Pane
             anchors.fill: parent
             keys: [ "rmindmap/reparenting","text/plain" ]
             onDropped: {
-                reparenting(drop.text)
+                console.log("drop:"+ drop.keys)
+                if(drop.hasUrls)
+                {
+                    root.dropImage(drop.urls)
+                }
+                else
+                {
+                    reparenting(drop.text)
+                }
                 root.dropOver = false
             }
             onEntered: {

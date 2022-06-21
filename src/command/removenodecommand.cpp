@@ -22,13 +22,13 @@
 #include "model/minditemmodel.h"
 #include <algorithm>
 
-RemoveNodeCommand::RemoveNodeCommand(const std::vector<PositionedItem*>& selection, MindItemModel* nodeModel)
+RemoveNodeCommand::RemoveNodeCommand(const std::vector<MindItem*>& selection, MindItemModel* nodeModel)
     : m_nodeModel(nodeModel)
 {
     std::transform(selection.begin(), selection.end(), std::back_inserter(m_selection),
-                   [](PositionedItem* node) -> QPointer<PositionedItem> { return QPointer<PositionedItem>(node); });
+                   [](MindItem* node) -> QPointer<MindItem> { return QPointer<MindItem>(node); });
 
-    std::for_each(selection.begin(), selection.end(), [this](PositionedItem* node) {
+    std::for_each(selection.begin(), selection.end(), [this](MindItem* node) {
         auto sublinks= m_nodeModel->sublink(node->id());
         std::copy(sublinks.begin(), sublinks.end(), std::back_inserter(m_links));
     });
@@ -36,14 +36,12 @@ RemoveNodeCommand::RemoveNodeCommand(const std::vector<PositionedItem*>& selecti
 
 void RemoveNodeCommand::undo()
 {
-    std::for_each(m_selection.begin(), m_selection.end(),
-                  [this](PositionedItem* node) { m_nodeModel->appendItem(node); });
-    std::for_each(m_links.begin(), m_links.end(), [this](Link* link) { m_nodeModel->appendItem(link); });
+    std::for_each(m_selection.begin(), m_selection.end(), [this](MindItem* node) { m_nodeModel->appendItem(node); });
+    std::for_each(m_links.begin(), m_links.end(), [this](LinkController* link) { m_nodeModel->appendItem(link); });
 }
 
 void RemoveNodeCommand::redo()
 {
-    std::for_each(m_selection.begin(), m_selection.end(),
-                  [this](PositionedItem* node) { m_nodeModel->removeItem(node); });
-    std::for_each(m_links.begin(), m_links.end(), [this](Link* link) { m_nodeModel->removeItem(link); });
+    std::for_each(m_selection.begin(), m_selection.end(), [this](MindItem* node) { m_nodeModel->removeItem(node); });
+    std::for_each(m_links.begin(), m_links.end(), [this](LinkController* link) { m_nodeModel->removeItem(link); });
 }

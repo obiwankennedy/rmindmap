@@ -9,20 +9,19 @@ import RMindMap 1.0
 ApplicationWindow {
     id: root
     visible: true
-    width: 800
-    height: 400
-    property real viewScale: 1
+    visibility: ApplicationWindow.Maximized
+    minimumHeight: 800
+    minimumWidth: 1024
+
+
     property int idx: 0
     property bool darkMode: false
-    property bool addPackage: false
+    property alias addPackage: _buttonGrid.addPackage
 
     onDarkModeChanged: Theme.nightMode = root.darkMode
 
     Universal.theme: root.darkMode ? Universal.Dark: Universal.Light
 
-    MindMapController {
-        id: ctrl
-    }
 
     FileDialog {
         id: importDialog
@@ -31,7 +30,7 @@ ApplicationWindow {
         selectMultiple: false
         nameFilters: ["Text file (*.txt)"]
         onAccepted: {
-            ctrl.importFile(importDialog.fileUrl)
+            MainController.importFile(importDialog.fileUrl)
             close()
         }
         onRejected: close()
@@ -44,8 +43,8 @@ ApplicationWindow {
         selectMultiple: false
         nameFilters: ["Rolisteam MindMap (*.rmap)"]
         onAccepted: {
-            ctrl.setFilename(openDialog.fileUrl)
-            ctrl.loadFile();
+            MainController.setFilename(openDialog.fileUrl)
+            MainController.loadFile();
             close()
         }
         onRejected: close()
@@ -60,157 +59,90 @@ ApplicationWindow {
         defaultSuffix: "rmap"
         nameFilters: ["Rolisteam MindMap (*.rmap)"]
         onAccepted: {
-            ctrl.setFilename(saveDialog.fileUrl)
-            ctrl.saveFile();
+            MainController.setFilename(saveDialog.fileUrl)
+            MainController.saveFile();
             close()
         }
         onRejected: close()
     }
 
     Component.onCompleted: {
-        ctrl.setFilename("file:///home/renaud/documents/03_jdr/01_Scenariotheque/16_l5r/15_riz/riz.rmap")
-        ctrl.loadFile();
+        MainController.setFilename("file:///home/renaud/documents/03_jdr/01_Scenariotheque/16_l5r/15_riz/riz.rmap")
+        MainController.loadFile();
     }
 
 
     MindMap {
+        id: mindMap
         anchors.fill: parent
-        ctrl: ctrl
+        addSubLink: _buttonGrid.addArrow
+        zoomLevel: slider.value
+        onPressed:   {          if(root.addPackage)
+                MainController.addPackage(Qt.point(mouse.x, mouse.y))}
+        onPositionChanged: {
+            if(root.addPackage)
+                MainController.updatePackage(Qt.point(mouse.x, mouse.y))
+        }
+
+        onReleased: {
+            if(root.addPackage)
+                root.addPackage = false
+        }
     }
+    RowLayout {
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        Slider {
+            id: slider
+            from: 0.01
+            to: 10
+            value: 1
+        }
+        Button {
+            text: "reset"
+            onClicked: slider.value = 1.0
+        }
+    }
+
     MindMenu {
         id: menu
-        ctrl: ctrl
+        mindMapHeight: mindMap.contentHeight
+        mindMapWidth: mindMap.contentWidth
     }
 
-
-    GridLayout{
-        columns: 4
+    ButtonGrid {
+        id: _buttonGrid
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.rightMargin: 14
         anchors.topMargin: 14
-        IconButton {//undo
-            source: Theme.undoIcon
-            enabled: ctrl.canUndo
-            onClicked: ctrl.undo()
-        }
-        IconButton {//redo
-            source: Theme.redoIcon
-            enabled: ctrl.canRedo
-            onClicked: ctrl.redo()
-        }
-        IconButton {//add package
-            source: Theme.editIcon
-            checkable: true
-            checked: root.addPackage
-            onClicked: root.addPackage = !root.addPackage
-        }
-        IconButton {
-            source: Theme.listIcon
-            onClicked: drawer.open()
-        }
+        onOpenDrawer: drawer.open()
+        onExportScene: mindMap.makeScreenShot()
     }
 
-    Drawer {
+    SideMenu {
         id: drawer
         edge: Qt.RightEdge
         width: 0.33 * root.width
         height: root.height
-        ColumnLayout {
-            anchors.fill: parent
-
-            Switch {
-                text: qsTr("Night Mode")
-                checked: false
-                onCheckedChanged: root.darkMode = checked
-            }
-            RowLayout {
-                Layout.fillWidth: true
-                Label {
-                    text: qsTr("Default Style")
-                }
-                ComboBox {
-                    id: combo
-                    model: ctrl.styleModel
-                    currentIndex: 0
-                    onCurrentIndexChanged: ctrl.defaultStyleIndex = currentIndex
-
-                   contentItem: Rectangle {
-                        radius: 8
-                        width: 80
-                        height: 15
-                        border.width: 1
-                        border.color: "black"
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: ctrl.style(combo.currentIndex).colorOne }
-                            GradientStop { position: 1.0; color: ctrl.style(combo.currentIndex).colorTwo }
-                        }
-                        Text {
-                            anchors.centerIn: parent
-                            color: ctrl.style(combo.currentIndex).textColor
-                            text: qsTr("Text")
-                        }
-                    }
-
-
-                    delegate: ItemDelegate {
-                        width: combo.width
-                        height: 20
-
-                        Rectangle {
-                            radius: 8
-                            width: 80
-                            height: 15
-                            anchors.centerIn: parent
-                            border.width: 1
-                            border.color: "black"
-                            gradient: Gradient {
-                                GradientStop { position: 0.0; color: colorOne }
-                                GradientStop { position: 1.0; color: colorTwo }
-                            }
-                            Label {
-                                anchors.centerIn: parent
-                                color: model.textColor
-                                text: qsTr("Text")
-                            }
-                        }
-                    }
-                }
-            }
-
-            Label {
-               property string logs
-               text: qsTr("Errors:\n%1").arg(logs)
-               Layout.fillHeight: true
-               Layout.fillWidth: true
-            }
-        }
+        onDarkModeChanged: root.darkMode = darkMode
+        onLinkVisibilityChanged: MainController.linkLabelVisibility = linkVisibility
+        onDefaultStyleChanged: MainController.defaultStyleIndex = defaultStyle
     }
+
+
 
     MouseArea {
         anchors.fill:parent
         acceptedButtons:Qt.MiddleButton | Qt.RightButton
         propagateComposedEvents: true
-        onPressed: {
-            if(root.addPackage)
-                ctrl.addPackage(Qt.point(mouse.x, mouse.y))
-        }
-
-        onPositionChanged: {
-            if(root.addPackage)
-                ctrl.updatePackage(Qt.point(mouse.x, mouse.y))
-        }
-        onReleased: {
-            if(root.addPackage)
-                root.addPackage = false
-        }
 
         onClicked:{
             menu.x = mouse.x
             menu.y = mouse.y
             menu.open()
         }
-        onWheel: {
+        /*onWheel: {
             var step = (wheel.modifiers & Qt.ControlModifier) ? 0.1 : 0.01
             if(wheel.angleDelta.y>0)
             {
@@ -218,6 +150,6 @@ ApplicationWindow {
             }
             else
                 root.viewScale = Math.max(root.viewScale-step,0.2)
-        }
+        }*/
     }
 }

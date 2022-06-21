@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "spacingcontroller.h"
 
-#include "data/link.h"
+#include "data/linkcontroller.h"
 #include "data/positioneditem.h"
 #include "model/minditemmodel.h"
 
@@ -83,8 +83,11 @@ void SpacingController::computeInLoop()
         auto const allLinks= m_model->items(MindItem::LinkType);
         for(auto& item : allLinks)
         {
-            auto link= dynamic_cast<Link*>(item);
+            auto link= dynamic_cast<LinkController*>(item);
             if(!link)
+                continue;
+
+            if(!link->constraint())
                 continue;
 
             applyHookesLaw(link);
@@ -93,7 +96,7 @@ void SpacingController::computeInLoop()
         {
             node->setVelocity(node->getVelocity() * k_defaultDamping);
 
-            if(!node->isDragged())
+            if(!node->isDragged() && !node->isLocked())
                 node->setPosition(node->position() + node->getVelocity().toPointF());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -120,7 +123,7 @@ void SpacingController::applyCoulombsLaw(PositionedItem* node, std::vector<Posit
     node->setVelocity(node->getVelocity() + globalRepulsionForce);
 }
 
-void SpacingController::applyHookesLaw(Link* link)
+void SpacingController::applyHookesLaw(LinkController* link)
 {
     auto node1= link->start();
     auto node2= link->end();

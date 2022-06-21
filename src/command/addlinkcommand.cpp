@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2022 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,33 +17,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ADDITEMCOMMAND_H
-#define ADDITEMCOMMAND_H
+#include "addlinkcommand.h"
 
-#include <QPointer>
-#include <QUndoCommand>
+#include "data/linkcontroller.h"
+#include "model/minditemmodel.h"
 
-#include "data/minditem.h"
-
-class LinkController;
-class MindItemModel;
-class MindMapController;
-class AddItemCommand : public QUndoCommand
+AddLinkCommand::AddLinkCommand(MindItemModel* model, const QString& start, const QString& end)
+    : m_model(model), m_startId(start), m_endId(end)
 {
-public:
-    AddItemCommand(MindItemModel* nodeModel, MindItem::Type type, MindMapController* ctrl, const QString& idParent= {},
-                   QPointF pos= {});
-    void undo() override;
-    void redo() override;
+}
 
-private:
-    QPointer<MindItem> m_mindItem;
-    QPointer<LinkController> m_link;
-    QPointer<MindMapController> m_ctrl;
-    QPointer<MindItemModel> m_nodeModel;
-    QString m_idParent;
-    MindItem::Type m_type;
-    QPointF m_pos;
-};
+void AddLinkCommand::undo()
+{
+    m_model->removeItem(m_model->item(m_linkId));
+}
 
-#endif // ADDITEMCOMMAND_H
+void AddLinkCommand::redo()
+{
+    auto start= dynamic_cast<PositionedItem*>(m_model->item(m_startId));
+    auto end= dynamic_cast<PositionedItem*>(m_model->item(m_endId));
+
+    if(!start || !end)
+        return;
+
+    auto link= new LinkController();
+    link->setConstraint(false);
+    link->setColor(false);
+    link->setLineStyle(Qt::DashLine);
+
+    link->setStart(start);
+    link->setEnd(end);
+
+    m_model->appendItem(link);
+    m_linkId= link->id();
+}

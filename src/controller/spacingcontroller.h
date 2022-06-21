@@ -25,7 +25,7 @@
 
 class MindNode;
 class MindItemModel;
-class Link;
+class LinkController;
 class PositionedItem;
 class SpacingController : public QObject
 {
@@ -46,12 +46,12 @@ public slots:
 
 private:
     void applyCoulombsLaw(PositionedItem* node, std::vector<PositionedItem*> nodeList);
-    void applyHookesLaw(Link* link);
+    void applyHookesLaw(LinkController* link);
     void attractToCenter();
 
 private:
     QPointer<MindItemModel> m_model;
-    bool m_running= true;
+    bool m_running= false;
 };
 
 #endif // SPACINGCONTROLLER_H

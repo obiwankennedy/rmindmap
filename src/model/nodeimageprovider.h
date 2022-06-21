@@ -22,10 +22,24 @@
 
 #include <QQuickImageProvider>
 
-class ImageModel;
-
-namespace mindmap
+class ImageModel : public QObject
 {
+    Q_OBJECT
+public:
+    ImageModel(QObject* parent= nullptr);
+
+    void appendData(const QString& id, const QPixmap& map);
+
+    QPixmap pixmapFromId(const QString& id) const;
+
+    bool hasPixmap(const QString& id) const;
+
+    const QHash<QString, QPixmap>& data() const;
+
+private:
+    QHash<QString, QPixmap> m_pixmaps;
+};
+
 class NodeImageProvider : public QQuickImageProvider
 {
 public:
@@ -36,5 +50,5 @@ public:
 private:
     QPointer<ImageModel> m_dataModel;
 };
-} // namespace mindmap
+
 #endif // NODEIMAGEPROVIDER_H

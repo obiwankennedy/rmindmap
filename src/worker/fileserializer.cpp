@@ -19,11 +19,14 @@
  ***************************************************************************/
 #include "fileserializer.h"
 
-#include "data/link.h"
+#include "controller/mindmapcontroller.h"
+#include "data/linkcontroller.h"
 #include "data/mindnode.h"
 #include "data/packagenode.h"
 #include "model/minditemmodel.h"
+#include "model/nodeimageprovider.h"
 
+#include <QBuffer>
 #include <QByteArray>
 #include <QFile>
 #include <QJsonArray>
@@ -78,7 +81,7 @@ bool FileSerializer::readTextFile(MindItemModel* nodeModel, const QString& filep
         if(newdepth >= depth && !parent.isEmpty())
         {
             // parent.last(), node;
-            auto link= new Link();
+            auto link= new LinkController();
             link->setStart(parent.last());
             link->setEnd(node);
             nodeModel->appendItem(link);
@@ -91,7 +94,7 @@ bool FileSerializer::readTextFile(MindItemModel* nodeModel, const QString& filep
     return true;
 }
 
-bool FileSerializer::readFile(MindItemModel* nodeModel, const QString& filepath)
+bool FileSerializer::readFile(MindMapController* controller, const QString& filepath)
 {
     QFile file(filepath);
     if(!file.open(QFile::ReadOnly))
@@ -99,17 +102,30 @@ bool FileSerializer::readFile(MindItemModel* nodeModel, const QString& filepath)
         return false;
     }
 
+    auto nodeModel= dynamic_cast<MindItemModel*>(controller->itemModel());
+
     auto data= file.readAll();
     QJsonDocument doc= QJsonDocument::fromJson(data);
 
     auto json= doc.object();
 
     auto linkArray= json["links"].toArray();
+    auto imgArray= json["imgs"].toArray();
     auto nodeArray= json["nodes"].toArray();
     auto packagesArray= json["packages"].toArray();
+    auto imgModel= controller->imgModel();
+    for(auto const& imgRef : qAsConst(imgArray))
+    {
+        auto img= imgRef.toObject();
+        auto id= img["id"].toString();
+        auto data= QByteArray::fromBase64(img["data"].toString().toLocal8Bit());
+        QPixmap map;
+        if(map.loadFromData(data))
+            imgModel->appendData(id, map);
+    }
 
     std::map<QString, PositionedItem*> nodeMap;
-    for(auto nodeRef : nodeArray)
+    for(auto const& nodeRef : qAsConst(nodeArray))
     {
         auto obj= nodeRef.toObject();
         auto node= new MindNode();
@@ -121,12 +137,19 @@ bool FileSerializer::readFile(MindItemModel* nodeModel, const QString& filepath)
         node->setImageUri(obj["image"].toString());
         node->setVisible(obj["visible"].toBool());
         node->setOpen(obj["open"].toBool());
+        node->setStyleIndex(obj["styleIndex"].toInt());
+        node->setDescription(obj["description"].toString());
+        QStringList tags;
+        auto tagArray= obj["tags"].toArray();
+        std::transform(std::begin(tagArray), std::end(tagArray), std::back_inserter(tags),
+                       [](const QJsonValue& val) { return val.toString(); });
+        node->setTags(tags);
 
         nodeModel->appendItem(node);
         nodeMap.insert({node->id(), node});
     }
 
-    for(auto packRef : packagesArray)
+    for(auto const& packRef : qAsConst(packagesArray))
     {
         auto obj= packRef.toObject();
         auto node= new PackageNode();
@@ -141,7 +164,7 @@ bool FileSerializer::readFile(MindItemModel* nodeModel, const QString& filepath)
         nodeMap.insert({node->id(), node});
     }
 
-    for(auto linkRef : linkArray)
+    for(auto const& linkRef : qAsConst(linkArray))
     {
         auto obj= linkRef.toObject();
         // auto link= new Link();
@@ -149,25 +172,31 @@ bool FileSerializer::readFile(MindItemModel* nodeModel, const QString& filepath)
         auto idStart= obj["idStart"].toString();
         auto idEnd= obj["idEnd"].toString();
         auto text= obj["text"].toString();
+        auto color= obj["color"].toBool();
+        auto constraint= obj["constraint"].toBool();
 
-        auto link= new Link();
+        auto link= new LinkController();
         link->setStart(nodeMap[idStart]);
         link->setEnd(nodeMap[idEnd]);
+        nodeMap[idEnd]->setParentNode(nodeMap[idStart]);
 
         link->setText(text);
         link->setVisible(obj["visible"].toBool());
-        link->setDirection(static_cast<Link::Direction>(obj["Direction"].toInt()));
+        link->setColor(color);
+        link->setConstraint(constraint);
+        link->setDirection(static_cast<LinkController::Direction>(obj["Direction"].toInt()));
         nodeModel->appendItem(link);
     }
     return true;
 }
 
-bool FileSerializer::writeFile(MindItemModel* nodeModel, const QString& filepath)
+bool FileSerializer::writeFile(MindMapController* controller, const QString& filepath)
 {
     QJsonObject data;
 
     // NODES
     QJsonArray nodeArray;
+    auto nodeModel= dynamic_cast<MindItemModel*>(controller->itemModel());
     auto const& nodes= nodeModel->items(MindItem::NodeType);
     for(auto item : nodes)
     {
@@ -183,6 +212,8 @@ bool FileSerializer::writeFile(MindItemModel* nodeModel, const QString& filepath
         obj["visible"]= node->isVisible();
         obj["open"]= node->open();
         obj["styleIndex"]= node->styleIndex();
+        obj["description"]= node->description();
+        obj["tags"]= QJsonArray::fromStringList(node->tags());
         nodeArray.append(obj);
     }
     data["nodes"]= nodeArray;
@@ -213,7 +244,7 @@ bool FileSerializer::writeFile(MindItemModel* nodeModel, const QString& filepath
     auto const& links= nodeModel->items(MindItem::LinkType);
     for(auto item : links)
     {
-        auto link= dynamic_cast<Link*>(item);
+        auto link= dynamic_cast<LinkController*>(item);
         if(!link)
             continue;
         QJsonObject obj;
@@ -221,10 +252,36 @@ bool FileSerializer::writeFile(MindItemModel* nodeModel, const QString& filepath
         obj["idEnd"]= link->end()->id();
         obj["visible"]= link->isVisible();
         obj["Direction"]= link->direction();
+        obj["color"]= link->color();
+        obj["constraint"]= link->constraint();
         obj["text"]= link->text();
         linkArray.append(obj);
     }
     data["links"]= linkArray;
+
+    // Save image data
+
+    auto imgModel= controller->imgModel();
+    auto const& dataImg= imgModel->data();
+    QJsonArray imgArray;
+    for(auto& key : dataImg.keys())
+    {
+        QJsonObject img;
+        img["id"]= key;
+
+        auto pix= dataImg[key];
+        QJsonArray linkArray;
+        QByteArray bytes;
+        {
+            QBuffer buffer(&bytes);
+            buffer.open(QIODevice::WriteOnly);
+            pix.save(&buffer, "PNG");
+        }
+        img["data"]= QString(bytes.toBase64());
+        imgArray.append(img);
+    }
+    data["imgs"]= imgArray;
+
     QJsonDocument doc;
     doc.setObject(data);
 

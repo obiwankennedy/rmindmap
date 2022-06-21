@@ -19,10 +19,6 @@
  ***************************************************************************/
 #include "nodeimageprovider.h"
 
-#include "core/model/imagemodel.h"
-
-namespace mindmap
-{
 NodeImageProvider::NodeImageProvider(ImageModel* model)
     : QQuickImageProvider(QQuickImageProvider::Pixmap), m_dataModel(model)
 {
@@ -41,4 +37,25 @@ QPixmap NodeImageProvider::requestPixmap(const QString& id, QSize* size, const Q
 
     return map;
 }
-} // namespace mindmap
+
+ImageModel::ImageModel(QObject* parent) : QObject(parent) {}
+
+void ImageModel::appendData(const QString& id, const QPixmap& map)
+{
+    m_pixmaps.insert(id, map);
+}
+
+QPixmap ImageModel::pixmapFromId(const QString& id) const
+{
+    return m_pixmaps.value(id);
+}
+
+bool ImageModel::hasPixmap(const QString& id) const
+{
+    return m_pixmaps.contains(id);
+}
+
+const QHash<QString, QPixmap>& ImageModel::data() const
+{
+    return m_pixmaps;
+}

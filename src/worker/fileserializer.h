@@ -22,6 +22,7 @@
 
 #include <QObject>
 class MindItemModel;
+class MindMapController;
 class FileSerializer : public QObject
 {
     Q_OBJECT
@@ -29,8 +30,8 @@ public:
     FileSerializer();
 
     static bool readTextFile(MindItemModel* nodeModel, const QString& filepath);
-    static bool readFile(MindItemModel* nodeModel, const QString& filepath);
-    static bool writeFile(MindItemModel* nodeModel, const QString& filepath);
+    static bool readFile(MindMapController* nodeModel, const QString& filepath);
+    static bool writeFile(MindMapController* controller, const QString& filepath);
 };
 
 #endif // FILESERIALIZER_H

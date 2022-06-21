@@ -17,22 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef LINK_H
-#define LINK_H
+#ifndef LINKCONTROLLER_H
+#define LINKCONTROLLER_H
 
+#include <QColor>
 #include <QObject>
 #include <QPointF>
 #include <QPointer>
 #include <QRectF>
+#include <Qt>
 
 #include "data/minditem.h"
 //#include "data/positioneditem.h"
 
 class PositionedItem;
-class Link : public MindItem
+class LinkController : public MindItem
 {
     Q_OBJECT
     Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+
+    Q_PROPERTY(QPointF topLeftCorner READ topLeftCorner NOTIFY normalizedRectChanged)
+    Q_PROPERTY(qreal normalizedWidth READ normalizedWidth NOTIFY normalizedRectChanged)
+    Q_PROPERTY(qreal normalizedHeight READ normalizedHeight NOTIFY normalizedRectChanged)
 
     Q_PROPERTY(PositionedItem* start READ start WRITE setStart NOTIFY startChanged)
     Q_PROPERTY(PositionedItem* end READ end WRITE setEnd NOTIFY endChanged)
@@ -43,8 +49,13 @@ class Link : public MindItem
     Q_PROPERTY(QRectF startBox READ startBox NOTIFY startBoxChanged)
     Q_PROPERTY(QRectF endBox READ endBox NOTIFY endBoxChanged)
 
-    Q_PROPERTY(qreal width READ width NOTIFY sizeChanged)
-    Q_PROPERTY(qreal height READ height NOTIFY sizeChanged)
+    Q_PROPERTY(qreal width READ width NOTIFY geometryChanged)
+    Q_PROPERTY(qreal height READ height NOTIFY geometryChanged)
+
+    Q_PROPERTY(bool color READ color WRITE setColor NOTIFY colorChanged)
+    Q_PROPERTY(Qt::PenStyle lineStyle READ lineStyle WRITE setLineStyle NOTIFY lineStyleChanged)
+    Q_PROPERTY(bool constraint READ constraint WRITE setConstraint NOTIFY constraintChanged)
+    Q_PROPERTY(Orientation orientation READ orientation NOTIFY orientationChanged)
 public:
     enum Direction
     {
@@ -53,13 +64,27 @@ public:
         Both
     };
     Q_ENUM(Direction)
-    explicit Link(QObject* parent= nullptr);
+    enum Orientation
+    {
+        RightBottom,
+        LeftBottom,
+        RightTop,
+        LeftTop
+    };
+    Q_ENUM(Orientation)
+    explicit LinkController(QObject* parent= nullptr);
 
     Direction direction() const;
     PositionedItem* start() const;
     PositionedItem* end() const;
     QPointF endPoint() const;
     QPointF startPoint() const;
+
+    QPointF topLeftCorner() const;
+    qreal normalizedWidth() const;
+    qreal normalizedHeight() const;
+
+    LinkController::Orientation orientation() const;
 
     float getLength() const;
     float getStiffness() const;
@@ -71,9 +96,18 @@ public:
     qreal width() const;
     qreal height() const;
 
+    bool color() const;
+    void setColor(const bool& newColor);
+
+    const Qt::PenStyle& lineStyle() const;
+    void setLineStyle(const Qt::PenStyle& newLineStyle);
+
+    bool constraint() const;
+    void setConstraint(bool newConstraint);
+
 public slots:
     void setStiffness(float stiffness);
-    void setDirection(const Direction& direction);
+    void setDirection(const LinkController::Direction& direction);
     void setEnd(PositionedItem* end);
     void setStart(PositionedItem* start);
     void computePosition();
@@ -87,12 +121,29 @@ signals:
     void endPointChanged();
     void startBoxChanged();
     void endBoxChanged();
+    void geometryChanged();
+    void colorChanged();
+    void lineStyleChanged();
+    void constraintChanged();
+    void normalizedRectChanged();
+    void orientationChanged();
+
+private slots:
+    void setNormalizedRect(QRectF rect);
+
+private:
+    void computeNormalizedRect();
 
 private:
     Direction m_dir= StartToEnd;
     QPointer<PositionedItem> m_start;
     QPointer<PositionedItem> m_end;
     float m_stiffness= 400.0f;
+    bool m_color= true;
+    Qt::PenStyle m_lineStyle= Qt::SolidLine;
+    bool m_constraint= true;
+    QRectF m_normalizedRect;
+    Orientation m_orient;
 };
 
-#endif // LINK_H
+#endif // LINKCONTROLLER_H

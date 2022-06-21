@@ -24,7 +24,7 @@
 #include <QSizeF>
 #include <vector>
 
-#include "link.h"
+#include "linkcontroller.h"
 #include "minditem.h"
 
 class PositionedItem : public MindItem
@@ -37,7 +37,9 @@ class PositionedItem : public MindItem
     Q_PROPERTY(bool isDragged READ isDragged WRITE setDragged NOTIFY isDraggedChanged)
     Q_PROPERTY(bool open READ open WRITE setOpen NOTIFY openChanged)
     Q_PROPERTY(bool hasLink READ hasLink NOTIFY hasLinkChanged)
+    Q_PROPERTY(bool locked READ isLocked WRITE setLocked NOTIFY lockedChanged)
     Q_PROPERTY(int mass READ mass WRITE setMass NOTIFY massChanged)
+
 public:
     explicit PositionedItem(Type type, QObject* parent= nullptr);
 
@@ -53,17 +55,20 @@ public:
     bool open() const;
 
     // Move
-    void setNextPosition(const QPointF& pos, Link* emiter);
+    void setNextPosition(const QPointF& pos, LinkController* emiter);
     QVector2D getVelocity() const;
     void setVelocity(const QVector2D& velocity);
     QVector2D getAcceleration() const;
     void setAcceleration(const QVector2D& acceleration);
     void applyForce(const QVector2D& force);
-    const std::vector<QPointer<Link>>& subLinks() const;
+    const std::vector<QPointer<LinkController>>& subLinks() const;
     int subNodeCount() const;
 
-    void addLink(Link* link);
-    void removeLink(Link* link);
+    void addLink(LinkController* link);
+    void removeLink(LinkController* link);
+
+    bool isLocked() const;
+    void setLocked(bool newLocked);
 
 public slots:
     void setDragged(bool isdragged);
@@ -87,6 +92,8 @@ signals:
     void hasLinkChanged();
     void openChanged();
 
+    void lockedChanged();
+
 protected:
     void updatePosition();
     void computeContentSize();
@@ -97,11 +104,12 @@ protected:
     qreal m_w= 0.0;
     qreal m_h= 0.0;
     bool m_isDragged= false;
-    std::vector<QPointer<Link>> m_subNodelinks;
+    std::vector<QPointer<LinkController>> m_subNodelinks;
     bool m_open= true;
     QVector2D m_velocity;
     QVector2D m_acceleration;
     int m_mass= 1;
-    std::map<Link*, QPointF> m_nextPositions;
+    std::map<LinkController*, QPointF> m_nextPositions;
+    bool m_locked= false;
 };
 #endif // POSITIONEDITEM_H

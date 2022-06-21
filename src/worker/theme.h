@@ -33,6 +33,10 @@ class Theme : public QObject
     Q_PROPERTY(QString redoIcon READ redoIcon NOTIFY redoIconChanged)
     Q_PROPERTY(QString listIcon READ listIcon NOTIFY listIconChanged)
     Q_PROPERTY(QString editIcon READ editIcon NOTIFY editIconChanged)
+    Q_PROPERTY(QString addGrayArrow READ addGrayArrow NOTIFY grayArrowChanged)
+    Q_PROPERTY(QString saveIcon READ saveIcon NOTIFY saveIconChanged)
+    Q_PROPERTY(QString trashIcon READ trashIcon NOTIFY trashIconChanged)
+    Q_PROPERTY(QString refreshIcon READ refreshIcon NOTIFY refreshIconChanged)
 public:
     explicit Theme(QQmlEngine* m_engine, QObject* parent= nullptr);
     ~Theme();
@@ -43,6 +47,10 @@ public:
     QString redoIcon() const;
     QString listIcon() const;
     QString editIcon() const;
+    QString addGrayArrow() const;
+    QString saveIcon() const;
+    QString trashIcon() const;
+    QString refreshIcon() const;
 
     QString imagePath(const QString& image) const;
 signals:
@@ -51,6 +59,10 @@ signals:
     void redoIconChanged();
     void listIconChanged();
     void editIconChanged();
+    void grayArrowChanged();
+    void saveIconChanged();
+    void trashIconChanged();
+    void refreshIconChanged();
 
 public slots:
     void setNightMode(bool b);

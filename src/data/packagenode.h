@@ -26,9 +26,21 @@
 class PackageNode : public PositionedItem
 {
     Q_OBJECT
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
 
 public:
     explicit PackageNode(QObject* parent= nullptr);
+    const QString& title() const;
+    void setTitle(const QString& newTitle);
+
+public slots:
+    void addChild(PositionedItem* item);
+signals:
+    void titleChanged();
+
+private:
+    QString m_title;
+    QList<PositionedItem*> m_internalChildren;
 };
 
 #endif // PACKAGENODE_H

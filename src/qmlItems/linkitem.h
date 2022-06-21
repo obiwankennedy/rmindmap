@@ -23,13 +23,15 @@
 #include <QList>
 #include <QQuickItem>
 
+#include "data/linkcontroller.h"
+
 typedef QList<QPointF> PointList;
 
 class LinkItem : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+    Q_PROPERTY(LinkController::Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
 
     Q_PROPERTY(QPointF start READ start WRITE setStart NOTIFY startChanged)
     Q_PROPERTY(QPointF end READ end WRITE setEnd NOTIFY endChanged)
@@ -37,18 +39,12 @@ class LinkItem : public QQuickItem
     Q_PROPERTY(QRectF endBox READ endBox WRITE setEndBox NOTIFY endBoxChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(PointList points READ points WRITE setPoints NOTIFY pointsChanged)
+    Q_PROPERTY(LinkController::Orientation orientation READ orientation WRITE setOrientation NOTIFY orientationChanged)
 
 public:
-    enum Direction
-    {
-        StartToEnd,
-        EndToStart,
-        Both
-    };
-    Q_ENUM(Direction)
     LinkItem();
 
-    Direction direction() const;
+    LinkController::Direction direction() const;
     QPointF start() const;
     QPointF end() const;
     PointList points() const;
@@ -56,14 +52,17 @@ public:
     QRectF endBox() const;
     QColor color() const;
 
+    const LinkController::Orientation& orientation() const;
+
 public slots:
-    void setDirection(const Direction& direction);
+    void setDirection(const LinkController::Direction& direction);
     void setStart(const QPointF& start);
     void setPoints(const PointList& list);
     void setEnd(const QPointF& end);
     void setStartBox(QRectF rect);
     void setEndBox(QRectF rect);
     void setColor(QColor color);
+    void setOrientation(const LinkController::Orientation& newOrientation);
 
 signals:
     void directionChanged();
@@ -73,19 +72,24 @@ signals:
     void startBoxChanged();
     void endBoxChanged();
     void colorChanged();
+    void selected(bool b);
+
+    void orientationChanged();
 
 protected:
     QSGNode* updatePaintNode(QSGNode*, UpdatePaintNodeData*) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
 
 private:
     QColor m_color= Qt::black;
-    Direction m_direction= StartToEnd;
+    LinkController::Direction m_direction= LinkController::StartToEnd;
     QPointF m_start;
     QPointF m_end;
     QRectF m_startBox;
     QRectF m_endBox;
     PointList m_points;
     bool m_colorChanged= false;
+    LinkController::Orientation m_orientation= LinkController::RightBottom;
 };
 
 #endif // LINKITEM_H

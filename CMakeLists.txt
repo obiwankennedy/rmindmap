@@ -24,7 +24,7 @@ set(mindmap_header
     src/controller/mindmapcontroller.h
     src/controller/selectioncontroller.h
     src/controller/spacingcontroller.h
-    src/data/link.h
+    src/data/linkcontroller.h
     src/data/mindnode.h
     src/data/nodestyle.h
     src/model/linkmodel.h
@@ -44,7 +44,7 @@ set(mindmap_src
 
     src/controller/selectioncontroller.cpp
     src/controller/spacingcontroller.cpp
-    src/data/link.cpp
+    src/data/linkcontroller.cpp
     src/data/mindnode.cpp
     src/data/nodestyle.cpp
     src/model/linkmodel.cpp

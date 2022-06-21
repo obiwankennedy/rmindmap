@@ -29,6 +29,11 @@ int MindNode::styleIndex() const
     return m_styleIndex;
 }
 
+QString MindNode::description() const
+{
+    return m_description;
+}
+
 void MindNode::setStyleIndex(int idx)
 {
     if(idx == m_styleIndex)
@@ -48,4 +53,39 @@ void MindNode::setImageUri(const QString& uri)
         return;
     m_imageUri= uri;
     emit imageUriChanged();
+}
+
+void MindNode::setDescription(const QString& newDescription)
+{
+    if(m_description == newDescription)
+        return;
+    m_description= newDescription;
+    emit descriptionChanged();
+}
+
+const QStringList& MindNode::tags() const
+{
+    return m_tags;
+}
+
+void MindNode::setTags(const QStringList& newTags)
+{
+    if(m_tags == newTags)
+        return;
+    m_tags= newTags;
+    emit tagsChanged();
+}
+
+const QString MindNode::tagsText() const
+{
+    return m_tags.join(", ");
+}
+
+void MindNode::setTagsText(const QString& newTagsText)
+{
+    auto list= newTagsText.split(",");
+    QStringList trimmed;
+    std::transform(std::begin(list), std::end(list), std::back_inserter(trimmed),
+                   [](const QString& text) { return text.trimmed(); });
+    setTags(trimmed);
 }

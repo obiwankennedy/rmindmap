@@ -19,10 +19,11 @@
  ***************************************************************************/
 #include "minditem.h"
 
+#include <QDebug>
 #include <QRectF>
 #include <QUuid>
 
-#include "data/link.h"
+#include "data/linkcontroller.h"
 
 MindItem::MindItem(Type type, QObject* parent)
     : QObject{parent}, m_type(type), m_id(QUuid::createUuid().toString(QUuid::WithoutBraces))
@@ -37,7 +38,7 @@ void MindItem::setVisible(bool op)
     if(op == m_visible)
         return;
     m_visible= op;
-    emit visibleChanged();
+    emit visibleChanged(m_visible);
 }
 
 QString MindItem::text() const
@@ -47,6 +48,7 @@ QString MindItem::text() const
 
 void MindItem::setText(QString text)
 {
+    // qDebug() << "text" << text << m_text;
     if(m_text == text)
         return;
 

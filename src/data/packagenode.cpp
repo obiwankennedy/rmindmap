@@ -19,4 +19,34 @@
  ***************************************************************************/
 #include "packagenode.h"
 
-PackageNode::PackageNode(QObject* parent) : PositionedItem{MindItem::PackageType, parent} {}
+PackageNode::PackageNode(QObject* parent) : PositionedItem{MindItem::PackageType, parent}
+{
+    connect(this, &PackageNode::positionChanged, this, [this](const QPointF& motion) {
+        std::for_each(std::begin(m_internalChildren), std::end(m_internalChildren), [motion](PositionedItem* item) {
+            if(!item)
+                return;
+            auto pos= item->position();
+            item->setPosition({pos.x() + motion.x(), pos.y() + motion.y()});
+        });
+    });
+}
+
+const QString& PackageNode::title() const
+{
+    return m_title;
+}
+
+void PackageNode::setTitle(const QString& newTitle)
+{
+    if(m_title == newTitle)
+        return;
+    m_title= newTitle;
+    emit titleChanged();
+}
+
+void PackageNode::addChild(PositionedItem* item)
+{
+    if(m_internalChildren.contains(item) || item == this)
+        return;
+    m_internalChildren.append(item);
+}

@@ -24,7 +24,7 @@
 #include <QPointF>
 #include <QVector2D>
 
-class Link;
+class LinkController;
 
 class MindItem : public QObject
 {
@@ -58,7 +58,7 @@ public slots:
 
 signals:
     void idChanged();
-    void visibleChanged();
+    void visibleChanged(bool b);
     void textChanged(QString text);
     void selectedChanged();
 

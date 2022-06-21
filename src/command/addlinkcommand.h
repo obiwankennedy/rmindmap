@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2022 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,33 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ADDITEMCOMMAND_H
-#define ADDITEMCOMMAND_H
+#ifndef ADDLINKCOMMAND_H
+#define ADDLINKCOMMAND_H
 
 #include <QPointer>
 #include <QUndoCommand>
 
-#include "data/minditem.h"
-
-class LinkController;
 class MindItemModel;
-class MindMapController;
-class AddItemCommand : public QUndoCommand
+class AddLinkCommand : public QUndoCommand
 {
 public:
-    AddItemCommand(MindItemModel* nodeModel, MindItem::Type type, MindMapController* ctrl, const QString& idParent= {},
-                   QPointF pos= {});
+    AddLinkCommand(MindItemModel* model, const QString& start, const QString& end);
+
     void undo() override;
     void redo() override;
 
 private:
-    QPointer<MindItem> m_mindItem;
-    QPointer<LinkController> m_link;
-    QPointer<MindMapController> m_ctrl;
-    QPointer<MindItemModel> m_nodeModel;
-    QString m_idParent;
-    MindItem::Type m_type;
-    QPointF m_pos;
+    QPointer<MindItemModel> m_model;
+    QString m_linkId;
+
+    QString m_startId;
+    QString m_endId;
 };
 
-#endif // ADDITEMCOMMAND_H
+#endif // ADDLINKCOMMAND_H
