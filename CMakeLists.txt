@@ -21,42 +21,53 @@ find_package(Qt5 ${QT_REQUIRED_VERSION} CONFIG REQUIRED COMPONENTS Core Svg Quic
 
 set(mindmap_header
     src/command/commandhelper.h
-    src/controller/mindmapcontroller.h
+    #src/controller/mindmapcontroller.h
     src/controller/selectioncontroller.h
     src/controller/spacingcontroller.h
+    src/controller/sidemenucontroller.h
     src/data/linkcontroller.h
+    src/data/positioneditem.h
     src/data/mindnode.h
+    src/data/packagenode.h
+    src/command/addlinkcommand.h
     src/data/nodestyle.h
     src/model/linkmodel.h
+    src/data/minditem.h
     src/geometry/linknode.h
     src/model/nodestylemodel.h
+    src/model/nodeimageprovider.h
     src/qmlItems/linkitem.h
-    src/command/addnodecommand.h
+    src/command/additemcommand.h
     src/worker/fileserializer.h
     src/command/reparentingnodecommand.h
     src/command/dragnodecommand.h
     src/command/removenodecommand.h
-    src/model/boxmodel.h
+    src/model/minditemmodel.h
     src/worker/theme.h)
 
         # main.cpp
 set(mindmap_src
-
+  src/command/addlinkcommand.cpp
     src/controller/selectioncontroller.cpp
     src/controller/spacingcontroller.cpp
+    src/controller/sidemenucontroller.cpp
     src/data/linkcontroller.cpp
     src/data/mindnode.cpp
     src/data/nodestyle.cpp
+    src/data/minditem.cpp
+    src/data/packagenode.cpp
     src/model/linkmodel.cpp
+    src/data/positioneditem.cpp
     src/command/dragnodecommand.cpp
-    src/command/addnodecommand.cpp
+    src/command/additemcommand.cpp
     src/command/removenodecommand.cpp
     src/model/nodestylemodel.cpp
+    src/model/nodeimageprovider.cpp
     src/worker/fileserializer.cpp
     src/command/reparentingnodecommand.cpp
     src/geometry/linknode.cpp
     src/qmlItems/linkitem.cpp
-    src/model/boxmodel.cpp
+    src/model/minditemmodel.cpp
     src/worker/theme.cpp)
 
 set(mindmap_qml
