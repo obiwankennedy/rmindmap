@@ -128,15 +128,15 @@ QHash<int, QByteArray> LinkModel::roleNames() const
     return roles;
 }
 
-Link* LinkModel::addLink(MindNode* p1, MindNode* p2)
+LinkController* LinkModel::addLink(MindNode* p1, MindNode* p2)
 {
     if(nullptr == p1 || nullptr == p2)
         return nullptr;
 
     beginInsertRows(QModelIndex(), static_cast<int>(m_data.size()), static_cast<int>(m_data.size()));
-    auto link= new Link();
+    auto link= new LinkController();
     p2->setParentNode(p1);
-    connect(link, &Link::linkChanged, this, &LinkModel::linkHasChanged);
+    connect(link, &LinkController::geometryChanged, this, &LinkModel::linkHasChanged);
     link->setStart(p1);
     p1->addLink(link);
     link->setEnd(p2);
@@ -145,7 +145,7 @@ Link* LinkModel::addLink(MindNode* p1, MindNode* p2)
     return link;
 }
 
-void LinkModel::append(Link* link)
+void LinkModel::append(LinkController* link)
 {
     if(link == nullptr)
         return;
@@ -153,13 +153,13 @@ void LinkModel::append(Link* link)
     if(p1==nullptr)
         return;
     beginInsertRows(QModelIndex(), static_cast<int>(m_data.size()), static_cast<int>(m_data.size()));
-    connect(link, &Link::linkChanged, this, &LinkModel::linkHasChanged);
+    connect(link, &LinkController::geometryChanged, this, &LinkModel::linkHasChanged);
     m_data.push_back(link);
     p1->addLink(link);
     endInsertRows();
 }
 
-void LinkModel::removeLink(Link* link)
+void LinkModel::removeLink(LinkController* link)
 {
     if(link == nullptr)
         return;
@@ -179,7 +179,7 @@ void LinkModel::removeLink(Link* link)
 
 void LinkModel::linkHasChanged()
 {
-    auto link= qobject_cast<Link*>(sender());
+    auto link= qobject_cast<LinkController*>(sender());
     QModelIndex parent;
     auto it= std::find(m_data.begin(), m_data.end(), link);
     auto offset= std::distance(m_data.begin(), it);
@@ -194,17 +194,17 @@ Qt::ItemFlags LinkModel::flags(const QModelIndex& index) const
     return flags;
 }
 
-std::vector<Link*>& LinkModel::getDataSet()
+std::vector<LinkController*>& LinkModel::getDataSet()
 {
     return m_data;
 }
 void LinkModel::openLinkAndChildren(const QString& id, bool status)
 {
-    std::vector<Link*> connectedLinks;
+    std::vector<LinkController*> connectedLinks;
     std::copy_if(m_data.begin(), m_data.end(), std::back_inserter(connectedLinks),
-                 [id](const Link* link) { return link->start()->id() == id; });
+                 [id](const LinkController* link) { return link->start()->id() == id; });
 
-    std::for_each(connectedLinks.begin(), connectedLinks.end(), [status](Link* link) { link->setVisible(status); });
+    std::for_each(connectedLinks.begin(), connectedLinks.end(), [status](LinkController* link) { link->setVisible(status); });
 }
 
 void LinkModel::clear()

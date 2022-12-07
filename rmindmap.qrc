@@ -15,6 +15,20 @@
         <file>resources/icons/list.svg</file>
         <file>resources/icons/redo.svg</file>
         <file>resources/icons/undo.svg</file>
+        <file>resources/icons/edit.svg</file>
+        <file>resources/icons/addArrow.svg</file>
+        <file>resources/icons/addGrayArrow.svg</file>
+        <file>resources/icons/save.svg</file>
+        <file>resources/icons/+dark/addGrayArrow.svg</file>
+        <file>resources/icons/+dark/save.svg</file>
+        <file>resources/icons/+dark/trash.svg</file>
+        <file>resources/icons/trash.svg</file>
+        <file>resources/icons/+light/addGrayArrow.svg</file>
+        <file>resources/icons/+light/save.svg</file>
+        <file>resources/icons/+light/trash.svg</file>
+        <file>resources/icons/+dark/edit.svg</file>
+        <file>resources/icons/refresh.svg</file>
+        <file>resources/icons/+dark/refresh.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>resources/qml/main.qml</file>
@@ -23,5 +37,9 @@
         <file>resources/qml/MindMap.qml</file>
         <file>resources/qml/MindMenu.qml</file>
         <file>resources/qml/IconButton.qml</file>
+        <file>resources/qml/ButtonGrid.qml</file>
+        <file>resources/qml/NodeSettingPopup.qml</file>
+        <file>resources/qml/SideMenu.qml</file>
+        <file>resources/qml/PackageItem.qml</file>
     </qresource>
 </RCC>

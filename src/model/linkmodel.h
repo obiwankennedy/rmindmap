@@ -22,7 +22,8 @@
 
 #include <QAbstractItemModel>
 
-#include "data/link.h"
+#include "data/linkcontroller.h"
+#include "data/mindnode.h"
 
 class LinkModel : public QAbstractItemModel
 {
@@ -55,20 +56,20 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
-    std::vector<Link*>& getDataSet();
+    std::vector<LinkController*>& getDataSet();
 
-    Link* addLink(MindNode* p1, MindNode* p2);
+    LinkController* addLink(MindNode* p1, MindNode* p2);
     void openLinkAndChildren(const QString& id, bool status);
 
     void clear();
 
-    void append(Link* link);
-    void removeLink(Link* link);
+    void append(LinkController* link);
+    void removeLink(LinkController* link);
 public slots:
     void linkHasChanged();
 
 private:
-    std::vector<Link*> m_data;
+    std::vector<LinkController*> m_data;
 };
 
 #endif // LINKMODEL_H

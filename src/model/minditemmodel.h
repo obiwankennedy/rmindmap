@@ -17,74 +17,79 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef BOXMODEL_H
-#define BOXMODEL_H
+#ifndef MINDITEMMODEL_H
+#define MINDITEMMODEL_H
 
 #include <QAbstractListModel>
+#include <QPointer>
 
+#include "data/minditem.h"
 #include "data/mindnode.h"
-#include "model/linkmodel.h"
+#include "data/packagenode.h"
 
-class BoxModel : public QAbstractItemModel
+class ImageModel;
+
+class MindItemModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel* linkModel READ linkModel WRITE setLinkModel NOTIFY linkModelChanged)
-    Q_PROPERTY(int defaultStyleIndex READ defaultStyleIndex WRITE setDefaultStyleIndex NOTIFY defaultStyleIndexChanged)
+    Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY contentRectChanged)
 public:
-    enum Roles : int
+    enum Roles
     {
         // Curves
         Label= Qt::UserRole + 1,
-        Color,
-        ContentWidth,
-        ContentHeight,
-        Position,
-        Node,
-        Posx,
-        Posy
+        Visible,
+        Selected,
+        Type,
+        Uuid,
+        Object,
+        HasPicture
     };
-    explicit BoxModel(QObject* parent= nullptr);
-    ~BoxModel() override;
+    Q_ENUM(Roles)
+    explicit MindItemModel(ImageModel* imgModel, QObject* parent= nullptr);
+    ~MindItemModel() override;
 
     // Basic functionality:
     int rowCount(const QModelIndex& parent= QModelIndex()) const override;
-    int columnCount(const QModelIndex& parent= QModelIndex()) const override;
-    QModelIndex parent(const QModelIndex& index) const override;
     QVariant data(const QModelIndex& index, int role= Qt::DisplayRole) const override;
 
     // Editable:
     bool setData(const QModelIndex& index, const QVariant& value, int role= Qt::EditRole) override;
-    QModelIndex index(int row, int column, const QModelIndex& parent) const override;
 
     QHash<int, QByteArray> roleNames() const override;
-    QAbstractItemModel* linkModel() const;
-    void setLinkModel(QAbstractItemModel* linkModel);
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-    std::vector<MindNode*>& nodes();
+    std::vector<MindItem*>& items(MindItem::Type type);
 
     void clear();
-    void appendNode(MindNode* node);
-    MindNode* node(const QString& id) const;
-    int defaultStyleIndex() const;
+    void appendItem(MindItem* node);
+    MindItem* item(const QString& id) const;
 
-signals:
-    void linkModelChanged();
-    void defaultStyleIndexChanged();
+    QRectF contentRect() const;
+
+    std::vector<LinkController*> sublink(const QString& id);
+
+    std::vector<PositionedItem*> positionnedItems() const;
 
 public slots:
     // Add data:
-    std::pair<MindNode*, Link*> addBox(const QString& idparent);
+    std::pair<MindItem*, LinkController*> addItem(const QString& idparent, MindItem::Type type);
 
     // Remove data:
-    bool removeBox(const MindNode* node);
-    void openNode(const QString& id, bool status);
-    void setDefaultStyleIndex(int indx);
+    bool removeItem(const MindItem* node);
+    void openItem(const QString& id, bool status);
+    void setImageUriToNode(const QString& id, const QString& url);
+    void update(const QString& id, int role);
+
+signals:
+    void contentRectChanged();
 
 private:
-    std::vector<MindNode*> m_data;
-    LinkModel* m_linkModel= nullptr;
-    int m_defaultStyleIndex= 0;
+    std::vector<MindItem*> m_links;
+    std::vector<MindItem*> m_packages;
+    std::vector<MindItem*> m_nodes;
+
+    QPointer<ImageModel> m_imgModel;
 };
 
-#endif // BOXMODEL_H
+#endif // MINDITEMMODEL_H

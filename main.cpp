@@ -28,7 +28,11 @@
 
 #include "controller/mindmapcontroller.h"
 #include "controller/selectioncontroller.h"
+#include "controller/sidemenucontroller.h"
+#include "data/minditem.h"
 #include "data/nodestyle.h"
+#include "data/positioneditem.h"
+#include "model/nodeimageprovider.h"
 #include "qmlItems/linkitem.h"
 #include "worker/theme.h"
 
@@ -37,6 +41,7 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setOrganizationName(QStringLiteral("Rolisteam"));
     app.setOrganizationDomain(QStringLiteral("org.rolisteam"));
+    Q_INIT_RESOURCE(rmindmap);
     auto format= QSurfaceFormat::defaultFormat();
     if(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
     {
@@ -50,14 +55,24 @@ int main(int argc, char** argv)
 
     QQuickStyle::setStyle("Universal");
 
-    QQmlApplicationEngine qmlEngine;
+    auto ctrl= new MindMapController();
 
-    qmlEngine.rootContext()->setContextProperty("_engineCtrl", new Theme(&qmlEngine));
+    qmlRegisterSingletonInstance<MindMapController>("RMindMap", 1, 0, "MainController", ctrl);
+
+    qmlRegisterSingletonType<Theme>("RMindMap", 1, 0, "Theme",
+                                    [](QQmlEngine* engine, QJSEngine*) { return new Theme(engine); });
     qmlRegisterType<MindMapController>("RMindMap", 1, 0, "MindMapController");
+    qmlRegisterType<SideMenuController>("RMindMap", 1, 0, "SideMenuController");
     qmlRegisterType<SelectionController>("RMindMap", 1, 0, "SelectionController");
     qmlRegisterType<LinkItem>("RMindMap", 1, 0, "MindLink");
+    qmlRegisterUncreatableType<PositionedItem>("RMindMap", 1, 0, "PositionedItem", "Enum only");
     qmlRegisterType<NodeStyle>("RMindMap", 1, 0, "NodeStyle");
+    qmlRegisterUncreatableType<MindItem>("RMindMap", 1, 0, "MindItem", "Enum only");
     qRegisterMetaType<QAbstractItemModel*>();
+
+    QQmlApplicationEngine qmlEngine;
+    auto provider= new NodeImageProvider(ctrl->imgModel());
+    qmlEngine.addImageProvider("nodes", provider);
 
     qmlEngine.load(QLatin1String("qrc:/resources/qml/main.qml"));
 

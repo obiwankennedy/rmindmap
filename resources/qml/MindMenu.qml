@@ -1,12 +1,14 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.2
+import RMindMap 1.0
 
 Menu {
     id: menu
-    property QtObject ctrl
+    required property real mindMapHeight
+    required property real mindMapWidth
     MenuItem {
         text: qsTr("New")
-        onTriggered: ctrl.resetData()
+        onTriggered: MainController.resetData()
     }
     MenuItem {
         text: qsTr("Open File…")
@@ -16,8 +18,8 @@ Menu {
         text: qsTr("Save")
 
         onTriggered: {
-            if(ctrl.filename)
-                ctrl.saveFile();
+            if(MainController.filename)
+                MainController.saveFile();
             else
                 saveDialog.open()
         }
@@ -31,22 +33,29 @@ Menu {
     MenuItem {
         text: qsTr("Remove Selection")
         onTriggered: {
-            ctrl.removeSelection();
+            MainController.removeSelection();
         }
     }
     MenuSeparator { }
     MenuItem {
         text: qsTr("Undo")
-        enabled: ctrl.canUndo
+        enabled: MainController.canUndo
         onTriggered: {
-            ctrl.undo()
+            MainController.undo()
         }
     }
     MenuItem {
         text: qsTr("Redo")
-        enabled: ctrl.canRedo
+        enabled: MainController.canRedo
         onTriggered: {
-            ctrl.redo()
+            MainController.redo()
+        }
+    }
+    MenuSeparator { }
+    MenuItem {
+        text: qsTr("Center")
+        onTriggered: {
+            MainController.centerItems(menu.mindMapWidth, menu.mindMapHeight)
         }
     }
     MenuSeparator { }
@@ -60,7 +69,7 @@ Menu {
     MenuItem {
         text: qsTr("Automatic Spacing")
         checkable: true
-        checked: ctrl.spacing
-        onTriggered: ctrl.spacing = checked
+        checked: MainController.spacing
+        onTriggered: MainController.spacing = checked
     }
 }

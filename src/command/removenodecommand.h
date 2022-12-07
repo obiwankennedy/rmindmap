@@ -23,22 +23,21 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-class MindNode;
-class Link;
-class BoxModel;
-class LinkModel;
+class PositionedItem;
+class MindItem;
+class LinkController;
+class MindItemModel;
 class RemoveNodeCommand : public QUndoCommand
 {
 public:
-    RemoveNodeCommand(const std::vector<MindNode*>& selection, BoxModel* nodeModel, LinkModel* linkModel);
+    RemoveNodeCommand(const std::vector<MindItem*>& selection, MindItemModel* nodeModel);
     void undo() override;
     void redo() override;
 
 private:
-    std::vector<QPointer<MindNode>> m_selection;
-    std::vector<QPointer<Link>> m_links;
-    BoxModel* m_nodeModel= nullptr;
-    LinkModel* m_linkModel= nullptr;
+    std::vector<QPointer<MindItem>> m_selection;
+    std::vector<QPointer<LinkController>> m_links;
+    QPointer<MindItemModel> m_nodeModel= nullptr;
 };
 
 #endif // REMOVENODECOMMAND_H

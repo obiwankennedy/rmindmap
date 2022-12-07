@@ -1,21 +1,28 @@
 HEADERS += \
+    src/command/additemcommand.h \
+    src/command/addlinkcommand.h \
     src/command/commandhelper.h \
     src/controller/mindmapcontroller.h \
     src/controller/selectioncontroller.h \
+    src/controller/sidemenucontroller.h \
     src/controller/spacingcontroller.h \
-    src/data/link.h \
+    src/data/linkcontroller.h \
+    src/data/minditem.h \
     src/data/mindnode.h \
     src/data/nodestyle.h \
-    src/model/linkmodel.h \
+    src/data/packagenode.h \
+    #src/model/linkmodel.h \
+    src/data/positioneditem.h \
     src/geometry/linknode.h \
+    src/model/minditemmodel.h \
+    src/model/nodeimageprovider.h \
     src/model/nodestylemodel.h \
     src/qmlItems/linkitem.h \
-    src/command/addnodecommand.h \
     src/worker/fileserializer.h \
     src/command/reparentingnodecommand.h \
     src/command/dragnodecommand.h  \
     src/command/removenodecommand.h \
-    src/model/boxmodel.h \ \
+    \ \
     src/worker/theme.h
 
 
@@ -23,23 +30,29 @@ HEADERS += \
 INCLUDEPATH += src
 
 SOURCES += \
+    src/command/additemcommand.cpp \
+    src/command/addlinkcommand.cpp \
     src/controller/mindmapcontroller.cpp \
     src/controller/selectioncontroller.cpp \
+    src/controller/sidemenucontroller.cpp \
     src/controller/spacingcontroller.cpp \
-    src/data/link.cpp \
+    src/data/linkcontroller.cpp \
+    src/data/minditem.cpp \
     src/data/mindnode.cpp \
     src/data/nodestyle.cpp \
-    src/model/linkmodel.cpp \
+    src/data/packagenode.cpp \
+    #src/model/linkmodel.cpp \
     src/command/dragnodecommand.cpp  \
-    src/command/addnodecommand.cpp  \
     src/command/removenodecommand.cpp \
+    src/data/positioneditem.cpp \
+    src/model/minditemmodel.cpp \
+    src/model/nodeimageprovider.cpp \
     src/model/nodestylemodel.cpp \
     src/worker/fileserializer.cpp \
     src/command/reparentingnodecommand.cpp  \
     main.cpp \
     src/geometry/linknode.cpp \
     src/qmlItems/linkitem.cpp \
-    src/model/boxmodel.cpp \
     src/worker/theme.cpp
 
 
@@ -53,6 +66,7 @@ RESOURCES += \
 
 DISTFILES += \
     resources/icons/shape.png \
+    resources/qml/ButtonGrid.qml \
     resources/qml/IconButton.qml \
     resources/qml/Link.qml \
     resources/qml/MindMap.qml \

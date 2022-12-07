@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
-
+import QtQuick.Controls.Universal 2.12
 
 Pane
 {
@@ -18,16 +18,18 @@ Pane
     property QtObject nodeStyle
     property string ident: object.id
     property bool dropOver: false
+    property alias buttonColor: control.foreground
 
     //Signals
     signal clicked(var mouse)
     signal selectStyle()
     signal reparenting(var id)
+    signal dropImage(var paths)
     signal addChild()
 
 
-    onWidthChanged: object.contentWidth = width
-    onHeightChanged: object.contentHeight = height
+    onWidthChanged: object.width = width
+    onHeightChanged: object.height = height
     onXChanged: {
         if(mouse.drag.active)
             object.position=Qt.point(x, y)
@@ -42,15 +44,15 @@ Pane
     Drag.keys: [ "rmindmap/reparenting","text/plain" ]
     Drag.supportedActions: Qt.MoveAction
     Drag.mimeData: {
-        "text/plain": node.id
+        "text/plain": root.object.id
     }
 
 
     Connections {
         target: object
-        onPositionChanged: {
-            x=object.position.x
-            y=object.position.y
+        function onPositionChanged(position) {
+            x=position.x
+            y=position.y
         }
     }
 
@@ -58,13 +60,21 @@ Pane
         Image {
             id: img
             visible: source
+            //source: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTEzkD2vu5XtWwvH_LjybftQPmxVjdCrIMbjQ&usqp=CAU"
+            fillMode: Image.PreserveAspectFit
+            sourceSize.height: 200
+            sourceSize.width: 200
+
         }
         TextInput{
             id: text
             enabled: root.isEditable
             color: root.nodeStyle.textColor
+            Layout.alignment: Qt.AlignHCenter
             onEnabledChanged: focus = enabled
-            onEditingFinished: root.isEditable = false
+            onEditingFinished:{ root.isEditable = false
+                root.object.text = text.text
+            }
         }
     }
 
@@ -111,21 +121,29 @@ Pane
             visible: object.hasLink
             width: root.expandButtonSize
             height: root.expandButtonSize
-            anchors.top: parent.bottom
+            anchors.verticalCenter: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             topPadding: 0
             padding: 0
-            contentItem: Text {
-                topPadding: 0
-                padding: 0
-                verticalAlignment: Text.AlignTop
-                horizontalAlignment: Text.AlignHCenter
-                text: control.checked ? qsTr("-") : qsTr("+")
+            rotation: control.checked ? 180 : 0
+            property color foreground: Universal.foreground
+            onForegroundChanged: canvas.requestPaint()
+            contentItem: Canvas {
+                id: canvas
+                onPaint: {
+                    var color = control.foreground
+                    var ctx = getContext("2d")
+                    ctx.fillStyle = Qt.rgba(color.r,color.g,color.b, 1)
+                    ctx.beginPath();
+                    ctx.moveTo(width/2,0)
+                    ctx.lineTo(0,height)
+                    ctx.lineTo(width,height)
+                    ctx.lineTo(width/2,0)
+                    ctx.closePath()
+                    ctx.fill()
+                }
             }
-            background: Rectangle{
-                border.width: 1
-                border.color: "black"
-                color: "transparent"
+            background: Item {
             }
         }
 
@@ -175,7 +193,15 @@ Pane
             anchors.fill: parent
             keys: [ "rmindmap/reparenting","text/plain" ]
             onDropped: {
-                reparenting(drop.text)
+                console.log("drop:"+ drop.keys)
+                if(drop.hasUrls)
+                {
+                    root.dropImage(drop.urls)
+                }
+                else
+                {
+                    reparenting(drop.text)
+                }
                 root.dropOver = false
             }
             onEntered: {

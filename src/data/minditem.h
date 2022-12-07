@@ -1,5 +1,5 @@
 /***************************************************************************
- *	Copyright (C) 2019 by Renaud Guezennec                                 *
+ *	Copyright (C) 2022 by Renaud Guezennec                               *
  *   http://www.rolisteam.org/contact                                      *
  *                                                                         *
  *   This software is free software; you can redistribute it and/or modify *
@@ -17,72 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef LINK_H
-#define LINK_H
+#ifndef MINDITEM_H
+#define MINDITEM_H
 
 #include <QObject>
 #include <QPointF>
-#include <QPointer>
+#include <QVector2D>
 
-class MindNode;
-class Link : public QObject
+class LinkController;
+
+class MindItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
-    Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
-    Q_PROPERTY(QPointF startPoint READ startPoint NOTIFY startPointChanged)
-    Q_PROPERTY(QPointF endPoint READ endPoint NOTIFY endPointChanged)
+    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
+    Q_PROPERTY(bool selected READ selected WRITE setSelected NOTIFY selectedChanged)
+    Q_PROPERTY(Type type READ type CONSTANT)
 public:
-    enum Direction
+    enum Type
     {
-        StartToEnd,
-        EndToStart,
-        Both
+        NodeType,
+        LinkType,
+        PackageType
     };
-    Q_ENUM(Direction)
-    explicit Link(QObject* parent= nullptr);
+    Q_ENUM(Type);
+    explicit MindItem(Type type, QObject* parent= nullptr);
 
-    Direction direction() const;
-    void setDirection(const Direction& direction);
-
-    MindNode* start() const;
-    void setStart(MindNode* start);
-
-    MindNode* end() const;
-    void setEnd(MindNode* end);
-
-    QPointF endPoint() const;
-    QPointF startPoint() const;
-
-    float getLength() const;
-
-    float getStiffness() const;
-    void setStiffness(float stiffness);
-    void setVisible(bool vi);
-    bool isVisible() const;
     QString text() const;
-
-    void cleanUpLink();
-signals:
-    void linkChanged();
-    void visibleChanged();
-    void directionChanged();
-    void startPointChanged();
-    void endPointChanged();
-    void textChanged();
+    QString id() const;
+    bool isVisible() const;
+    bool selected() const;
+    Type type() const;
 
 public slots:
-    void computePosition();
-    void setText(const QString& text);
+    void setText(QString text);
+    void setVisible(bool op);
+    void setSelected(bool isSelected);
+    void setId(const QString& id);
 
-private:
-    Direction m_dir= StartToEnd;
-    bool m_visible= true;
-    QPointer<MindNode> m_start;
-    QPointer<MindNode> m_end;
+signals:
+    void idChanged();
+    void visibleChanged(bool b);
+    void textChanged(QString text);
+    void selectedChanged();
+
+protected:
+    Type m_type;
+    QString m_id;
     QString m_text;
-    float m_stiffness= 400.0f;
+    bool m_visible= true;
+    bool m_selected= false;
 };
 
-#endif // LINK_H
+#endif // MINDITEM_H

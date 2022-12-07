@@ -17,33 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "addnodecommand.h"
+#ifndef ADDITEMCOMMAND_H
+#define ADDITEMCOMMAND_H
 
-#include "model/boxmodel.h"
-#include "model/linkmodel.h"
+#include <QPointer>
+#include <QUndoCommand>
 
-AddNodeCommand::AddNodeCommand(BoxModel* nodeModel, LinkModel* linkModel, const QString& idParent)
-    : m_nodeModel(nodeModel), m_linkModel(linkModel), m_idParent(idParent)
+#include "data/minditem.h"
+
+class LinkController;
+class MindItemModel;
+class MindMapController;
+class AddItemCommand : public QUndoCommand
 {
-}
+public:
+    AddItemCommand(MindItemModel* nodeModel, MindItem::Type type, MindMapController* ctrl, const QString& idParent= {},
+                   QPointF pos= {});
+    void undo() override;
+    void redo() override;
 
-void AddNodeCommand::undo()
-{
-    m_nodeModel->removeBox(m_mindNode);
-    m_linkModel->removeLink(m_link);
-}
+private:
+    QPointer<MindItem> m_mindItem;
+    QPointer<LinkController> m_link;
+    QPointer<MindMapController> m_ctrl;
+    QPointer<MindItemModel> m_nodeModel;
+    QString m_idParent;
+    MindItem::Type m_type;
+    QPointF m_pos;
+};
 
-void AddNodeCommand::redo()
-{
-    if(m_mindNode.isNull())
-    {
-        auto pair= m_nodeModel->addBox(m_idParent);
-        m_mindNode= pair.first;
-        m_link= pair.second;
-    }
-    else
-    {
-        m_nodeModel->appendNode(m_mindNode.data());
-        m_linkModel->append(m_link);
-    }
-}
+#endif // ADDITEMCOMMAND_H

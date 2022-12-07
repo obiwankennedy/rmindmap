@@ -21,17 +21,18 @@
 #define SPACINGCONTROLLER_H
 
 #include <QObject>
+#include <QPointer>
 
 class MindNode;
-class LinkModel;
-class Link;
-
+class MindItemModel;
+class LinkController;
+class PositionedItem;
 class SpacingController : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
 public:
-    explicit SpacingController(std::vector<MindNode*>& data, LinkModel* linkModel, QObject* parent= nullptr);
+    explicit SpacingController(MindItemModel* data, QObject* parent= nullptr);
     ~SpacingController();
 
     bool running() const;
@@ -44,14 +45,13 @@ public slots:
     void setRunning(bool run);
 
 private:
-    void applyCoulombsLaw(MindNode* node, std::vector<MindNode*> nodeList);
-    void applyHookesLaw(Link* link);
+    void applyCoulombsLaw(PositionedItem* node, std::vector<PositionedItem*> nodeList);
+    void applyHookesLaw(LinkController* link);
     void attractToCenter();
 
 private:
-    std::vector<MindNode*>& m_data;
-    LinkModel* m_linkModel;
-    bool m_running= true;
+    QPointer<MindItemModel> m_model;
+    bool m_running= false;
 };
 
 #endif // SPACINGCONTROLLER_H

@@ -24,16 +24,17 @@
 LinkItem::LinkItem()
 {
     setFlag(QQuickItem::ItemHasContents, true);
+    setAcceptedMouseButtons(Qt::LeftButton);
     setWidth(280);
     setHeight(280);
 }
 
-LinkItem::Direction LinkItem::direction() const
+LinkController::Direction LinkItem::direction() const
 {
     return m_direction;
 }
 
-void LinkItem::setDirection(const LinkItem::Direction& direction)
+void LinkItem::setDirection(const LinkController::Direction& direction)
 {
     if(direction == m_direction)
         return;
@@ -66,6 +67,7 @@ void LinkItem::setEnd(const QPointF& end)
         return;
     m_end= end;
     emit endChanged();
+    update();
 }
 
 PointList LinkItem::points() const
@@ -116,6 +118,18 @@ void LinkItem::setColor(QColor color)
     m_color= color;
     emit colorChanged();
     m_colorChanged= true;
+    update();
+}
+
+void LinkItem::mousePressEvent(QMouseEvent* event)
+{
+    if(event->button() & Qt::LeftButton)
+    {
+        emit selected(true);
+        event->accept();
+    }
+
+    // QQuickItem::mousePressEvent(event);
 }
 
 QSGNode* LinkItem::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*)
@@ -132,13 +146,34 @@ QSGNode* LinkItem::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeDat
         m_colorChanged= false;
     }
 
-    auto abox= m_startBox;
-    abox.moveTo(-m_startBox.width() / 2, -m_startBox.height() / 2);
-    auto bbox= m_endBox;
-    auto p2= m_end - m_start;
-    auto hw= bbox.width() / 2;
-    auto hh= bbox.height() / 2;
-    bbox.setCoords(p2.x() - hw, p2.y() - hh, p2.x() + hw, p2.y() + hh);
-    link->update(QPointF(0, 0), abox, p2, bbox);
+    // auto abox= m_startBox;
+    // abox.moveTo(-m_startBox.width() / 2, -m_startBox.height() / 2);
+    // auto bbox= m_endBox;
+
+    // QPointF p2;
+
+    // if(m_end.x() > m_start.x() && m_end.y() > m_start.y())
+    // p2= m_end - m_start;
+    // else
+    //    p2= m_start - m_end;
+
+    // auto hw= bbox.width() / 2;
+    // auto hh= bbox.height() / 2;
+    // bbox.setCoords(std::abs(p2.x()) - hw, std::abs(p2.y()) - hh, std::abs(p2.x()) + hw, std::abs(p2.y()) + hh);
+    link->update(QRectF{0, 0, width(), height()}, m_orientation, m_startBox, m_endBox);
     return link;
+}
+
+const LinkController::Orientation& LinkItem::orientation() const
+{
+    return m_orientation;
+}
+
+void LinkItem::setOrientation(const LinkController::Orientation& newOrientation)
+{
+    if(m_orientation == newOrientation)
+        return;
+    m_orientation= newOrientation;
+    emit orientationChanged();
+    update();
 }
