@@ -27,10 +27,9 @@ MindLink {
             focusReason: Qt.MouseFocusReason
             onReadOnlyChanged: focus = root.editable
             onEditingFinished: {
-
-                root.editable = false
-                root.object.text = label.text
-
+              console.log("mindlink: "+label.text)
+              root.editable = false
+              root.textEdited(label.text)
             }
             color: root.color
 
